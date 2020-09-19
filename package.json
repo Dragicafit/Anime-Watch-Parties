@@ -1,0 +1,42 @@
+{
+  "name": "anime-watch-parties",
+  "version": "0.1.0",
+  "description": "Watch your favorite anime with your streamer.",
+  "main": "server.js",
+  "scripts": {
+    "release": "./concat.ps1 && zip -r -FS Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json icons/* js/background-script.js js/listener.js js/script.js js/dependencies/* css/script.css css/dependencies/* popup/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dragicafit/Anime-Watch-Parties.git"
+  },
+  "author": "Dragicafit",
+  "license": "MIT",
+  "dependencies": {
+    "@d-fischer/passport-twitch": "^1.0.5",
+    "connect-redis": "^5.0.0",
+    "dotenv": "8.1.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "express-socket.io-session": "^1.3.5",
+    "handlebars": "^4.7.6",
+    "lodash": "^4.17.13",
+    "passport": "^0.4.1",
+    "passport-oauth": "^1.0.0",
+    "passport-oauth2": "^1.5.0",
+    "passport.socketio": "^3.7.0",
+    "rate-limiter-flexible": "^2.1.10",
+    "redis": "^3.0.2",
+    "request": "^2.88.2",
+    "socket.io": "*",
+    "socket.io-redis": "^5.4.0",
+    "ws": ">=3.3.1"
+  },
+  "bugs": {
+    "url": "https://github.com/Dragicafit/Anime-Watch-Parties/issues"
+  },
+  "homepage": "https://github.com/Dragicafit/Anime-Watch-Parties#readme",
+  "devDependencies": {
+    "jshint": "^2.11.0"
+  }
+}

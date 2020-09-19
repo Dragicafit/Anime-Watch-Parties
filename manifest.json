@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+  "name": "Anime Watch Parties",
+  "description": "Watch your favorite anime with your streamer.",
+  "version": "0.1",
+  "author": "Dragicafit",
+  "icons": {
+    "16": "icons/icon.svg",
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg",
+    "128": "icons/icon.svg"
+  },
+  "homepage_url": "https://github.com/Dragicafit/Anime-Watch-Parties",
+  "permissions": ["*://*.wakanim.tv/*/episode/*", "activeTab", "tabs"],
+  "background": {
+    "scripts": ["js/background-script.js"]
+  },
+  "browser_action": {
+    "default_title": "Anime Watch Parties",
+    "default_popup": "popup/popup.html"
+  },
+  "web_accessible_resources": ["js/script.js", "css/script.css"]
+}

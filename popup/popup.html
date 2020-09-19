@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+
+    <script src="/js/dependencies/jquery.min.js"></script>
+  </head>
+
+  <body>
+    <div>
+      <div id="userFormArea">
+        <h2>Hello <span id="username"></span>!</h2>
+        <form id="userForm">
+          <h2><label for="roomnum">Join a Streamer!</label></h2>
+          <input id="roomnum" placeholder="streamer name" />
+          <br />
+          <input type="submit" value="Refresh" />
+        </form>
+      </div>
+      <div id="roomArea">
+        <h2>Host: <span id="hostName"></span></h2>
+        <div>
+          <h5><span id="online-users"></span> online</h5>
+        </div>
+      </div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

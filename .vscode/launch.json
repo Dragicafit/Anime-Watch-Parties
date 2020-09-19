@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch WebExtension",
+      "type": "firefox",
+      "request": "launch",
+      "reAttach": true,
+      "addonPath": "${workspaceFolder}",
+      "preLaunchTask": "browserify"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch server",
+      "program": "server.js",
+      "skipFiles": ["<node_internals>/**"],
+      "env": { "NODE_DEBUG": "" }
+    }
+  ]
+}

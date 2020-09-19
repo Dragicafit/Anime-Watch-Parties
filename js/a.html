@@ -1,0 +1,43 @@
+<div
+  id="twitchEmbed"
+  style="
+    position: absolute;
+    z-index: 999;
+    left: 1453px;
+    top: 230px;
+    height: 500px;
+    width: 350px;
+    overflow: hidden;
+    display: flex;
+    flex-flow: column;
+  "
+>
+  <div
+    id="moveEmbed"
+    style="
+      text-align: center;
+      padding: 10px;
+      cursor: move;
+      background-color: rgb(145, 71, 255);
+      color: #fff;
+    "
+  >
+    Click here to move
+  </div>
+  <div id="twitchVideoEmbed" style="position: relative; padding-top: 56.25%">
+    <iframe
+      src="https://player.twitch.tv/?channel=sardoche&parent=www.wakanim.tv&muted=false"
+      frameborder="0"
+      allowfullscreen="true"
+      style="position: absolute; top: 0; width: 100%; height: 100%"
+    >
+    </iframe>
+  </div>
+  <iframe
+    id="twitchChatEmbed"
+    src="https://www.twitch.tv/embed/sardoche/chat?parent=www.wakanim.tv&darkpopout"
+    frameborder="0"
+    style="flex-grow: 1"
+  >
+  </iframe>
+</div>
