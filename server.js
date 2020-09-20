@@ -2,13 +2,20 @@
 "use strict";
 
 require("dotenv").config();
+const fs = require("fs");
 
 const app = require("express")();
 const session = require("express-session");
 const passport = require("passport");
 const twitchStrategy = require("@d-fischer/passport-twitch").Strategy;
 const handlebars = require("handlebars");
-const server = require("http").createServer(app);
+const server = require("https").createServer(
+  {
+    key: fs.readFileSync("key.pem"),
+    cert: fs.readFileSync("cert.pem"),
+  },
+  app
+);
 const io = require("socket.io")(server, {
   perMessageDeflate: false,
 });
@@ -39,6 +46,7 @@ var customsession = session({
   saveUninitialized: false,
   secret: SESSION_SECRET,
   store: new RedisStore({ client: redisClient }),
+  cookie: { secure: true, sameSite: "none" },
 });
 app.use(customsession);
 io.use((socket, next) => {

@@ -4,7 +4,8 @@
   "description": "Watch your favorite anime with your streamer.",
   "main": "server.js",
   "scripts": {
-    "release": "./concat.ps1 && zip -r -FS Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json icons/* js/background-script.js js/listener.js js/script.js js/dependencies/* css/script.css css/dependencies/* popup/*"
+    "release": "./concat.ps1 && zip -r -FS Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json icons/* js/background-script.js js/listener.js js/script.js js/dependencies/* css/script.css css/dependencies/* popup/*",
+    "cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj \"/C=FR/ST=Ile-de-France/L=Paris/O=Dragicafit/OU=Org/CN=localhost\" -sha256"
   },
   "repository": {
     "type": "git",
