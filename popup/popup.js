@@ -43,13 +43,13 @@ function chat() {
         return;
       }
       $roomnum.val("");
-      browser.tabs.sendMessage(tab, {
+      chrome.tabs.sendMessage(tab, {
         command: "joinRoom",
         roomnum: roomnum,
       });
     });
 
-    browser.runtime.onMessage.addListener((message) => {
+    chrome.runtime.onMessage.addListener((message) => {
       if (message?.command === "sendInfo") {
         console.log("get info");
 
@@ -69,7 +69,7 @@ function chat() {
       }
     });
     console.log("ask info");
-    browser.tabs.sendMessage(tab, {
+    chrome.tabs.sendMessage(tab, {
       command: "askInfo",
     });
   });
@@ -82,37 +82,34 @@ function reportError(error) {
 let listener = (message) => {
   if (message.command === "sciptLoaded") {
     console.log("scipt loaded");
-    browser.runtime.onMessage.removeListener(listener);
+    chrome.runtime.onMessage.removeListener(listener);
     chat();
   }
 };
-browser.runtime.onMessage.addListener(listener);
+chrome.runtime.onMessage.addListener(listener);
 
-browser.tabs
-  .query({
+chrome.tabs.query(
+  {
     currentWindow: true,
     active: true,
     url: "*://*.wakanim.tv/*",
-  })
-  .then((tabs) => {
+  },
+  (tabs) => {
     if (tabs.length) {
       injectScript(tabs[0]);
     } else {
-      browser.tabs
-        .create({ url: "https://www.wakanim.tv/" })
-        .then(injectScript);
+      chrome.tabs.create({ url: "https://www.wakanim.tv/" }, injectScript);
     }
-  });
+  }
+);
 
 function injectScript(tabId) {
   tab = tabId.id;
-  browser.tabs
-    .executeScript(tab, {
-      runAt: "document_end",
-      file: "/js/listener.js",
-    })
-    .catch(reportError);
-  browser.runtime.sendMessage({
+  chrome.tabs.executeScript(tab, {
+    runAt: "document_end",
+    file: "/js/listener.js",
+  });
+  chrome.runtime.sendMessage({
     command: "createVideoClient",
     tab: tab,
   });

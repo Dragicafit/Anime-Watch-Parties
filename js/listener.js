@@ -1,14 +1,14 @@
 (function () {
   if (window.hasRun) {
     console.log("already running");
-    browser.runtime.sendMessage({
+    chrome.runtime.sendMessage({
       command: "sciptLoaded",
     });
     return;
   }
   window.hasRun = true;
 
-  browser.runtime.onMessage.addListener((message) => {
+  chrome.runtime.onMessage.addListener((message) => {
     message.direction = "from-content-AWP";
     window.postMessage(message, "https://www.wakanim.tv");
   });
@@ -20,13 +20,13 @@
       event.data.direction !== "from-script-AWP"
     )
       return;
-    browser.runtime.sendMessage(event.data);
+    chrome.runtime.sendMessage(event.data);
   });
 
   let s = document.createElement("script");
-  s.src = browser.runtime.getURL("/js/script.js");
+  s.src = chrome.runtime.getURL("/js/script.js");
   s.onload = function () {
-    browser.runtime.sendMessage({
+    chrome.runtime.sendMessage({
       command: "sciptLoaded",
     });
   };
@@ -35,6 +35,6 @@
   let css = document.createElement("link");
   css.rel = "stylesheet";
   css.type = "text/css";
-  css.href = browser.runtime.getURL("/css/script.css");
+  css.href = chrome.runtime.getURL("/css/script.css");
   (document.head || document.documentElement).appendChild(css);
 })();

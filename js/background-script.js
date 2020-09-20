@@ -1,13 +1,13 @@
 let roomsTabs = {};
 
-browser.runtime.onMessage.addListener((message, sender) => {
+chrome.runtime.onMessage.addListener((message, sender) => {
   if (message.command === "changeVideoClient") {
     let tabId = sender.tab.id;
     console.log("change video client");
 
     if (roomsTabs[tabId] == null) return;
 
-    browser.tabs.update(tabId, {
+    chrome.tabs.update(tabId, {
       active: true,
       url: `https://www.wakanim.tv/${message.location}/v2/catalogue/episode/${message.videoId}`,
     });
@@ -25,25 +25,23 @@ browser.runtime.onMessage.addListener((message, sender) => {
 
 function joinRoom(tabId) {
   console.log("joinRoom");
-  browser.tabs
-    .sendMessage(tabId, {
-      command: "joinRoom",
-      roomnum: roomsTabs[tabId],
-    })
-    .catch(reportError);
+  chrome.tabs.sendMessage(tabId, {
+    command: "joinRoom",
+    roomnum: roomsTabs[tabId],
+  });
 }
 
 function insertScript(tabId) {
   let listener = (message) => {
     if (message.command !== "sciptLoaded") return;
     console.log("scipt loaded");
-    browser.runtime.onMessage.removeListener(listener);
+    chrome.runtime.onMessage.removeListener(listener);
     joinRoom(tabId);
   };
-  browser.runtime.onMessage.addListener(listener);
+  chrome.runtime.onMessage.addListener(listener);
 
   console.log("executeScript");
-  browser.tabs
+  chrome.tabs
     .executeScript(tabId, {
       runAt: "document_end",
       file: "/js/listener.js",
@@ -51,7 +49,7 @@ function insertScript(tabId) {
     .catch(reportError);
 }
 
-browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if (changeInfo.status !== "complete") return;
   if (roomsTabs[tabId] == null) return;
   console.log("updated");

@@ -4,7 +4,7 @@
   "description": "Watch your favorite anime with your streamer.",
   "main": "server.js",
   "scripts": {
-    "release": "./concat.ps1 && zip -r -FS Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json icons/* js/background-script.js js/listener.js js/script.js js/dependencies/* css/script.css css/dependencies/* popup/*"
+    "release": "./concat.ps1 && crx3 -p Release/Chrome/Anime-Watch-Parties.pem -o Release/Chrome/Anime-Watch-Parties.crx LICENSE manifest.json icons/* js/background-script.js js/listener.js js/script.js js/dependencies/* css/script.css css/dependencies/* popup/*"
   },
   "repository": {
     "type": "git",
@@ -15,6 +15,7 @@
   "dependencies": {
     "@d-fischer/passport-twitch": "^1.0.5",
     "connect-redis": "^5.0.0",
+    "crx3": "^1.1.2",
     "dotenv": "8.1.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
