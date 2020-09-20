@@ -3,6 +3,7 @@ node_modules/
 script.js
 script.css
 package-lock.json
+*.pem
 
 # Ignore VScode
 
