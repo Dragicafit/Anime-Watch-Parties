@@ -1,8 +1,8 @@
 let roomsTabs = {};
 
 browser.runtime.onMessage.addListener((message, sender) => {
+  let tabId = sender.tab?.id;
   if (message.command === "changeVideoClient") {
-    let tabId = sender.tab.id;
     console.log("change video client");
 
     if (roomsTabs[tabId] == null) return;
@@ -27,7 +27,6 @@ browser.runtime.onMessage.addListener((message, sender) => {
 
     roomsTabs[message.tab] = 0;
   } else if (message.command === "sendInfo") {
-    let tabId = sender.tab.id;
     console.log("get info");
 
     if (message.roomnum) roomsTabs[tabId] = message.roomnum;
