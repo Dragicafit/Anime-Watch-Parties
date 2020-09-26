@@ -15,8 +15,7 @@ socket.on("changeStateClient", (data) => {
 
     player.setState(data.state);
 
-    if (clientTime < data.time - 0.2 || clientTime > data.time + 0.2)
-      player.seekTo(data.time);
+    if (Math.abs(clientTime - data.time) > 0.2) player.seekTo(data.time);
   }, delay);
 });
 
