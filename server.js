@@ -86,18 +86,25 @@ passport.use(
 
 io.on("connection", (socket) => {
   connections++;
-  console.log(`Connected: ${connections} sockets connected`);
+  function debug() {
+    console.log(`${socket.id} connected:`, ...arguments);
+  }
+  debug(`${connections} sockets connected`);
 
   socket.on("disconnect", () => {
     connections--;
-    console.log(`${socket.id} disconnected: ${connections} sockets connected`);
+    function debug() {
+      console.log(`${socket.id} disconnected:`, ...arguments);
+    }
+    debug(`${connections} sockets connected`);
 
     if (socket.roomnum == null) return;
     let room = io.sockets.adapter.rooms[`room-${socket.roomnum}`];
-    if (room == null) return;
+    if (room == null) return debug("room is null (error server)");
     if (socket.id === room.host) {
       room.host = undefined;
     }
+    debug(`applied to room-${socket.roomnum}`);
 
     let session = socket.request.session;
     let username = session?.passport?.user?.display_name;
@@ -105,22 +112,28 @@ io.on("connection", (socket) => {
       const index = room.users.indexOf(username);
       if (index > -1) {
         room.users.splice(index, 1);
-        updateRoomUsers();
+        updateRoomUsers(debug);
       }
     }
   });
 
   socket.on("joinRoom", (data, callback) => {
-    console.log(`${socket.id} Join room`);
-    if (data == null || typeof callback !== "function")
-      return callback("wrong input");
+    function debug() {
+      console.log(`${socket.id} join room:`, ...arguments);
+    }
+    debug(data);
+    if (data == null) return debug("data is null") || callback("wrong input");
+    if (typeof callback !== "function")
+      return debug("callback is not a function") || callback("wrong input");
     if (typeof data.roomnum !== "string" || !regexRoom.test(data.roomnum))
-      return callback("wrong roomnum");
-    console.log(`${socket.id} Join room ${data.roomnum}`);
+      return (
+        debug("data.roomnum is not a valid string") || callback("wrong roomnum")
+      );
 
     let session = socket.request.session;
     let username = session?.passport?.user?.display_name;
-    if (username == null) return callback("not connected");
+    if (username == null)
+      return debug("socket is not connected") || callback("not connected");
 
     let newRoomnum = data.roomnum.toLowerCase();
     if (socket.roomnum === newRoomnum) {
@@ -129,33 +142,32 @@ io.on("connection", (socket) => {
     if (socket.roomnum != null) {
       let room = io.sockets.adapter.rooms[`room-${socket.roomnum}`];
       if (room == null) {
-        console.error("room null");
-        return callback("error server");
+        return debug("room is null (error server)") || callback("error server");
       }
       socket.leave(`room-${socket.roomnum}`);
       const index = room.users.indexOf(username);
       if (index > -1) {
         room.users.splice(index, 1);
-        updateRoomUsers(false);
+        updateRoomUsers(debug);
       }
     }
 
     let init = io.sockets.adapter.rooms[`room-${newRoomnum}`] == null;
     socket.join(`room-${newRoomnum}`, (err) => {
       if (err) {
-        console.error("join fail");
-        return callback("error server");
+        return (
+          debug("join failed (error server): ", err) || callback("error server")
+        );
       }
       configure(init);
     });
 
     function configure(init) {
-      console.log(`${socket.id} connected to room-${newRoomnum}`);
+      debug(`connected to room-${newRoomnum}`);
 
       let room = io.sockets.adapter.rooms[`room-${newRoomnum}`];
       if (room == null) {
-        console.error("room null");
-        return callback("error server");
+        return debug("room is null (error server)") || callback("error server");
       }
       if (init) {
         room.currVideo = null;
@@ -168,7 +180,7 @@ io.on("connection", (socket) => {
         room.lastChange = performance.now();
       }
       if (username.toLowerCase() === newRoomnum) {
-        console.log("I am the host");
+        debug("socket is host");
 
         if (room.host != null) socket.broadcast.to(room.host).emit("unSetHost");
         room.host = socket.id;
@@ -185,7 +197,7 @@ io.on("connection", (socket) => {
         }, 1000);
       }
       socket.roomnum = newRoomnum;
-      updateRoomUsers();
+      updateRoomUsers(debug);
 
       callback(null, {
         roomnum: socket.roomnum,
@@ -197,19 +209,20 @@ io.on("connection", (socket) => {
   });
 
   socket.on("changeStateServer", (data) => {
-    console.log(`${socket.id} change state server`);
-    if (data == null) return;
-    if (typeof data.state !== "boolean") return;
-    if (!Number.isFinite(data.time)) return;
+    function debug() {
+      console.log(`${socket.id} change state server:`, ...arguments);
+    }
+    debug(data);
+    if (data == null) return debug("data is null");
+    if (typeof data.state !== "boolean")
+      return debug("data.state is not boolean");
+    if (!Number.isFinite(data.time)) return debug("data.time is not int");
 
-    if (socket.roomnum == null) return;
+    if (socket.roomnum == null) return debug("socket is not connected to room");
     let room = io.sockets.adapter.rooms[`room-${socket.roomnum}`];
-    if (room == null) return;
-    if (socket.id !== room.host) return;
-
-    console.log(
-      `${socket.id} change state server room-${socket.roomnum} ${data.state} ${data.time}`
-    );
+    if (room == null) return debug("room is null (error server)");
+    if (socket.id !== room.host) return debug("socket is not host");
+    debug(`applied to room-${socket.roomnum}`);
 
     room.currTime = data.time;
     room.state = data.state;
@@ -221,22 +234,23 @@ io.on("connection", (socket) => {
   });
 
   socket.on("changeVideoServer", (data) => {
-    console.log(`${socket.id} change video server`);
-    if (data == null) return;
+    function debug() {
+      console.log(`${socket.id} change video server:`, ...arguments);
+    }
+    debug(data);
+    if (data == null) return debug("data is null");
     if (typeof data.videoId !== "string" || !regexVideoId.test(data.videoId))
-      return;
-    if (typeof data.site !== "string" || !regexSite.test(data.site)) return;
+      return debug("data.videoId is not a valid string");
+    if (typeof data.site !== "string" || !regexSite.test(data.site))
+      return debug("data.site is not a valid string");
     if (typeof data.location !== "string" || !regexLocation.test(data.location))
-      return;
+      return debug("data.location is not a valid string");
 
-    if (socket.roomnum == null) return;
+    if (socket.roomnum == null) return debug("socket is not connected to room");
     let room = io.sockets.adapter.rooms[`room-${socket.roomnum}`];
-    if (room == null) return;
-    if (socket.id !== room.host) return;
-
-    console.log(
-      `${socket.id} change video server room-${socket.roomnum} ${data.videoId} ${data.site} ${data.location}`
-    );
+    if (room == null) return debug("room is null (error server)");
+    if (socket.id !== room.host) return debug("socket is not host");
+    debug(`applied to room-${socket.roomnum}`);
 
     room.currVideo = data.videoId;
     room.site = data.site;
@@ -251,12 +265,14 @@ io.on("connection", (socket) => {
   socket.on("syncClient", syncClient);
 
   function syncClient() {
-    console.log(`${socket.id} sync client`);
-    if (socket.roomnum == null) return;
+    function debug() {
+      console.log(`${socket.id} sync client:`, ...arguments);
+    }
+    debug();
+    if (socket.roomnum == null) return debug("socket is not connected to room");
     let room = io.sockets.adapter.rooms[`room-${socket.roomnum}`];
-    if (room == null) return;
-
-    console.log(`${socket.id} sync client room-${socket.roomnum}`);
+    if (room == null) return debug("room is null (error server)");
+    debug(`applied to room-${socket.roomnum}`);
 
     if (
       room.currTime != null &&
@@ -281,10 +297,11 @@ io.on("connection", (socket) => {
     }
   }
 
-  function updateRoomUsers() {
-    if (socket.roomnum == null) return;
+  function updateRoomUsers(debug) {
+    if (socket.roomnum == null) return debug("socket is not connected to room");
     let room = io.sockets.adapter.rooms[`room-${socket.roomnum}`];
-    if (room == null) return;
+    if (room == null) return debug("room is null (error server)");
+    debug(`applied to room-${socket.roomnum}`);
 
     io.sockets.to(`room-${socket.roomnum}`).emit("getUsers", {
       onlineUsers: room.users.length,
