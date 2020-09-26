@@ -6,17 +6,17 @@ function changeState(currTime, state) {
 }
 
 socket.on("changeStateClient", (data) => {
-  setTimeout(() => {
-    let clientTime = getTime();
+  setTimeout(async () => {
+    let clientTime = await player.getTime();
 
     console.log(`current time is: ${clientTime}`);
     console.log(`current time server is: ${data.time}`);
     console.log(`current state server is: ${data.state}`);
 
-    setState(data.state);
+    player.setState(data.state);
 
     if (clientTime < data.time - 0.2 || clientTime > data.time + 0.2)
-      seekTo(data.time);
+      player.seekTo(data.time);
   }, delay);
 });
 

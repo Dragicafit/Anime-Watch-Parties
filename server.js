@@ -34,6 +34,9 @@ const CALLBACK_URL = process.env.CALLBACK_URL;
 
 let connections = 0;
 let regexRoom = /^\w{1,30}$/;
+let regexVideoId = /^[\w\/-]{1,30}$/;
+let regexSite = /^(wakanim|crunchyroll)$/;
+let regexLocation = /^[a-zA-Z]{2}$/;
 
 process.title = "AnimeWatchParties";
 
@@ -156,6 +159,8 @@ io.on("connection", (socket) => {
       }
       if (init) {
         room.currVideo = null;
+        room.site = null;
+        room.location = null;
         room.users = [username];
         room.hostName = "";
         room.state = false;
@@ -218,7 +223,11 @@ io.on("connection", (socket) => {
   socket.on("changeVideoServer", (data) => {
     console.log(`${socket.id} change video server`);
     if (data == null) return;
-    if (!Number.isSafeInteger(data.videoId)) return;
+    if (typeof data.videoId !== "string" || !regexVideoId.test(data.videoId))
+      return;
+    if (typeof data.site !== "string" || !regexSite.test(data.site)) return;
+    if (typeof data.location !== "string" || !regexLocation.test(data.location))
+      return;
 
     if (socket.roomnum == null) return;
     let room = io.sockets.adapter.rooms[`room-${socket.roomnum}`];
@@ -226,12 +235,16 @@ io.on("connection", (socket) => {
     if (socket.id !== room.host) return;
 
     console.log(
-      `${socket.id} change video server room-${socket.roomnum} ${data.videoId}`
+      `${socket.id} change video server room-${socket.roomnum} ${data.videoId} ${data.site} ${data.location}`
     );
 
     room.currVideo = data.videoId;
+    room.site = data.site;
+    room.location = data.location;
     socket.broadcast.to(`room-${socket.roomnum}`).emit("changeVideoClient", {
       videoId: room.currVideo,
+      site: room.site,
+      location: room.location,
     });
   });
 
@@ -262,6 +275,8 @@ io.on("connection", (socket) => {
       console.log(`${socket.id} change video client`);
       socket.emit("changeVideoClient", {
         videoId: room.currVideo,
+        site: room.site,
+        location: room.location,
       });
     }
   }

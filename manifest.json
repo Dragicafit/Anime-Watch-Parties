@@ -11,7 +11,12 @@
     "128": "icons/icon.svg"
   },
   "homepage_url": "https://github.com/Dragicafit/Anime-Watch-Parties",
-  "permissions": ["*://*.wakanim.tv/*/episode/*", "activeTab", "tabs"],
+  "permissions": [
+    "*://*.wakanim.tv/*/episode/*",
+    "*://www.crunchyroll.com/*/episode-*",
+    "activeTab",
+    "tabs"
+  ],
   "background": {
     "scripts": ["js/background-script.js"]
   },

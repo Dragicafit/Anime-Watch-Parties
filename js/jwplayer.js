@@ -1,48 +1,48 @@
-if (jwplayerExist()) {
-  jwplayer().on("play", (e) => {
-    console.log("jwplayer playing", e);
-    if (!host) {
-      if (e.playReason === "interaction" && e.reason === "playing")
-        socket.emit("syncClient");
-      return;
-    }
-    changeState(getTime(), true);
-  });
+class jwplayerSetup extends playerSetup {
+  _onPlay() {
+    jwplayer().on("play", (e) => {
+      console.log("jwplayer playing", e);
+      if (!host) {
+        if (e.playReason === "interaction" && e.reason === "playing")
+          socket.emit("syncClient");
+        return;
+      }
+      changeState(this.getTime(), true);
+    });
+  }
+  _onPause() {
+    jwplayer().on("pause", (e) => {
+      console.log("jwplayer pausing", e);
+      if (!host) return;
+      changeState(this.getTime(), false);
+    });
+  }
+  _onSeek() {
+    jwplayer().on("seek", (e) => {
+      console.log("jwplayer seeking", e);
+      if (!host) return;
+      changeState(e.offset, this.isPlay());
+    });
+  }
 
-  jwplayer().on("pause", (e) => {
-    console.log("jwplayer pausing", e);
-    if (!host) return;
-    changeState(getTime(), false);
-  });
+  _getTime() {
+    return jwplayer().getPosition();
+  }
 
-  jwplayer().on("seek", (e) => {
-    console.log("jwplayer seeking", e);
-    if (!host) return;
-    changeState(e.offset, isPlay());
-  });
-}
+  _isPlay() {
+    return jwplayer().getState() === "playing";
+  }
 
-function getTime() {
-  if (!jwplayerExist()) return 0;
-  return jwplayer().getPosition();
-}
+  _seekTo(time) {
+    jwplayer().seek(time);
+  }
 
-function isPlay() {
-  if (!jwplayerExist()) return false;
-  return jwplayer().getState() === "playing";
-}
+  _setState(state) {
+    if (state) jwplayer().play();
+    else jwplayer().pause();
+  }
 
-function seekTo(time) {
-  if (!jwplayerExist()) return;
-  jwplayer().seek(time);
-}
-
-function setState(state) {
-  if (!jwplayerExist()) return;
-  if (state) jwplayer().play();
-  else jwplayer().pause();
-}
-
-function jwplayerExist() {
-  return typeof jwplayer === "function";
+  _playerExist() {
+    return typeof jwplayer === "function";
+  }
 }

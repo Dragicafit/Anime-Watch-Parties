@@ -2,11 +2,11 @@ window.addEventListener("message", (event) => {
   if (event.source !== window || event.data?.direction !== "from-content-AWP")
     return;
   if (event.data?.command === "joinRoom") {
-    socket.emit("joinRoom", event.data, (err, data) => {
+    socket.emit("joinRoom", event.data, async (err, data) => {
       if (err) {
         if (err === "not connected") {
           popup(() => {
-            window.postMessage(event.data, "https://www.wakanim.tv");
+            window.postMessage(event.data, window.location.origin);
           });
         }
         return console.log(err);
@@ -19,17 +19,17 @@ window.addEventListener("message", (event) => {
 
       if (host) {
         console.log("You are the new host!");
-        changeVideoParse(roomnum);
-        changeState(getTime(), isPlay());
+        changeVideo();
+        changeState(await player.getTime(), await player.isPlay());
       } else {
         if ($2("#twitchEmbed").length) {
           $2("#twitchVideoEmbed > iframe").attr(
             "src",
-            `https://player.twitch.tv/?channel=${roomnum}&parent=www.wakanim.tv&muted=false`
+            `https://player.twitch.tv/?channel=${roomnum}&parent=${window.location.hostname}&muted=false`
           );
           $2("#twitchChatEmbed").attr(
             "src",
-            `https://www.twitch.tv/embed/${roomnum}/chat?parent=www.wakanim.tv&darkpopout`
+            `https://www.twitch.tv/embed/${roomnum}/chat?parent=${window.location.hostname}&darkpopout`
           );
         } else {
           $2("body").append(`<div id="twitchEmbed">
@@ -37,14 +37,14 @@ window.addEventListener("message", (event) => {
             <div id="twitchVideoChatEmbed">
               <div id="twitchVideoEmbed">
                 <iframe
-                  src="https://player.twitch.tv/?channel=${roomnum}&parent=www.wakanim.tv&muted=false"
+                  src="https://player.twitch.tv/?channel=${roomnum}&parent=${window.location.hostname}&muted=false"
                   frameborder="0"
                   allowfullscreen="true"
                 ></iframe>
               </div>
               <iframe
                 id="twitchChatEmbed"
-                src="https://www.twitch.tv/embed/${roomnum}/chat?parent=www.wakanim.tv&darkpopout"
+                src="https://www.twitch.tv/embed/${roomnum}/chat?parent=${window.location.hostname}&darkpopout"
                 frameborder="0"
               ></iframe>
             </div>

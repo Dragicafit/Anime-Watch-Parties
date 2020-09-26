@@ -10,7 +10,7 @@
 
   browser.runtime.onMessage.addListener((message) => {
     message.direction = "from-content-AWP";
-    window.postMessage(message, "https://www.wakanim.tv");
+    window.postMessage(message, window.location.origin);
   });
 
   window.addEventListener("message", (event) => {

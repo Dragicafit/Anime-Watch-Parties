@@ -7,9 +7,20 @@ browser.runtime.onMessage.addListener((message, sender) => {
 
     if (roomsTabs[tabId] == null) return;
 
+    let url;
+    switch (message.site) {
+      case "wakanim":
+        url = `https://www.wakanim.tv/${message.location}/v2/catalogue/episode/${message.videoId}`;
+        break;
+      case "crunchyroll":
+        url = `https://www.crunchyroll.com/${message.location}/${message.videoId}`;
+        break;
+      default:
+        return;
+    }
     browser.tabs.update(tabId, {
       active: true,
-      url: `https://www.wakanim.tv/${message.location}/v2/catalogue/episode/${message.videoId}`,
+      url: url,
     });
   } else if (message.command === "createVideoClient") {
     console.log("create video client");

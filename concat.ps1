@@ -7,6 +7,12 @@ cat "dependencies/jquery.min.js" >> script.js
 echo "" >> script.js
 cat "dependencies/jquery-ui.min.js" >> script.js
 echo "" >> script.js
+cat "player.js" >> script.js
+echo "" >> script.js
+cat "jwplayer.js" >> script.js
+echo "" >> script.js
+cat "vilosplayer.js" >> script.js
+echo "" >> script.js
 cat "declare.js" >> script.js
 echo "" >> script.js
 cat "sync.js" >> script.js
@@ -14,8 +20,6 @@ echo "" >> script.js
 cat "host.js" >> script.js
 echo "" >> script.js
 cat "events.js" >> script.js
-echo "" >> script.js
-cat "jwplayer.js" >> script.js
 echo "" >> script.js
 cat "transmission.js" >> script.js
 echo "" >> script.js

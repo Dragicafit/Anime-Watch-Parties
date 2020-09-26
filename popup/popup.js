@@ -92,7 +92,7 @@ browser.tabs
   .query({
     currentWindow: true,
     active: true,
-    url: "*://*.wakanim.tv/*",
+    url: ["*://*.wakanim.tv/*", "*://*.crunchyroll.com/*"],
   })
   .then((tabs) => {
     if (tabs.length) {
