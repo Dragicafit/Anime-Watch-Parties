@@ -15,6 +15,8 @@ cat "vilosplayer.js" >> script.js
 echo "" >> script.js
 cat "declare.js" >> script.js
 echo "" >> script.js
+cat "embed.js" >> script.js
+echo "" >> script.js
 cat "sync.js" >> script.js
 echo "" >> script.js
 cat "host.js" >> script.js
