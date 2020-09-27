@@ -1,5 +1,5 @@
 let $2 = $.noConflict(true);
-let server = "https://localhost:4000/";
+let server = "https://localhost:4000";
 let socket = io.connect(server, { secure: true });
 let roomnum = "";
 let username = "";

@@ -65,18 +65,24 @@ function startEmbed() {
 }
 
 window.addEventListener("message", (event) => {
-  if (event.source !== $2("#twitchVideoEmbed>iframe")?.[0]?.contentWindow)
+  if (
+    event.source !== $2("#twitchVideoEmbed>iframe")?.[0]?.contentWindow ||
+    event.origin !== "https://player.twitch.tv" ||
+    event.data?.namespace !== "twitch-embed-player-proxy"
+  )
     return;
-  let stat = event.data?.params?.stats?.videoStats;
-  if (stat?.hlsLatencyBroadcaster != null) {
-    delay = (streamerDelay + stat.hlsLatencyBroadcaster) * 1000;
+  if (event.data.eventName === "UPDATE_STATE") {
+    let stat = event.data.params?.stats?.videoStats;
+    if (stat?.hlsLatencyBroadcaster != null) {
+      delay = (streamerDelay + stat.hlsLatencyBroadcaster) * 1000;
 
-    if (stat.videoResolution === "" || stat.videoResolution === "0x0") return;
-    let resolution = stat.videoResolution.match(/(\d+)x(\d+)/);
-    $2("#twitchVideoEmbed").css(
-      "padding-top",
-      `${(100 * resolution[2]) / resolution[1]}%`
-    );
+      if (stat.videoResolution === "" || stat.videoResolution === "0x0") return;
+      let resolution = stat.videoResolution.match(/(\d+)x(\d+)/);
+      $2("#twitchVideoEmbed").css(
+        "padding-top",
+        `${(100 * resolution[2]) / resolution[1]}%`
+      );
+    }
   }
 });
 
