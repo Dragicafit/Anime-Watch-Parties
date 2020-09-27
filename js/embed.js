@@ -71,10 +71,11 @@ window.addEventListener("message", (event) => {
   if (stat?.hlsLatencyBroadcaster != null) {
     delay = (streamerDelay + stat.hlsLatencyBroadcaster) * 1000;
 
-    let resulution = stat.videoResolution.match(/(\d+)x(\d+)/);
+    if (stat.videoResolution === "" || stat.videoResolution === "0x0") return;
+    let resolution = stat.videoResolution.match(/(\d+)x(\d+)/);
     $2("#twitchVideoEmbed").css(
       "padding-top",
-      `${(100 * resulution[2]) / resulution[1]}%`
+      `${(100 * resolution[2]) / resolution[1]}%`
     );
   }
 });
