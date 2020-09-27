@@ -5,7 +5,7 @@ window.addEventListener("message", (event) => {
     socket.emit("joinRoom", event.data, async (err, data) => {
       if (err) {
         if (err === "not connected") {
-          popup(() => {
+          openPopupTwitch(() => {
             window.postMessage(event.data, window.location.origin);
           });
         }
@@ -50,21 +50,31 @@ function sendInfo() {
   );
 }
 
-function popup(callback) {
-  let popup = window.open(
-    `${server}auth/twitch`,
-    "Twitch",
-    "width=1024,height=600,scrollbars=yes"
-  );
-  if (!popup) return;
-  let interval = setInterval(() => {
-    if (!popup.closed) return;
-    clearInterval(interval);
+function openPopupTwitch(callback) {
+  if (popupTwitch == null || popupTwitch.closed) {
+    popupTwitch = window.open(
+      `${server}auth/twitch`,
+      "Twitch",
+      "width=1024,height=600,scrollbars=yes"
+    );
+  } else {
+    return popupTwitch.focus();
+  }
+  if (popupTwitch == null) return;
 
-    socket.close();
-    setTimeout(() => {
-      socket.connect();
-      callback();
-    }, 1000);
-  }, 500);
+  window.addEventListener("message", (event) => {
+    if (
+      event.source !== popupTwitch ||
+      event.data?.direction !== "from-popupTwitch-AWP"
+    )
+      return;
+    if (event.data?.command === "success") {
+      popupTwitch.close();
+      socket.close();
+      setTimeout(() => {
+        socket.connect();
+        callback();
+      }, 100);
+    }
+  });
 }

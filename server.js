@@ -318,7 +318,22 @@ app.get(
 );
 
 var template = handlebars.compile(`
-<html><head><title>Twitch Auth Sample</title><script>window.close()</script></head>
+<html><head><title>Twitch Auth Sample</title><script>
+  opener.postMessage(
+    {
+      direction: "from-popupTwitch-AWP",
+      command: "success",
+    },
+    "https://www.wakanim.tv"
+  );
+  opener.postMessage(
+    {
+      direction: "from-popupTwitch-AWP",
+      command: "success",
+    },
+    "https://www.crunchyroll.com"
+  );
+  </script></head>
 <table>
     <tr><th>Access Token</th><td>{{accessToken}}</td></tr>
     <tr><th>Refresh Token</th><td>{{refreshToken}}</td></tr>

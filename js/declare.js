@@ -10,6 +10,7 @@ let parseUrlWakanim = /^https:\/\/www\.wakanim\.tv\/(?<location>\w+)\/v2\/\w+\/e
 let parseUrlCrunchyroll = /^https:\/\/www\.crunchyroll\.com\/(?<location>\w+)\/(?<videoId>[\w\/-]+)/;
 let delay = 0;
 let streamerDelay = 0;
+let popupTwitch;
 let player;
 
 switch (window.location.hostname) {
