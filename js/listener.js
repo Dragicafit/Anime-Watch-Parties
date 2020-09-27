@@ -14,11 +14,7 @@
   });
 
   window.addEventListener("message", (event) => {
-    if (
-      event.source !== window ||
-      !event.data ||
-      event.data.direction !== "from-script-AWP"
-    )
+    if (event.source !== window || event.data?.direction !== "from-script-AWP")
       return;
     browser.runtime.sendMessage(event.data);
   });

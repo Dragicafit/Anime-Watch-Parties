@@ -68,7 +68,7 @@ window.addEventListener("message", (event) => {
   if (event.source !== $2("#twitchVideoEmbed>iframe")?.[0]?.contentWindow)
     return;
   let stat = event.data?.params?.stats?.videoStats;
-  if (stat != null && stat.hlsLatencyBroadcaster) {
+  if (stat?.hlsLatencyBroadcaster != null) {
     delay = (streamerDelay + stat.hlsLatencyBroadcaster) * 1000;
 
     let resulution = stat.videoResolution.match(/(\d+)x(\d+)/);

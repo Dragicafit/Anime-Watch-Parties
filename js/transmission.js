@@ -1,7 +1,7 @@
 window.addEventListener("message", (event) => {
   if (event.source !== window || event.data?.direction !== "from-content-AWP")
     return;
-  if (event.data?.command === "joinRoom") {
+  if (event.data.command === "joinRoom") {
     socket.emit("joinRoom", event.data, async (err, data) => {
       if (err) {
         if (err === "not connected") {
@@ -29,7 +29,7 @@ window.addEventListener("message", (event) => {
 
       sendInfo();
     });
-  } else if (event.data?.command === "askInfo") {
+  } else if (event.data.command === "askInfo") {
     sendInfo();
   }
 });
@@ -68,7 +68,7 @@ function openPopupTwitch(callback) {
       event.data?.direction !== "from-popupTwitch-AWP"
     )
       return;
-    if (event.data?.command === "success") {
+    if (event.data.command === "success") {
       popupTwitch.close();
       socket.close();
       setTimeout(() => {
