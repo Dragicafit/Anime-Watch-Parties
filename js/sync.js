@@ -53,7 +53,7 @@ socket.on("changeVideoClient", (data) => {
         site: data.site,
         location: data.location,
       },
-      "*"
+      window.location.origin
     );
   }, delay);
 });

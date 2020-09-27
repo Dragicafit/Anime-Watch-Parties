@@ -29,6 +29,6 @@ socket.on("getUsers", (data) => {
       command: "sendInfo",
       onlineUsers: onlineUsers,
     },
-    "*"
+    window.location.origin
   );
 });

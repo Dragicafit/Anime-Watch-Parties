@@ -46,7 +46,7 @@ function sendInfo() {
       hostName: hostName,
       onlineUsers: onlineUsers,
     },
-    "*"
+    window.location.origin
   );
 }
 
