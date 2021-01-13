@@ -19,8 +19,6 @@ cat "embed.js" >> script.js
 echo "" >> script.js
 cat "sync.js" >> script.js
 echo "" >> script.js
-cat "host.js" >> script.js
-echo "" >> script.js
 cat "events.js" >> script.js
 echo "" >> script.js
 cat "transmission.js" >> script.js

@@ -33,27 +33,13 @@ async function changeVideo() {
   });
 }
 
-socket.on("changeVideoClient", (data) => {
-  setTimeout(() => {
-    console.log(`video id is: ${data.videoId}`);
+function changeState(currTime, state) {
+  socket.emit("changeStateServer", {
+    time: currTime,
+    state: state,
+  });
+}
 
-    let url = parseUrl();
-    if (
-      url.videoId === data.videoId &&
-      url.site === data.site &&
-      url.location === data.location
-    )
-      return;
-
-    window.postMessage(
-      {
-        direction: "from-script-AWP",
-        command: "changeVideoClient",
-        videoId: data.videoId,
-        site: data.site,
-        location: data.location,
-      },
-      window.location.origin
-    );
-  }, delay);
-});
+function syncClient() {
+  socket.emit("syncClient");
+}

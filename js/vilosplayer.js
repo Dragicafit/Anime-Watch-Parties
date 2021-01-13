@@ -4,7 +4,7 @@ class vilosplayerSetup extends playerSetup {
   _onPlay() {
     VILOS_PLAYERJS.on("play", async () => {
       console.log("vilosplayer playing");
-      if (!host) return socket.emit("syncClient");
+      if (!host) return syncClient();
       changeState(await this.getTime(), true);
     });
   }

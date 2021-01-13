@@ -4,7 +4,7 @@ class jwplayerSetup extends playerSetup {
       console.log("jwplayer playing", e);
       if (!host) {
         if (e.playReason === "interaction" && e.reason === "playing")
-          socket.emit("syncClient");
+          syncClient();
         return;
       }
       changeState(this.getTime(), true);
