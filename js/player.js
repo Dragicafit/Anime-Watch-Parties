@@ -1,11 +1,38 @@
 class playerSetup {
-  constructor() {
+  name = "";
+
+  constructor(name) {
+    this.name = name;
     this._waitForExist();
   }
 
-  _onPlay() {}
-  _onPause() {}
-  _onSeek() {}
+  _onPlay(a) {}
+  _onPause(a) {}
+  _onSeek(a) {}
+
+  onPlay() {
+    this._onPlay(async (e) => {
+      console.log(`${this.name} playing`, e);
+      if (!host) return syncClient();
+      changeState(await this.getTime(), true);
+    });
+  }
+
+  onPause() {
+    this._onPause(async (e) => {
+      console.log(`${this.name} pausing`, e);
+      if (!host) return;
+      changeState(await this.getTime(), false);
+    });
+  }
+
+  onSeek() {
+    this._onSeek(async (offset, e) => {
+      console.log(`${this.name} seeking ${offset} sec`, e);
+      if (!host) return;
+      changeState(offset, await this.isPlay());
+    });
+  }
 
   getTime() {
     if (!this._playerExist()) return 0;
@@ -43,8 +70,8 @@ class playerSetup {
     if (!this._playerExist())
       return setTimeout(this._waitForExist.bind(this), 500);
 
-    this._onPlay();
-    this._onPause();
-    this._onSeek();
+    this.onPlay();
+    this.onPause();
+    this.onSeek();
   }
 }

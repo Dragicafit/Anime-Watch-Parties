@@ -1,28 +1,21 @@
 class jwplayerSetup extends playerSetup {
-  _onPlay() {
+  constructor() {
+    super("jwplayer");
+  }
+
+  _onPlay(a) {
     jwplayer().on("play", (e) => {
-      console.log("jwplayer playing", e);
-      if (!host) {
-        if (e.playReason === "interaction" && e.reason === "playing")
-          syncClient();
-        return;
-      }
-      changeState(this.getTime(), true);
+      if (host || (e.playReason === "interaction" && e.reason === "playing"))
+        a(e);
     });
   }
-  _onPause() {
-    jwplayer().on("pause", (e) => {
-      console.log("jwplayer pausing", e);
-      if (!host) return;
-      changeState(this.getTime(), false);
-    });
+
+  _onPause(a) {
+    jwplayer().on("pause", (e) => a(e));
   }
-  _onSeek() {
-    jwplayer().on("seek", (e) => {
-      console.log("jwplayer seeking", e);
-      if (!host) return;
-      changeState(e.offset, this.isPlay());
-    });
+
+  _onSeek(a) {
+    jwplayer().on("seek", (e) => a(e.offset, e));
   }
 
   _getTime() {

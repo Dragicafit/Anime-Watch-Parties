@@ -1,30 +1,24 @@
 class vilosplayerSetup extends playerSetup {
   previousSeek = 0;
 
-  _onPlay() {
-    VILOS_PLAYERJS.on("play", async () => {
-      console.log("vilosplayer playing");
-      if (!host) return syncClient();
-      changeState(await this.getTime(), true);
-    });
+  constructor() {
+    super("vilosplayer");
   }
 
-  _onPause() {
-    VILOS_PLAYERJS.on("pause", async () => {
-      console.log("vilosplayer pausing");
-      if (!host) return;
-      changeState(await this.getTime(), false);
-    });
+  _onPlay(a) {
+    VILOS_PLAYERJS.on("play", () => a());
   }
 
-  _onSeek() {
-    VILOS_PLAYERJS.on("timeupdate", async (e) => {
+  _onPause(a) {
+    VILOS_PLAYERJS.on("pause", () => a());
+  }
+
+  _onSeek(a) {
+    VILOS_PLAYERJS.on("timeupdate", (e) => {
       let previousSeek = this.previousSeek;
       this.previousSeek = e.seconds;
       if (Math.abs(e.seconds - previousSeek) < 0.5) return;
-      console.log("vilosplayer seeking", e);
-      if (!host) return;
-      changeState(e.seconds, await this.isPlay());
+      a(e.seconds, e);
     });
   }
 
