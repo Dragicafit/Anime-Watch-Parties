@@ -24,7 +24,7 @@
   });
 
   let s = document.createElement("script");
-  s.src = browser.runtime.getURL("/js/script.js");
+  s.src = browser.runtime.getURL("/src/web-accessible-resources/js/script.js");
   s.onload = function () {
     browser.runtime.sendMessage({
       command: "sciptLoaded",
@@ -35,6 +35,8 @@
   let css = document.createElement("link");
   css.rel = "stylesheet";
   css.type = "text/css";
-  css.href = browser.runtime.getURL("/css/script.css");
+  css.href = browser.runtime.getURL(
+    "/src/web-accessible-resources/css/script.css"
+  );
   (document.head || document.documentElement).appendChild(css);
 })();

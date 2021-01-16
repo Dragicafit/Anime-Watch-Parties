@@ -5,10 +5,10 @@
   "version": "0.1",
   "author": "Dragicafit",
   "icons": {
-    "16": "icons/icon.svg",
-    "48": "icons/icon.svg",
-    "96": "icons/icon.svg",
-    "128": "icons/icon.svg"
+    "16": "src/icons/icon.svg",
+    "48": "src/icons/icon.svg",
+    "96": "src/icons/icon.svg",
+    "128": "src/icons/icon.svg"
   },
   "homepage_url": "https://github.com/Dragicafit/Anime-Watch-Parties",
   "permissions": [
@@ -18,11 +18,14 @@
     "tabs"
   ],
   "background": {
-    "scripts": ["js/background-script2.js"]
+    "scripts": ["src/background-scripts/background-script2.js"]
   },
   "browser_action": {
     "default_title": "Anime Watch Parties",
-    "default_popup": "popup/popup.html"
+    "default_popup": "src/popup/popup.html"
   },
-  "web_accessible_resources": ["js/script.js", "css/script.css"]
+  "web_accessible_resources": [
+    "src/web-accessible-resources/js/script.js",
+    "src/web-accessible-resources/css/script.css"
+  ]
 }

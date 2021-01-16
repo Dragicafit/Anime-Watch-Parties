@@ -13,7 +13,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch server",
-      "program": "server.js",
+      "program": "src/server/server.js",
       "skipFiles": ["<node_internals>/**"],
       "env": { "NODE_DEBUG": "" }
     }

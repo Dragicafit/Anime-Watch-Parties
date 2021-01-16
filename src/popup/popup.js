@@ -109,7 +109,7 @@ function injectScript(tabId) {
   browser.tabs
     .executeScript(tab, {
       runAt: "document_end",
-      file: "/js/listener.js",
+      file: "/src/content-scripts/listener.js",
     })
     .catch(reportError);
   browser.runtime.sendMessage({

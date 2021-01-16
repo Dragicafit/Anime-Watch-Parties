@@ -57,7 +57,7 @@ function insertScript(tabId) {
   browser.tabs
     .executeScript(tabId, {
       runAt: "document_end",
-      file: "/js/listener.js",
+      file: "/src/content-scripts/listener.js",
     })
     .catch(reportError);
 }
