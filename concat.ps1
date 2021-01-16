@@ -25,6 +25,12 @@ cat "transmission.js" >> script.js
 echo "" >> script.js
 echo "undefined;" >> script.js
 echo "" >> script.js
+
+echo "\"use strict\";" > background-script2.js
+cat "transmission-b.js" >> background-script2.js
+echo "" >> background-script2.js
+cat "background-script.js" >> background-script2.js
+echo "" >> background-script2.js
 cd ..
 
 cd css

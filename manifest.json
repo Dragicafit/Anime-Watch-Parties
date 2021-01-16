@@ -18,7 +18,7 @@
     "tabs"
   ],
   "background": {
-    "scripts": ["js/background-script.js"]
+    "scripts": ["js/background-script2.js"]
   },
   "browser_action": {
     "default_title": "Anime Watch Parties",

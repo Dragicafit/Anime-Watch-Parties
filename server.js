@@ -34,7 +34,7 @@ const CALLBACK_URL = process.env.CALLBACK_URL;
 
 let connections = 0;
 let regexRoom = /^\w{1,30}$/;
-let regexVideoId = /^[\w\/-]{1,30}$/;
+let regexVideoId = /^[\w\/-]{1,300}$/;
 let regexSite = /^(wakanim|crunchyroll)$/;
 let regexLocation = /^[a-zA-Z]{2}$/;
 

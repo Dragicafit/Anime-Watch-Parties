@@ -1,45 +1,45 @@
-socket.on("changeStateClient", (data) => {
+function changeStateClient(time, state) {
   setTimeout(async () => {
     let clientTime = await player.getTime();
 
     console.log(`current time is: ${clientTime}`);
-    console.log(`current time server is: ${data.time}`);
-    console.log(`current state server is: ${data.state}`);
+    console.log(`current time server is: ${time}`);
+    console.log(`current state server is: ${state}`);
 
-    player.setState(data.state);
+    player.setState(state);
 
-    if (Math.abs(clientTime - data.time) > 0.2) player.seekTo(data.time);
+    if (Math.abs(clientTime - time) > 0.2) player.seekTo(time);
   }, delay);
-});
+}
 
-socket.on("getUsers", (data) => {
-  console.log(`online: ${data.onlineUsers}`);
-  onlineUsers = data.onlineUsers;
+function getUsers(newOnlineUsers) {
+  console.log(`online: ${newOnlineUsers}`);
+  onlineUsers = newOnlineUsers;
 
   window.postMessage(
     {
       direction: "from-script-AWP",
       command: "sendInfo",
-      onlineUsers: onlineUsers,
+      onlineUsers: newOnlineUsers,
     },
     window.location.origin
   );
-});
+}
 
-socket.on("unSetHost", () => {
+function unSetHost() {
   console.log("Unsetting host");
   host = false;
-});
+}
 
-socket.on("changeVideoClient", (data) => {
+function changeVideoClient(videoId, site, location) {
   setTimeout(() => {
-    console.log(`video id is: ${data.videoId}`);
+    console.log(`video id is: ${videoId}`);
 
     let url = parseUrl();
     if (
-      url.videoId === data.videoId &&
-      url.site === data.site &&
-      url.location === data.location
+      url.videoId === videoId &&
+      url.site === site &&
+      url.location === location
     )
       return;
 
@@ -47,11 +47,11 @@ socket.on("changeVideoClient", (data) => {
       {
         direction: "from-script-AWP",
         command: "changeVideoClient",
-        videoId: data.videoId,
-        site: data.site,
-        location: data.location,
+        videoId: videoId,
+        site: site,
+        location: location,
       },
       window.location.origin
     );
   }, delay);
-});
+}
