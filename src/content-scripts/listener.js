@@ -2,7 +2,7 @@
   if (window.hasRun) {
     console.log("already running");
     browser.runtime.sendMessage({
-      command: "sciptLoaded",
+      command: "scriptLoaded",
     });
     return;
   }
@@ -27,7 +27,7 @@
   s.src = browser.runtime.getURL("/src/web-accessible-resources/js/script.js");
   s.onload = function () {
     browser.runtime.sendMessage({
-      command: "sciptLoaded",
+      command: "scriptLoaded",
     });
   };
   (document.head || document.documentElement).appendChild(s);

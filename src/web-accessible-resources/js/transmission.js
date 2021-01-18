@@ -6,22 +6,22 @@ window.addEventListener("message", (event) => {
   )
     return;
   switch (event.data.command) {
-    case "joinRoom":
-      joinRoom(event.data.roomnum);
+    case "sendInfo":
+      sendInfo(event.data.roomnum, event.data.host);
       break;
-    case "askInfo":
-      sendInfo();
+    case "openPopupTwitch":
+      openPopupTwitch(event.data.roomnum);
+      break;
+    case "startEmbed":
+      startEmbed();
+      break;
+    case "changeStateClient":
+      changeStateClient(event.data.time, event.data.state);
+      break;
+    case "askState":
+      askState();
       break;
     default:
       break;
   }
 });
-
-socket.on("changeStateClient", (data) =>
-  changeStateClient(data?.time, data?.state)
-);
-socket.on("getUsers", (data) => getUsers(data?.onlineUsers));
-socket.on("unSetHost", () => unSetHost());
-socket.on("changeVideoClient", (data) =>
-  changeVideoClient(data?.videoId, data?.site, data?.location)
-);

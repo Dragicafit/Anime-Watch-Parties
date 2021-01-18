@@ -1,4 +1,6 @@
 function startEmbed() {
+  console.log("start embed");
+
   if ($2("#twitchEmbed").length) {
     $2("#twitchVideoEmbed > iframe").attr(
       "src",
@@ -87,6 +89,8 @@ window.addEventListener("message", (event) => {
 });
 
 function studio() {
+  console.log("mode studio");
+
   if ($2(".jw-icon-studio.jw-off").length) {
     $(".jw-icon-studio").removeClass("jw-off");
     $2("#twitchVideoChatEmbed").resizable("destroy");

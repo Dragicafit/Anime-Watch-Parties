@@ -1,4 +1,6 @@
 function changeStateClient(time, state) {
+  console.log("change state client");
+
   setTimeout(() => {
     awpplayer.getTime().then((clientTime) => {
       console.log(`current time is: ${clientTime}`);
@@ -12,46 +14,54 @@ function changeStateClient(time, state) {
   }, delay);
 }
 
-function getUsers(newOnlineUsers) {
-  console.log(`online: ${newOnlineUsers}`);
-  onlineUsers = newOnlineUsers;
+function openPopupTwitch(roomnum) {
+  console.log("open popup twitch");
 
-  window.postMessage(
-    {
-      direction: "from-script-AWP",
-      command: "sendInfo",
-      onlineUsers: newOnlineUsers,
-    },
-    window.location.origin
-  );
-}
+  if (popupTwitch == null || popupTwitch.closed) {
+    popupTwitch = window.open(
+      `${server}/auth/twitch`,
+      "Twitch",
+      "width=1024,height=600,scrollbars=yes"
+    );
+  } else {
+    return popupTwitch.focus();
+  }
+  if (popupTwitch == null) return;
 
-function unSetHost() {
-  console.log("Unsetting host");
-  host = false;
-}
-
-function changeVideoClient(videoId, site, location) {
-  setTimeout(() => {
-    console.log(`video id is: ${videoId}`);
-
-    let url = parseUrl();
+  window.addEventListener("message", (event) => {
     if (
-      url.videoId === videoId &&
-      url.site === site &&
-      url.location === location
+      event.source !== popupTwitch ||
+      event.origin !== server ||
+      event.data?.direction !== "from-popupTwitch-AWP"
     )
       return;
+    if (event.data.command === "success") {
+      popupTwitch.close();
+      window.postMessage(
+        {
+          direction: "from-script-AWP",
+          command: "restartSocket",
+          roomnum: roomnum,
+        },
+        window.location.origin
+      );
+    }
+  });
+}
 
-    window.postMessage(
-      {
-        direction: "from-script-AWP",
-        command: "changeVideoClient",
-        videoId: videoId,
-        site: site,
-        location: location,
-      },
-      window.location.origin
-    );
-  }, delay);
+function sendInfo(newRoomnum, newHost) {
+  console.log("send info");
+
+  if (newRoomnum != null) roomnum = newRoomnum;
+  if (newHost != null) host = newHost;
+}
+
+function askState() {
+  console.log("ask state");
+
+  awpplayer.getTime().then((time) => {
+    awpplayer.isPlay().then((state) => {
+      sendState(time, state);
+    });
+  });
 }

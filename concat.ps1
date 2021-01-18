@@ -3,8 +3,6 @@ cd src/
 cd web-accessible-resources/
     cd js/
     echo "\"use strict\";" > script.js
-    cat "../../dependencies/socket.io.js" >> script.js
-    echo "" >> script.js
     cat "../../dependencies/jquery.min.js" >> script.js
     echo "" >> script.js
     cat "../../dependencies/jquery-ui.min.js" >> script.js
@@ -37,7 +35,13 @@ cd web-accessible-resources/
 cd ../
 cd background-scripts/
 echo "\"use strict\";" > background-script2.js
-cat "transmission-b.js" >> background-script2.js
+cat "../dependencies/socket.io.js" >> background-script2.js
 echo "" >> background-script2.js
 cat "background-script.js" >> background-script2.js
+echo "" >> background-script2.js
+cat "transmission-b.js" >> background-script2.js
+echo "" >> background-script2.js
+cat "sync.js" >> background-script2.js
+echo "" >> background-script2.js
+cat "events.js" >> background-script2.js
 echo "" >> background-script2.js

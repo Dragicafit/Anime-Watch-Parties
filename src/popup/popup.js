@@ -1,4 +1,3 @@
-let tab;
 let regexRoom = /^\w{1,30}$/;
 
 function chat() {
@@ -43,77 +42,63 @@ function chat() {
         return;
       }
       $roomnum.val("");
-      browser.tabs.sendMessage(tab, {
+      browser.runtime.sendMessage({
         command: "joinRoom",
         roomnum: roomnum,
       });
     });
 
-    browser.runtime.onMessage.addListener((message) => {
-      if (message?.command === "sendInfo") {
-        console.log("get info");
-
-        if (message.username != null) {
-          document.getElementById("username").innerHTML = message.username;
-        }
-        if (message.roomnum != null) {
-          document.getElementById("roomnum").value = message.roomnum;
-        }
-        if (message.hostName != null) {
-          document.getElementById("hostName").innerHTML = message.hostName;
-        }
-        if (message.onlineUsers != null) {
-          document.getElementById("online-users").innerHTML =
-            message.onlineUsers;
-        }
-      }
-    });
     console.log("ask info");
-    browser.tabs.sendMessage(tab, {
+    browser.runtime.sendMessage({
       command: "askInfo",
     });
   });
 }
 
+function sendInfo(username, roomnum, hostName, onlineUsers) {
+  console.log("get info");
+
+  if (username != null) {
+    document.getElementById("username").innerHTML = username;
+  }
+  if (roomnum != null) {
+    document.getElementById("roomnum").value = roomnum;
+  }
+  if (hostName != null) {
+    document.getElementById("hostName").innerHTML = hostName;
+  }
+  if (onlineUsers != null) {
+    document.getElementById("online-users").innerHTML = onlineUsers;
+  }
+}
+
+browser.runtime.sendMessage({
+  command: "insertScript",
+});
+
+browser.runtime.onMessage.addListener((message) => {
+  switch (message?.command) {
+    case "sendInfo":
+      sendInfo(
+        message.username,
+        message.roomnum,
+        message.hostName,
+        message.onlineUsers
+      );
+      break;
+    case "scriptLoaded":
+      scriptLoaded();
+      break;
+    default:
+      break;
+  }
+});
+
 function reportError(error) {
   console.error(`Could not beastify: ${error}`);
 }
 
-let listener = (message) => {
-  if (message.command === "sciptLoaded") {
-    console.log("scipt loaded");
-    browser.runtime.onMessage.removeListener(listener);
-    chat();
-  }
-};
-browser.runtime.onMessage.addListener(listener);
-
-browser.tabs
-  .query({
-    currentWindow: true,
-    active: true,
-    url: ["*://*.wakanim.tv/*", "*://*.crunchyroll.com/*"],
-  })
-  .then((tabs) => {
-    if (tabs.length) {
-      injectScript(tabs[0]);
-    } else {
-      browser.tabs
-        .create({ url: "https://www.wakanim.tv/" })
-        .then(injectScript);
-    }
-  });
-
-function injectScript(tabId) {
-  tab = tabId.id;
-  browser.tabs
-    .executeScript(tab, {
-      runAt: "document_end",
-      file: "/src/content-scripts/listener.js",
-    })
-    .catch(reportError);
-  browser.runtime.sendMessage({
-    command: "createVideoClient",
-    tab: tab,
-  });
+function scriptLoaded() {
+  console.log("scipt loaded");
+  chat();
 }
