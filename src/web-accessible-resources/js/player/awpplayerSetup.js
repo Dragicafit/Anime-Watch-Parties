@@ -1,4 +1,4 @@
-class playerSetup {
+class awpplayerSetup {
   name = "";
 
   constructor(name) {

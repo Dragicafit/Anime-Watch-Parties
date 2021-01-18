@@ -19,7 +19,7 @@ function parseUrl() {
 }
 
 function changeVideo() {
-  player.getTime().then((time) => {
+  awpplayer.getTime().then((time) => {
     let url = parseUrl();
 
     console.log(`change video to ${url.videoId}`);
@@ -67,8 +67,8 @@ function joinRoom(newRoomnum) {
     if (host) {
       console.log("You are the new host!");
       changeVideo();
-      player.getTime().then((time) => {
-        player.isPlay().then((state) => {
+      awpplayer.getTime().then((time) => {
+        awpplayer.isPlay().then((state) => {
           changeState(time, state);
         });
       });

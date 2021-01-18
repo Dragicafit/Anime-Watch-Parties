@@ -1,4 +1,4 @@
-class jwplayerSetup extends playerSetup {
+class jwplayerSetup extends awpplayerSetup {
   constructor() {
     super("jwplayer");
   }

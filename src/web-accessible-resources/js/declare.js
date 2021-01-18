@@ -11,14 +11,14 @@ let parseUrlCrunchyroll = /^https:\/\/www\.crunchyroll\.com\/(?<location>\w+)\/(
 let delay = 0;
 let streamerDelay = 0;
 let popupTwitch;
-let player;
+let awpplayer;
 
 switch (window.location.hostname) {
   case "www.wakanim.tv":
-    player = new jwplayerSetup();
+    awpplayer = new jwplayerSetup();
     break;
   case "www.crunchyroll.com":
-    player = new vilosplayerSetup();
+    awpplayer = new vilosplayerSetup();
     break;
   default:
     throw new Error("invalid url");

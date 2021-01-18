@@ -9,11 +9,11 @@ cd web-accessible-resources/
     echo "" >> script.js
     cat "../../dependencies/jquery-ui.min.js" >> script.js
     echo "" >> script.js
-    cat "player.js" >> script.js
+    cat "player/awpplayerSetup.js" >> script.js
     echo "" >> script.js
-    cat "jwplayer.js" >> script.js
+    cat "player/jwplayerSetup.js" >> script.js
     echo "" >> script.js
-    cat "vilosplayer.js" >> script.js
+    cat "player/vilosplayerSetup.js" >> script.js
     echo "" >> script.js
     cat "declare.js" >> script.js
     echo "" >> script.js

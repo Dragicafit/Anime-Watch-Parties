@@ -1,4 +1,4 @@
-class vilosplayerSetup extends playerSetup {
+class vilosplayerSetup extends awpplayerSetup {
   previousSeek = 0;
 
   constructor() {

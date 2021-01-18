@@ -1,13 +1,13 @@
 function changeStateClient(time, state) {
   setTimeout(() => {
-    player.getTime().then((clientTime) => {
+    awpplayer.getTime().then((clientTime) => {
       console.log(`current time is: ${clientTime}`);
       console.log(`current time server is: ${time}`);
       console.log(`current state server is: ${state}`);
 
-      player.setState(state);
+      awpplayer.setState(state);
 
-      if (Math.abs(clientTime - time) > 0.2) player.seekTo(time);
+      if (Math.abs(clientTime - time) > 0.2) awpplayer.seekTo(time);
     });
   }, delay);
 }
