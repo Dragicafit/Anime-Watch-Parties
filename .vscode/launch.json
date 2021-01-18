@@ -15,7 +15,8 @@
       "name": "Launch server",
       "program": "src/server/server.js",
       "skipFiles": ["<node_internals>/**"],
-      "env": { "NODE_DEBUG": "" }
+      "env": { "NODE_DEBUG": "", "DEBUG": "serverAWP:*" },
+      "console": "integratedTerminal"
     }
   ]
 }
