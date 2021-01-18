@@ -19,11 +19,11 @@ class jwplayerSetup extends playerSetup {
   }
 
   _getTime() {
-    return jwplayer().getPosition();
+    return Promise.resolve(jwplayer().getPosition());
   }
 
   _isPlay() {
-    return jwplayer().getState() === "playing";
+    return Promise.resolve(jwplayer().getState() === "playing");
   }
 
   _seekTo(time) {

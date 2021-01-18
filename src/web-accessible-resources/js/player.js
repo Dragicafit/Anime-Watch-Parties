@@ -11,43 +11,43 @@ class playerSetup {
   _onSeek(a) {}
 
   onPlay() {
-    this._onPlay(async (e) => {
+    this._onPlay((e) => {
       console.log(`${this.name} playing`, e);
       if (!host) return syncClient();
-      changeState(await this.getTime(), true);
+      this.getTime().then((time) => sendState(time, true));
     });
   }
 
   onPause() {
-    this._onPause(async (e) => {
+    this._onPause((e) => {
       console.log(`${this.name} pausing`, e);
       if (!host) return;
-      changeState(await this.getTime(), false);
+      this.getTime().then((time) => sendState(time, false));
     });
   }
 
   onSeek() {
-    this._onSeek(async (offset, e) => {
+    this._onSeek((offset, e) => {
       console.log(`${this.name} seeking ${offset} sec`, e);
       if (!host) return;
-      changeState(offset, await this.isPlay());
+      this.isPlay().then((state) => sendState(offset, state));
     });
   }
 
   getTime() {
-    if (!this._playerExist()) return 0;
+    if (!this._playerExist()) return Promise.resolve(0);
     return this._getTime();
   }
   _getTime() {
-    return 0;
+    return Promise.reject(new Error("not initialized"));
   }
 
   isPlay() {
-    if (!this._playerExist()) return false;
+    if (!this._playerExist()) return Promise.resolve(false);
     return this._isPlay();
   }
   _isPlay() {
-    return false;
+    return Promise.reject(new Error("not initialized"));
   }
 
   seekTo(time) {

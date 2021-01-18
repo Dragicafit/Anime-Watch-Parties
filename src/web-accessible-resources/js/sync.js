@@ -18,18 +18,19 @@ function parseUrl() {
   return {};
 }
 
-async function changeVideo() {
-  let time = await player.getTime();
-  let url = parseUrl();
+function changeVideo() {
+  player.getTime().then((time) => {
+    let url = parseUrl();
 
-  console.log(`change video to ${url.videoId}`);
-  console.log(`The time is this man: ${time}`);
-  socket.emit("changeVideoServer", {
-    room: roomnum,
-    videoId: url.videoId,
-    site: url.site,
-    location: url.location,
-    time: time,
+    console.log(`change video to ${url.videoId}`);
+    console.log(`The time is this man: ${time}`);
+    socket.emit("changeVideoServer", {
+      room: roomnum,
+      videoId: url.videoId,
+      site: url.site,
+      location: url.location,
+      time: time,
+    });
   });
 }
 
@@ -45,7 +46,7 @@ function syncClient() {
 }
 
 function joinRoom(newRoomnum) {
-  socket.emit("joinRoom", { roomnum: newRoomnum }, async (err, data) => {
+  socket.emit("joinRoom", { roomnum: newRoomnum }, (err, data) => {
     if (err) {
       if (err === "not connected") {
         openPopupTwitch(() => {
@@ -66,7 +67,11 @@ function joinRoom(newRoomnum) {
     if (host) {
       console.log("You are the new host!");
       changeVideo();
-      changeState(await player.getTime(), await player.isPlay());
+      player.getTime().then((time) => {
+        player.isPlay().then((state) => {
+          changeState(time, state);
+        });
+      });
     } else {
       startEmbed();
     }

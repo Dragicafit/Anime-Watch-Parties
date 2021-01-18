@@ -22,14 +22,14 @@ class vilosplayerSetup extends playerSetup {
     });
   }
 
-  async _getTime() {
-    return await new Promise((resolve) => {
+  _getTime() {
+    return new Promise((resolve) => {
       VILOS_PLAYERJS.getCurrentTime(resolve);
     });
   }
 
-  async _isPlay() {
-    return await new Promise((resolve) => {
+  _isPlay() {
+    return new Promise((resolve) => {
       VILOS_PLAYERJS.getPaused((paused) => resolve(paused === false));
     });
   }
