@@ -13,7 +13,9 @@
       "type": "node",
       "request": "launch",
       "name": "Launch server",
-      "program": "src/server/server.js",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
       "skipFiles": ["<node_internals>/**"],
       "env": { "NODE_DEBUG": "", "DEBUG": "serverAWP:*" },
       "console": "integratedTerminal"
