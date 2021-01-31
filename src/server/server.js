@@ -19,6 +19,10 @@ const server = require("https").createServer(
 );
 const io = require("socket.io")(server, {
   perMessageDeflate: false,
+  cors: {
+    origin: `moz-extension://${process.env.EXTENSION_ID}`,
+    credentials: true,
+  },
 });
 const redisAdapter = require("socket.io-redis");
 const performance = require("perf_hooks").performance;
@@ -108,8 +112,8 @@ io.on("connection", (socket) => {
     debugDisconnect2(`${connections} sockets connected`);
 
     if (socket.roomnum == null) return;
-    let room = io.sockets.adapter.rooms[`room-${socket.roomnum}`];
-    if (room == null) return debugDisconnect2("room is null (error server)");
+    let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
+    if (room == null) return debugDisconnect2("room is null (empty room)");
     if (socket.id === room.host) {
       room.host = undefined;
     }
@@ -157,7 +161,7 @@ io.on("connection", (socket) => {
       return configure();
     }
     if (socket.roomnum != null) {
-      let room = io.sockets.adapter.rooms[`room-${socket.roomnum}`];
+      let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
       if (room == null) {
         debugJoinRoom2("room is null (error server)");
         return callback("error server");
@@ -170,19 +174,14 @@ io.on("connection", (socket) => {
       }
     }
 
-    init = io.sockets.adapter.rooms[`room-${newRoomnum}`] == null;
-    socket.join(`room-${newRoomnum}`, (err) => {
-      if (err) {
-        debugJoinRoom2("join failed (error server): ", err);
-        return callback("error server");
-      }
-      configure();
-    });
+    init = io.sockets.adapter.rooms.get(`room-${newRoomnum}`) == null;
+    socket.join(`room-${newRoomnum}`);
+    configure();
 
     function configure() {
       debugJoinRoom2(`connected to room-${newRoomnum}`);
 
-      let room = io.sockets.adapter.rooms[`room-${newRoomnum}`];
+      let room = io.sockets.adapter.rooms.get(`room-${newRoomnum}`);
       if (room == null) {
         debugJoinRoom2("room is null (error server)");
         return callback("error server");
@@ -239,7 +238,7 @@ io.on("connection", (socket) => {
 
     if (socket.roomnum == null)
       return debugChangeStateServer2("socket is not connected to room");
-    let room = io.sockets.adapter.rooms[`room-${socket.roomnum}`];
+    let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
     if (room == null)
       return debugChangeStateServer2("room is null (error server)");
     if (socket.id !== room.host)
@@ -270,7 +269,7 @@ io.on("connection", (socket) => {
 
     if (socket.roomnum == null)
       return debugChangeVideoServer2("socket is not connected to room");
-    let room = io.sockets.adapter.rooms[`room-${socket.roomnum}`];
+    let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
     if (room == null)
       return debugChangeVideoServer2("room is null (error server)");
     if (socket.id !== room.host)
@@ -296,7 +295,7 @@ io.on("connection", (socket) => {
     debugSyncClient2();
     if (socket.roomnum == null)
       return debugSyncClient2("socket is not connected to room");
-    let room = io.sockets.adapter.rooms[`room-${socket.roomnum}`];
+    let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
     if (room == null) return debugSyncClient2("room is null (error server)");
     debugSyncClient2(`applied to room-${socket.roomnum}`);
 
@@ -326,9 +325,8 @@ io.on("connection", (socket) => {
   function updateRoomUsers(debugUpdateRoomUsers2) {
     if (socket.roomnum == null)
       return debugUpdateRoomUsers2("socket is not connected to room");
-    let room = io.sockets.adapter.rooms[`room-${socket.roomnum}`];
-    if (room == null)
-      return debugUpdateRoomUsers2("room is null (error server)");
+    let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
+    if (room == null) return debugUpdateRoomUsers2("room is null (empty room)");
     debugUpdateRoomUsers2(`applied to room-${socket.roomnum}`);
 
     io.sockets.to(`room-${socket.roomnum}`).emit("getUsers", {

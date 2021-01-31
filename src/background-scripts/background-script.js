@@ -1,6 +1,9 @@
 let infoTabs = {};
 let server = "https://localhost:4000";
-let socket = io.connect(server, { secure: true });
+let socket = io.connect(server, {
+  secure: true,
+  withCredentials: true,
+});
 let username = "";
 let parseUrlWakanim = /^https:\/\/www\.wakanim\.tv\/(?<location>\w+)\/v2\/\w+\/episode\/(?<videoId>\d+)/;
 let parseUrlCrunchyroll = /^https:\/\/www\.crunchyroll\.com\/(?<location>\w+)\/(?<videoId>[\w\/-]+)/;

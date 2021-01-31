@@ -4,6 +4,7 @@
   "description": "Watch your favorite anime with your streamer.",
   "scripts": {
     "start": "node src/server/server.js",
+    "debug": "DEBUG=serverAWP:* npm start",
     "release": "./concat.ps1 && zip -r -FS Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json src/icons/* src/dependencies/* src/background-scripts/background-script2.js src/content-scripts/listener.js src/web-accessible-resources/js/script.js src/web-accessible-resources/css/script.css src/popup/*",
     "cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj \"/C=FR/ST=Ile-de-France/L=Paris/O=Dragicafit/OU=Org/CN=localhost\" -sha256"
   },
@@ -16,22 +17,22 @@
   "dependencies": {
     "connect-redis": "^5.0.0",
     "debug": "^4.3.1",
-    "dotenv": "8.1.0",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "handlebars": "^4.7.6",
     "passport": "^0.4.1",
-    "passport-twitch-new": "0.0.2",
+    "passport-twitch-new": "^0.0.2",
     "rate-limiter-flexible": "^2.2.1",
     "redis": "^3.0.2",
-    "socket.io": "^2.4.1",
-    "socket.io-redis": "^5.4.0"
+    "socket.io": "^3.1.0",
+    "socket.io-redis": "^6.0.1"
   },
   "bugs": {
     "url": "https://github.com/Dragicafit/Anime-Watch-Parties/issues"
   },
   "homepage": "https://github.com/Dragicafit/Anime-Watch-Parties#readme",
   "devDependencies": {
-    "jshint": "^2.11.0"
+    "jshint": "^2.12.0"
   }
 }
