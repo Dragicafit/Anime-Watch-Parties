@@ -17,6 +17,7 @@ const server = require("https").createServer(
   },
   app
 );
+exports.serverServer = server;
 const io = require("socket.io")(server, {
   perMessageDeflate: false,
   cors: {
@@ -24,12 +25,14 @@ const io = require("socket.io")(server, {
     credentials: true,
   },
 });
+exports.serverIo = io;
 const redisAdapter = require("socket.io-redis");
 const performance = require("perf_hooks").performance;
 const redis = require("redis");
 const RedisStore = require("connect-redis")(session);
 const rateLimiter = require("./middleware/rateLimiter");
-const redisClient = redis.createClient();
+const redisClient = rateLimiter.redisClient;
+exports.serverRedisClient = redisClient;
 const port = process.env.PORT || 4000;
 
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
@@ -135,12 +138,12 @@ io.on("connection", (socket) => {
       debugJoinRoom(`${socket.id}:`, ...arguments);
     }
     debugJoinRoom2(data);
-    if (data == null) {
-      debugJoinRoom2("data is null");
-      return callback("wrong input");
-    }
     if (typeof callback !== "function") {
       debugJoinRoom2("callback is not a function");
+      return;
+    }
+    if (data == null) {
+      debugJoinRoom2("data is null");
       return callback("wrong input");
     }
     if (typeof data.roomnum !== "string" || !regexRoom.test(data.roomnum)) {

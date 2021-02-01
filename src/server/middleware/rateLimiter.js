@@ -4,6 +4,7 @@ const {
   BurstyRateLimiter,
 } = require("rate-limiter-flexible");
 const redisClient = redis.createClient();
+exports.redisClient = redisClient;
 
 const rateLimiter = new BurstyRateLimiter(
   new RateLimiterRedis({
