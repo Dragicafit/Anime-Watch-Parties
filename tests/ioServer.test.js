@@ -2,30 +2,38 @@
 "use strict";
 
 require("dotenv").config();
-const fs = require("fs");
 
-const {
-  serverIo,
-  serverServer,
-  serverRedisClient,
-} = require("../src/server/server");
+const ioClient = require("socket.io-client");
+const ioServerSetup = require("../src/server/ioServerSetup");
+const { Server: ioServer } = require("socket.io");
 
-const io = require("socket.io-client");
-const port = process.env.PORT || 4000;
+const portTest = process.env.PORT_TEST || 4001;
+const port = process.env.PORT != portTest ? portTest : portTest + 1;
+
+/**@type {ioServer} */
+let io;
+
+beforeEach(() => {
+  io = new ioServer(port);
+  ioServerSetup.start(io);
+  return Promise.resolve();
+});
+
+afterEach(() => {
+  return ioServerSetup.close(io);
+});
 
 describe("test arguments", function () {
-  var socket;
+  /**@type {ioClient.Socket} */
+  let socket;
 
   beforeEach((done) => {
-    serverRedisClient.flushall(() => {
-      socket = io.connect(`https://localhost:${port}`, {
-        ca: fs.readFileSync("cert.pem"),
-        reconnectionDelay: 0,
-        forceNew: true,
-      });
-      socket.on("connect", function () {
-        done();
-      });
+    socket = ioClient.io(`http://localhost:${port}`, {
+      reconnectionDelay: 0,
+      forceNew: true,
+    });
+    socket.on("connect", function () {
+      done();
     });
   });
 
@@ -237,11 +245,161 @@ describe("test arguments", function () {
   });
 });
 
-afterAll(() => {
-  return Promise.all([
-    new Promise((res, rej) => serverIo.sockets.adapter.pubClient.quit(res)),
-    new Promise((res, rej) => serverIo.sockets.adapter.subClient.quit(res)),
-    new Promise((res, rej) => serverServer.close(res)),
-    new Promise((res, rej) => serverRedisClient.quit(res)),
-  ]);
+describe("test connection", function () {
+  beforeEach(() => {
+    io.use((socket, next) => {
+      socket.request.session = {
+        passport: { user: { display_name: socket.handshake.query.username } },
+      };
+      next();
+    });
+    return Promise.resolve();
+  });
+
+  describe("with one socket", function () {
+    /**@type {ioClient.Socket} */
+    let socket;
+
+    beforeEach(() => {
+      socket = ioClient.io(`http://localhost:${port}`, {
+        reconnectionDelay: 0,
+        forceNew: true,
+        query: {
+          username: "socket",
+        },
+      });
+      return new Promise((resolve) =>
+        socket.on("connect", function () {
+          resolve();
+        })
+      );
+    });
+
+    afterEach(() => {
+      if (socket?.connected) {
+        socket.disconnect();
+      } else {
+        console.error("no connection to break...");
+      }
+      return Promise.resolve();
+    });
+
+    it("simple connection", () => {
+      return new Promise((resolve) =>
+        socket.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
+          expect(err).toBeNull();
+          expect(data).toEqual({
+            host: false,
+            hostName: "",
+            roomnum: "roomnum",
+            username: "socket",
+          });
+          resolve();
+        })
+      );
+    });
+
+    it("get online users", () => {
+      return new Promise((resolve) =>
+        socket.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
+          expect(err).toBeNull();
+          expect(data).toEqual({
+            host: false,
+            hostName: "",
+            roomnum: "roomnum",
+            username: "socket",
+          });
+          resolve();
+        })
+      );
+    });
+  });
+
+  describe("with two sockets", function () {
+    /**@type {ioClient.Socket} */
+    let socket1;
+    /**@type {ioClient.Socket} */
+    let socket2;
+
+    beforeEach(() => {
+      socket1 = ioClient.io(`http://localhost:${port}`, {
+        reconnectionDelay: 0,
+        forceNew: true,
+        query: {
+          username: "socket1",
+        },
+      });
+      socket2 = ioClient.io(`http://localhost:${port}`, {
+        reconnectionDelay: 0,
+        forceNew: true,
+        query: {
+          username: "socket2",
+        },
+      });
+
+      return Promise.all([
+        new Promise((resolve) =>
+          socket1.on("connect", function () {
+            resolve();
+          })
+        ),
+        new Promise((resolve) =>
+          socket2.on("connect", function () {
+            resolve();
+          })
+        ),
+      ]);
+    });
+
+    afterEach(() => {
+      if (socket1?.connected) {
+        socket1.disconnect();
+      } else {
+        console.error("no connection to break...");
+      }
+      if (socket2?.connected) {
+        socket2.disconnect();
+      } else {
+        console.error("no connection to break...");
+      }
+      return Promise.resolve();
+    });
+
+    it("number of connection", () => {
+      expect(io.sockets.sockets.size).toBe(2);
+      return Promise.resolve();
+    });
+
+    it("simple connection", () => {
+      return Promise.all([
+        new Promise((resolve) =>
+          socket1.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
+            expect(err).toBeNull();
+            expect(data).toEqual({
+              host: false,
+              hostName: "",
+              roomnum: "roomnum",
+              username: "socket1",
+            });
+            resolve();
+          })
+        ),
+        new Promise((resolve) =>
+          socket2.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
+            expect(err).toBeNull();
+            expect(data).toEqual({
+              host: false,
+              hostName: "",
+              roomnum: "roomnum",
+              username: "socket2",
+            });
+            resolve();
+          })
+        ),
+      ]).then(() => {
+        expect(io.sockets.adapter.rooms.get(`room-roomnum`)).toBeDefined();
+        expect(io.sockets.adapter.rooms.get(`room-roomnum`).size).toBe(2);
+      });
+    });
+  });
 });
