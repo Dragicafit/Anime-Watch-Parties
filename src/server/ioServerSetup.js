@@ -1,4 +1,7 @@
+"use strict";
+
 const debug = require("debug")("ioServerAWP");
+const { Server: ioServer } = require("socket.io");
 const performance = require("perf_hooks").performance;
 
 const debugConnection = debug.extend("connection");
@@ -14,6 +17,7 @@ let regexSite = /^(wakanim|crunchyroll)$/;
 let regexLocation = /^[a-zA-Z]{2}$/;
 
 module.exports = {
+  /** @param {ioServer} io */
   start: function (io) {
     let connections = 0;
 
@@ -269,6 +273,7 @@ module.exports = {
       }
     });
   },
+  /** @param {ioServer} io */
   close: function (io) {
     return new Promise((resolve) => io.close(resolve));
   },

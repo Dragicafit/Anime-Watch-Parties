@@ -1,4 +1,7 @@
+"use strict";
+
 const debug = require("debug")("httpServerAWP");
+const { Express } = require("express");
 const handlebars = require("handlebars");
 
 var template = handlebars.compile(`
@@ -26,6 +29,7 @@ var template = handlebars.compile(`
 </table></html>`);
 
 module.exports = {
+  /** @param {Express} app */
   start: function (app) {
     app.get("/", function (req, res) {
       let reqSession = req.session;

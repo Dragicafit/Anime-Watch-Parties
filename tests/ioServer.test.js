@@ -10,7 +10,7 @@ const { Server: ioServer } = require("socket.io");
 const portTest = process.env.PORT_TEST || 4001;
 const port = process.env.PORT != portTest ? portTest : portTest + 1;
 
-/**@type {ioServer} */
+/** @type {ioServer} */
 let io;
 
 beforeEach(() => {
@@ -24,7 +24,7 @@ afterEach(() => {
 });
 
 describe("test arguments", function () {
-  /**@type {ioClient.Socket} */
+  /** @type {ioClient.Socket} */
   let socket;
 
   beforeEach((done) => {
@@ -257,7 +257,7 @@ describe("test connection", function () {
   });
 
   describe("with one socket", function () {
-    /**@type {ioClient.Socket} */
+    /** @type {ioClient.Socket} */
     let socket;
 
     beforeEach(() => {
@@ -316,9 +316,9 @@ describe("test connection", function () {
   });
 
   describe("with two sockets", function () {
-    /**@type {ioClient.Socket} */
+    /** @type {ioClient.Socket} */
     let socket1;
-    /**@type {ioClient.Socket} */
+    /** @type {ioClient.Socket} */
     let socket2;
 
     beforeEach(() => {

@@ -13,7 +13,8 @@ const server = require("https").createServer(
   },
   app
 );
-const io = require("socket.io")(server, {
+const { Server: ioServer } = require("socket.io");
+const io = new ioServer(server, {
   perMessageDeflate: false,
   cors: {
     origin: `moz-extension://${process.env.EXTENSION_ID}`,

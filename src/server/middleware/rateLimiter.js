@@ -1,9 +1,15 @@
+"use strict";
+
+const { Express } = require("express");
+const { Server: ioServer } = require("socket.io");
+const { RedisClient } = require("redis");
 const {
   RateLimiterRedis,
   BurstyRateLimiter,
 } = require("rate-limiter-flexible");
 
 module.exports = {
+  /** @param {Express} app @param {ioServer} io @param {RedisClient} redisClient */
   start: function (app, io, redisClient) {
     const rateLimiter = new BurstyRateLimiter(
       new RateLimiterRedis({
