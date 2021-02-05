@@ -248,9 +248,7 @@ describe("test arguments", function () {
 describe("test connection", function () {
   beforeEach(() => {
     io.use((socket, next) => {
-      socket.request.session = {
-        passport: { user: { display_name: socket.handshake.query.username } },
-      };
+      socket.username = socket.handshake.query.username;
       next();
     });
     return Promise.resolve();

@@ -33,6 +33,10 @@ module.exports = {
     io.use((socket, next) => {
       customsession(socket.request, socket.request.res || {}, next);
     });
+    io.use((socket, next) => {
+      socket.username = socket.request.session?.passport?.user?.display_name;
+      next();
+    });
 
     passport.serializeUser(function (user, done) {
       done(null, user);
