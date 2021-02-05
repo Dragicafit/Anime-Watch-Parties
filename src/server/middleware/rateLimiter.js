@@ -46,11 +46,11 @@ module.exports = {
         })
         .catch(() => {});
 
-      socket.use((packet, next) => {
+      socket.use((packet, next2) => {
         rateLimiter
           .consume(socket.handshake.address)
           .then(() => {
-            next();
+            next2();
           })
           .catch(() => {
             if (typeof packet[2] === "function") return packet[2]();
