@@ -23,6 +23,124 @@ afterEach(() => {
   return ioServerSetup.close(io);
 });
 
+describe("test argument middleware", function () {
+  /** @type {ioClient.Socket} */
+  let socket;
+
+  beforeEach((done) => {
+    socket = ioClient.io(`http://localhost:${port}`, {
+      reconnectionDelay: 0,
+      forceNew: true,
+    });
+    socket.on("connect", function () {
+      done();
+    });
+  });
+
+  afterEach((done) => {
+    if (socket?.connected) {
+      socket.disconnect();
+    } else {
+      console.error("no connection to break...");
+    }
+    done();
+  });
+
+  it("ignores non existent call", () => {
+    return new Promise((resolve) => {
+      socket.emit("nonExistent", (err, data) => {
+        expect(err).toBe("wrong input");
+        expect(data).toBeUndefined();
+        resolve();
+      });
+    });
+  });
+
+  it("ignores call without arguments", () => {
+    socket.emit("joinRoom");
+    socket.emit("changeStateServer");
+    socket.emit("changeVideoServer");
+    socket.emit("syncClient");
+
+    return new Promise((resolve) => setTimeout(resolve, 100));
+  });
+
+  it("ignores call without callback", () => {
+    socket.emit("joinRoom", {});
+    socket.emit("changeStateServer", {});
+    socket.emit("changeVideoServer", {});
+    socket.emit("syncClient", {});
+
+    return new Promise((resolve) => setTimeout(resolve, 100));
+  });
+
+  it("accept call without data", () => {
+    return Promise.all([
+      new Promise((resolve) => {
+        socket.emit("joinRoom", (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          resolve();
+        });
+      }),
+      new Promise((resolve) => {
+        socket.emit("changeStateServer", (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          resolve();
+        });
+      }),
+      new Promise((resolve) => {
+        socket.emit("changeVideoServer", (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          resolve();
+        });
+      }),
+      new Promise((resolve) => {
+        socket.emit("syncClient", (err, data) => {
+          expect(err).toBe("access denied");
+          expect(data).toBeUndefined();
+          resolve();
+        });
+      }),
+    ]);
+  });
+
+  it("callback error without data", () => {
+    return Promise.all([
+      new Promise((resolve) => {
+        socket.emit("joinRoom", null, (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          resolve();
+        });
+      }),
+      new Promise((resolve) => {
+        socket.emit("changeStateServer", (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          resolve();
+        });
+      }),
+      new Promise((resolve) => {
+        socket.emit("changeVideoServer", (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          resolve();
+        });
+      }),
+      new Promise((resolve) => {
+        socket.emit("syncClient", (err, data) => {
+          expect(err).toBe("access denied");
+          expect(data).toBeUndefined();
+          resolve();
+        });
+      }),
+    ]);
+  });
+});
+
 describe("test arguments", function () {
   /** @type {ioClient.Socket} */
   let socket;
@@ -57,27 +175,6 @@ describe("test arguments", function () {
   });
 
   describe("emit joinRoom", () => {
-    it("ignores call without arguments", (done) => {
-      socket.emit("joinRoom");
-
-      done();
-    });
-
-    it("ignores call without callback", (done) => {
-      socket.emit("joinRoom", { roomnum: "roomnum" });
-
-      done();
-    });
-
-    it("callback error without data", (done) => {
-      expect.assertions(2);
-      socket.emit("joinRoom", null, (err, data) => {
-        expect(err).toBe("wrong input");
-        expect(data).toBeUndefined();
-        done();
-      });
-    });
-
     it("callback error without connection", (done) => {
       expect.assertions(2);
       socket.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
@@ -90,7 +187,7 @@ describe("test arguments", function () {
     it("callback error without roomnum", (done) => {
       expect.assertions(2);
       socket.emit("joinRoom", { roomnum: null }, (err, data) => {
-        expect(err).toBe("wrong roomnum");
+        expect(err).toBe("wrong input");
         expect(data).toBeUndefined();
         done();
       });
@@ -99,7 +196,7 @@ describe("test arguments", function () {
     it("callback error with roomnum empty", (done) => {
       expect.assertions(2);
       socket.emit("joinRoom", { roomnum: "" }, (err, data) => {
-        expect(err).toBe("wrong roomnum");
+        expect(err).toBe("wrong input");
         expect(data).toBeUndefined();
         done();
       });
@@ -108,7 +205,7 @@ describe("test arguments", function () {
     it("callback error with roomnum not a word", (done) => {
       expect.assertions(2);
       socket.emit("joinRoom", { roomnum: "-" }, (err, data) => {
-        expect(err).toBe("wrong roomnum");
+        expect(err).toBe("wrong input");
         expect(data).toBeUndefined();
         done();
       });
@@ -142,7 +239,7 @@ describe("test arguments", function () {
         "joinRoom",
         { roomnum: "abcabcabcabcabcabcabcabcabcabca" },
         (err, data) => {
-          expect(err).toBe("wrong roomnum");
+          expect(err).toBe("wrong input");
           expect(data).toBeUndefined();
           done();
         }
@@ -152,7 +249,7 @@ describe("test arguments", function () {
     it("callback error with roomnum not a string", (done) => {
       expect.assertions(2);
       socket.emit("joinRoom", { roomnum: 26 }, (err, data) => {
-        expect(err).toBe("wrong roomnum");
+        expect(err).toBe("wrong input");
         expect(data).toBeUndefined();
         done();
       });

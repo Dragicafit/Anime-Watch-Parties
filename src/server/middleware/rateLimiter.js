@@ -1,5 +1,6 @@
 "use strict";
 
+const debug = require("debug")("rateLimiterServerAWP");
 const { Express } = require("express");
 const { Server: ioServer } = require("socket.io");
 const { RedisClient } = require("redis");
@@ -46,14 +47,19 @@ module.exports = {
         })
         .catch(() => {});
 
-      socket.use((packet, next2) => {
+      socket.use(([event, data, callback], next2) => {
         rateLimiter
           .consume(socket.handshake.address)
           .then(() => {
             next2();
           })
           .catch(() => {
-            if (typeof packet[2] === "function") return packet[2]();
+            if (typeof callback === "undefined") {
+              callback = data;
+            }
+            if (typeof callback === "function") {
+              return callback();
+            }
           });
       });
     });
