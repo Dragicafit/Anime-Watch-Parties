@@ -17,7 +17,7 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["start"],
       "skipFiles": ["<node_internals>/**"],
-      "env": { "NODE_DEBUG": "", "DEBUG": "serverAWP:*" },
+      "env": { "NODE_DEBUG": "", "DEBUG": "*erverAWP:*" },
       "console": "integratedTerminal"
     }
   ]

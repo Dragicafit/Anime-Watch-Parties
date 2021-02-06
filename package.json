@@ -4,7 +4,7 @@
   "description": "Watch your favorite anime with your streamer.",
   "scripts": {
     "start": "node src/server/server.js",
-    "debug": "DEBUG=serverAWP:* npm start",
+    "debug": "DEBUG=*erverAWP:* npm start",
     "test": "jest",
     "release": "./concat.ps1 && zip -r -FS Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json src/icons/* src/dependencies/* src/background-scripts/background-script2.js src/content-scripts/listener.js src/web-accessible-resources/js/script.js src/web-accessible-resources/css/script.css src/popup/*",
     "cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj \"/C=FR/ST=Ile-de-France/L=Paris/O=Dragicafit/OU=Org/CN=localhost\" -sha256"
