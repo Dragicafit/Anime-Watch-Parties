@@ -45,7 +45,7 @@ module.exports = {
         .then(() => {
           next();
         })
-        .catch(() => {});
+        .catch(() => next(new Error("Too Many Requests")));
 
       socket.use(([event, data, callback], next2) => {
         rateLimiter
@@ -54,11 +54,11 @@ module.exports = {
             next2();
           })
           .catch(() => {
-            if (typeof callback === "undefined") {
+            if (typeof data === "function") {
               callback = data;
             }
             if (typeof callback === "function") {
-              return callback();
+              callback();
             }
           });
       });

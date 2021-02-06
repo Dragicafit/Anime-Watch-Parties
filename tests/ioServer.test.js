@@ -56,25 +56,25 @@ describe("test argument middleware", function () {
     });
   });
 
-  it("ignores call without arguments", () => {
+  it("accepts call without data and callback", () => {
     socket.emit("joinRoom");
     socket.emit("changeStateServer");
     socket.emit("changeVideoServer");
     socket.emit("syncClient");
 
-    return new Promise((resolve) => setTimeout(resolve, 100));
+    return new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
-  it("ignores call without callback", () => {
+  it("accepts call without callback", () => {
     socket.emit("joinRoom", {});
     socket.emit("changeStateServer", {});
     socket.emit("changeVideoServer", {});
     socket.emit("syncClient", {});
 
-    return new Promise((resolve) => setTimeout(resolve, 100));
+    return new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
-  it("accept call without data", () => {
+  it("accepts call without data", () => {
     return Promise.all([
       new Promise((resolve) => {
         socket.emit("joinRoom", (err, data) => {

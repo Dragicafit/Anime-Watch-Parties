@@ -37,14 +37,17 @@ module.exports = {
           };
           debugSocket(events);
           let [event, data, callback] = events;
-          if (typeof callback === "undefined") {
+          if (typeof data === "function") {
             callback = data;
             data = {};
           }
           if (typeof callback !== "function") {
             callback = () => null;
           }
-          if (typeof data !== "object" || data == null) {
+          if (data == null) {
+            data = {};
+          }
+          if (typeof data !== "object") {
             debugSocket("data is null");
             return callback("wrong input");
           }
