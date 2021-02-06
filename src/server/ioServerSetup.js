@@ -37,19 +37,17 @@ module.exports = {
           };
           debugSocket(events);
           let [event, data, callback] = events;
-          if (typeof data === "function") {
+          if (data == null) {
+            data = {};
+          } else if (typeof data === "function") {
             callback = data;
             data = {};
+          } else if (typeof data !== "object") {
+            debugSocket("data is not valid");
+            return callback("data is not valid");
           }
           if (typeof callback !== "function") {
             callback = () => null;
-          }
-          if (data == null) {
-            data = {};
-          }
-          if (typeof data !== "object") {
-            debugSocket("data is null");
-            return callback("wrong input");
           }
           switch (event) {
             case "joinRoom":
@@ -83,7 +81,7 @@ module.exports = {
               events[2] = callback;
               break;
             default:
-              return callback("wrong input");
+              return callback("event is not valid");
           }
           next();
         });
