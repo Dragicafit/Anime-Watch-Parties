@@ -12,10 +12,17 @@ const debugChangeStateServer = debug.extend("changeStateServer");
 const debugChangeVideoServer = debug.extend("changeVideoServer");
 const debugSyncClient = debug.extend("syncClient");
 
-let regexRoom = /^\w{1,30}$/;
-let regexVideoId = /^[\w\/-]{1,300}$/;
-let regexSite = /^(wakanim|crunchyroll)$/;
-let regexLocation = /^[a-zA-Z]{2}$/;
+const supportedEvents = [
+  "joinRoom",
+  "changeStateServer",
+  "changeVideoServer",
+  "syncClient",
+];
+
+const regexRoom = /^\w{1,30}$/;
+const regexVideoId = /^[\w\/-]{1,300}$/;
+const regexSite = /^(wakanim|crunchyroll)$/;
+const regexLocation = /^[a-zA-Z]{2}$/;
 
 module.exports = {
   /** @param {ioServer} io */
@@ -339,4 +346,5 @@ module.exports = {
   close: function (io) {
     return new Promise((resolve) => io.close(resolve));
   },
+  supportedEvents: supportedEvents,
 };

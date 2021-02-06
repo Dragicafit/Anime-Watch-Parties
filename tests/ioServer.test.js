@@ -46,6 +46,15 @@ describe("test argument middleware", function () {
     done();
   });
 
+  it("throw an error", () => {
+    return new Promise((resolve) => {
+      expect(() => socket.emit("disconnect")).toThrow(
+        new Error('"disconnect" is a reserved event name')
+      );
+      resolve();
+    });
+  });
+
   it("callbacks error with non existent event", () => {
     return new Promise((resolve) => {
       socket.emit("nonExistent", (err, data) => {
@@ -57,153 +66,73 @@ describe("test argument middleware", function () {
   });
 
   it("accepts without data and callback", () => {
-    socket.emit("joinRoom");
-    socket.emit("changeStateServer");
-    socket.emit("changeVideoServer");
-    socket.emit("syncClient");
-
+    ioServerSetup.supportedEvents.map((supportedEvent) =>
+      socket.emit(supportedEvent)
+    );
     return new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
   it("accepts without callback", () => {
-    socket.emit("joinRoom", {});
-    socket.emit("changeStateServer", {});
-    socket.emit("changeVideoServer", {});
-    socket.emit("syncClient", {});
-
+    ioServerSetup.supportedEvents.map((supportedEvent) =>
+      socket.emit(supportedEvent, {})
+    );
     return new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
   it("accepts without data", () => {
-    return Promise.all([
-      new Promise((resolve) => {
-        socket.emit("joinRoom", (err, data) => {
-          expect(err).toBe("wrong input");
-          expect(data).toBeUndefined();
-          resolve();
+    return Promise.all(
+      ioServerSetup.supportedEvents.map((supportedEvent) => {
+        return new Promise((resolve) => {
+          socket.emit(supportedEvent, (err, data) => {
+            expect(err).not.toBe("data is not valid");
+            expect(err).not.toBe("event is not valid");
+            resolve();
+          });
         });
-      }),
-      new Promise((resolve) => {
-        socket.emit("changeStateServer", (err, data) => {
-          expect(err).toBe("wrong input");
-          expect(data).toBeUndefined();
-          resolve();
-        });
-      }),
-      new Promise((resolve) => {
-        socket.emit("changeVideoServer", (err, data) => {
-          expect(err).toBe("wrong input");
-          expect(data).toBeUndefined();
-          resolve();
-        });
-      }),
-      new Promise((resolve) => {
-        socket.emit("syncClient", (err, data) => {
-          expect(err).toBe("access denied");
-          expect(data).toBeUndefined();
-          resolve();
-        });
-      }),
-    ]);
+      })
+    );
   });
 
   it("accepts with undefined data", () => {
-    return Promise.all([
-      new Promise((resolve) => {
-        socket.emit("joinRoom", undefined, (err, data) => {
-          expect(err).toBe("wrong input");
-          expect(data).toBeUndefined();
-          resolve();
+    return Promise.all(
+      ioServerSetup.supportedEvents.map((supportedEvent) => {
+        return new Promise((resolve) => {
+          socket.emit(supportedEvent, undefined, (err, data) => {
+            expect(err).not.toBe("data is not valid");
+            expect(err).not.toBe("event is not valid");
+            resolve();
+          });
         });
-      }),
-      new Promise((resolve) => {
-        socket.emit("changeStateServer", undefined, (err, data) => {
-          expect(err).toBe("wrong input");
-          expect(data).toBeUndefined();
-          resolve();
-        });
-      }),
-      new Promise((resolve) => {
-        socket.emit("changeVideoServer", undefined, (err, data) => {
-          expect(err).toBe("wrong input");
-          expect(data).toBeUndefined();
-          resolve();
-        });
-      }),
-      new Promise((resolve) => {
-        socket.emit("syncClient", undefined, (err, data) => {
-          expect(err).toBe("access denied");
-          expect(data).toBeUndefined();
-          resolve();
-        });
-      }),
-    ]);
+      })
+    );
   });
 
   it("accepts with null data", () => {
-    return Promise.all([
-      new Promise((resolve) => {
-        socket.emit("joinRoom", null, (err, data) => {
-          expect(err).toBe("wrong input");
-          expect(data).toBeUndefined();
-          resolve();
+    return Promise.all(
+      ioServerSetup.supportedEvents.map((supportedEvent) => {
+        return new Promise((resolve) => {
+          socket.emit(supportedEvent, null, (err, data) => {
+            expect(err).not.toBe("data is not valid");
+            expect(err).not.toBe("event is not valid");
+            resolve();
+          });
         });
-      }),
-      new Promise((resolve) => {
-        socket.emit("changeStateServer", null, (err, data) => {
-          expect(err).toBe("wrong input");
-          expect(data).toBeUndefined();
-          resolve();
-        });
-      }),
-      new Promise((resolve) => {
-        socket.emit("changeVideoServer", null, (err, data) => {
-          expect(err).toBe("wrong input");
-          expect(data).toBeUndefined();
-          resolve();
-        });
-      }),
-      new Promise((resolve) => {
-        socket.emit("syncClient", null, (err, data) => {
-          expect(err).toBe("access denied");
-          expect(data).toBeUndefined();
-          resolve();
-        });
-      }),
-    ]);
+      })
+    );
   });
 
   it("callback error with invalid data", () => {
-    return Promise.all([
-      new Promise((resolve) => {
-        socket.emit("joinRoom", 0, (err, data) => {
-          expect(err).toBe("data is not valid");
-          expect(data).toBeUndefined();
-          resolve();
+    return Promise.all(
+      ioServerSetup.supportedEvents.map((supportedEvent) => {
+        return new Promise((resolve) => {
+          socket.emit(supportedEvent, 0, (err, data) => {
+            expect(err).toBe("data is not valid");
+            expect(data).toBeUndefined();
+            resolve();
+          });
         });
-      }),
-      new Promise((resolve) => {
-        socket.emit("changeStateServer", 0, (err, data) => {
-          expect(err).toBe("data is not valid");
-          expect(data).toBeUndefined();
-          resolve();
-        });
-      }),
-      new Promise((resolve) => {
-        socket.emit("changeVideoServer", 0, (err, data) => {
-          expect(err).toBe("data is not valid");
-          expect(data).toBeUndefined();
-          resolve();
-        });
-      }),
-      new Promise((resolve) => {
-        socket.emit("syncClient", 0, (err, data) => {
-          expect(err).toBe("data is not valid");
-          expect(data).toBeUndefined();
-          resolve();
-        });
-      }),
-    ]);
+      })
+    );
   });
 });
 
@@ -228,16 +157,6 @@ describe("test arguments", function () {
       console.error("no connection to break...");
     }
     done();
-  });
-
-  describe("emit disconnect", () => {
-    it("throw an error", (done) => {
-      expect(() => socket.emit("disconnect")).toThrow(
-        new Error('"disconnect" is a reserved event name')
-      );
-
-      done();
-    });
   });
 
   describe("emit joinRoom", () => {
