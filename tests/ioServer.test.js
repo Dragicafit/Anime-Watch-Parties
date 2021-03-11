@@ -364,6 +364,11 @@ describe("test connection", function () {
       return Promise.resolve();
     });
 
+    it("number of connections", () => {
+      expect(io.sockets.sockets.size).toBe(1);
+      return Promise.resolve();
+    });
+
     it("simple connection", () => {
       return new Promise((resolve) =>
         socket.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
@@ -376,22 +381,20 @@ describe("test connection", function () {
           });
           resolve();
         })
-      );
+      ).then(() => {
+        expect(io.sockets.adapter.rooms.get(`room-roomnum`)).toBeDefined();
+        expect(io.sockets.adapter.rooms.get(`room-roomnum`).size).toBe(1);
+      });
     });
 
     it("get online users", () => {
-      return new Promise((resolve) =>
-        socket.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
-          expect(err).toBeNull();
-          expect(data).toEqual({
-            host: false,
-            hostName: "",
-            roomnum: "roomnum",
-            username: "socket",
-          });
+      socket.emit("joinRoom", { roomnum: "roomnum" });
+      return new Promise((resolve) => {
+        socket.on("getUsers", function (data) {
+          expect(data.onlineUsers).toBe(1);
           resolve();
-        })
-      );
+        });
+      });
     });
   });
 
@@ -445,7 +448,7 @@ describe("test connection", function () {
       return Promise.resolve();
     });
 
-    it("number of connection", () => {
+    it("number of connections", () => {
       expect(io.sockets.sockets.size).toBe(2);
       return Promise.resolve();
     });
@@ -480,6 +483,25 @@ describe("test connection", function () {
         expect(io.sockets.adapter.rooms.get(`room-roomnum`)).toBeDefined();
         expect(io.sockets.adapter.rooms.get(`room-roomnum`).size).toBe(2);
       });
+    });
+
+    it("get online users", () => {
+      socket1.emit("joinRoom", { roomnum: "roomnum" });
+      socket2.emit("joinRoom", { roomnum: "roomnum" });
+      return Promise.all([
+        new Promise((resolve) => {
+          socket1.on("getUsers", function (data) {
+            expect(data.onlineUsers).toBe(1);
+            resolve();
+          });
+        }),
+        new Promise((resolve) => {
+          socket2.on("getUsers", function (data) {
+            expect(data.onlineUsers).toBe(2);
+            resolve();
+          });
+        }),
+      ]);
     });
   });
 });
