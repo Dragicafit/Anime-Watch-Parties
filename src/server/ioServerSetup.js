@@ -27,16 +27,13 @@ const regexLocation = /^[a-zA-Z]{2}$/;
 module.exports = {
   /** @param {ioServer} io */
   start: function (io) {
-    let connections = 0;
-
     io.on(
       "connection",
       /** @param {Socket} socket */ (socket) => {
-        connections++;
         function debugConnection2() {
           debugConnection(`${socket.id}:`, ...arguments);
         }
-        debugConnection2(`${connections} sockets connected`);
+        debugConnection2(`${io.sockets.sockets.size} sockets connected`);
 
         socket.use((events, next) => {
           let debugSocket = (...args) => {
@@ -94,11 +91,10 @@ module.exports = {
         });
 
         socket.on("disconnect", () => {
-          connections--;
           function debugSocket() {
             debugDisconnect(`${socket.id}:`, ...arguments);
           }
-          debugSocket(`${connections} sockets connected`);
+          debugSocket(`${io.sockets.sockets.size} sockets connected`);
 
           if (socket.roomnum == null) {
             return;
