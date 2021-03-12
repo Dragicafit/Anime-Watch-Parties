@@ -9,6 +9,8 @@ const { RedisClient } = require("redis");
 const session = require("express-session");
 const RedisStore = require("connect-redis")(session);
 const twitchStrategy = require("passport-twitch-new").Strategy;
+const wrap = (middleware) => (socket, next) =>
+  middleware(socket.request, {}, next);
 
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
 const TWITCH_SECRET = process.env.TWITCH_SECRET;
@@ -30,21 +32,21 @@ module.exports = {
       cookie: { secure: true, sameSite: "none" },
     });
     app.use(customsession);
+    io.use(wrap(customsession));
+
     io.use((socket, next) => {
-      customsession(socket.request, socket.request.res || {}, next);
-    });
-    io.use((socket, next) => {
-      socket.username = socket.request.session?.passport?.user?.display_name;
+      socket.auths = socket.request.session?.passport?.user;
       next();
     });
 
-    passport.serializeUser(function (user, done) {
+    passport.serializeUser((user, done) => {
       done(null, user);
     });
-    passport.deserializeUser(function (user, done) {
+    passport.deserializeUser((user, done) => {
       done(null, user);
     });
     passport.use(
+      "twitch",
       new twitchStrategy(
         {
           clientID: TWITCH_CLIENT_ID,
@@ -52,18 +54,26 @@ module.exports = {
           callbackURL: CALLBACK_URL,
           state: true,
         },
-        function (accessToken, refreshToken, profile, done) {
+        (accessToken, refreshToken, profile, done) => {
           done(null, profile);
         }
       )
     );
 
-    app.get(
-      "/auth/twitch",
-      passport.authenticate("twitch", {
-        successRedirect: "/",
-        failureRedirect: "/",
-      })
-    );
+    app.get("/auth/twitch", (req, res, next) => {
+      passport.authenticate("twitch", (err, user) => {
+        if (err || user === false) return res.redirect("/");
+
+        let userNew = req.session.passport?.user || {};
+        userNew[user.provider] = {
+          display_name: user.display_name,
+          id: user.id,
+        };
+
+        req.logIn(userNew, () => {
+          res.redirect("/");
+        });
+      })(req, res, next);
+    });
   },
 };

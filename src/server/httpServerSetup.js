@@ -21,12 +21,16 @@ var template = handlebars.compile(`
     "https://www.crunchyroll.com"
   );
   </script></head>
-<table>
-    <tr><th>Access Token</th><td>{{accessToken}}</td></tr>
-    <tr><th>Refresh Token</th><td>{{refreshToken}}</td></tr>
-    <tr><th>Display Name</th><td>{{display_name}}</td></tr>
-    <tr><th>Id</th><td>{{id}}</td></tr>
-</table></html>`);
+  {{#each auths}}
+  <table>
+      <tr><th>Provider</th><td>{{provider}}</td></tr>
+      <tr><th>Access Token</th><td>{{auth.accessToken}}</td></tr>
+      <tr><th>Refresh Token</th><td>{{auth.refreshToken}}</td></tr>
+      <tr><th>Display Name</th><td>{{auth.display_name}}</td></tr>
+      <tr><th>Id</th><td>{{auth.id}}</td></tr>
+  </table>
+  {{/each}}
+</html>`);
 
 module.exports = {
   /** @param {Express} app */
@@ -35,7 +39,11 @@ module.exports = {
       let reqSession = req.session;
       let user = reqSession?.passport?.user;
       if (user) {
-        res.send(template(user));
+        let auths = Object.keys(user).map((key) => ({
+          provider: key,
+          auth: user[key],
+        }));
+        res.send(template({ auths: auths }));
       } else {
         res.send(
           '<html><head><title>Twitch Auth Sample</title></head><a href="/auth/twitch"><img src="http://ttv-api.s3.amazonaws.com/assets/connect_dark.png"></a></html>'
