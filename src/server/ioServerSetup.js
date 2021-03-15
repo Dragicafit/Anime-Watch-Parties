@@ -3,21 +3,12 @@
 const debug = require("debug")("ioServerAWP");
 const { Server: ioServer, Socket } = require("socket.io");
 const performance = require("perf_hooks").performance;
+const filterInput = require("./middleware/filterInput");
 
 const debugConnection = debug.extend("connection");
 const debugDisconnect = debug.extend("disconnect");
-const debugArgument = debug.extend("argument");
-const debugJoinRoom = debug.extend("joinRoom");
-const debugChangeStateServer = debug.extend("changeStateServer");
-const debugChangeVideoServer = debug.extend("changeVideoServer");
-const debugSyncClient = debug.extend("syncClient");
 
-const supportedEvents = [
-  "joinRoom",
-  "changeStateServer",
-  "changeVideoServer",
-  "syncClient",
-];
+const supportedEvents = filterInput.supportedEvents;
 
 const regexRoom = /^\w{1,30}$/;
 const regexVideoId = /^[\w\/-]{1,300}$/;
@@ -35,60 +26,7 @@ module.exports = {
         }
         debugConnection2(`${io.sockets.sockets.size} sockets connected`);
 
-        socket.use((events, next) => {
-          let debugSocket = (...args) => {
-            debugArgument(`${socket.id}:`, ...args);
-          };
-          debugSocket(events);
-          let [event, data, callback] = events;
-          if (data == null) {
-            data = {};
-          } else if (typeof data === "function") {
-            callback = data;
-            data = {};
-          } else if (typeof data !== "object") {
-            debugSocket("data is not valid");
-            return callback("data is not valid");
-          }
-          if (typeof callback !== "function") {
-            callback = () => null;
-          }
-          switch (event) {
-            case "joinRoom":
-              events[1] = (...args) => {
-                debugJoinRoom(`${socket.id}:`, ...args);
-              };
-              events[2] = data.roomnum;
-              events[3] = callback;
-              break;
-            case "changeStateServer":
-              events[1] = (...args) => {
-                debugChangeStateServer(`${socket.id}:`, ...args);
-              };
-              events[2] = data.state;
-              events[3] = data.time;
-              events[4] = callback;
-              break;
-            case "changeVideoServer":
-              events[1] = (...args) => {
-                debugChangeVideoServer(`${socket.id}:`, ...args);
-              };
-              events[2] = data.videoId;
-              events[3] = data.site;
-              events[4] = data.location;
-              events[5] = callback;
-              break;
-            case "syncClient":
-              events[1] = (...args) => {
-                debugSyncClient(`${socket.id}:`, ...args);
-              };
-              events[2] = callback;
-              break;
-            default:
-              return callback("event is not valid");
-          }
-          next();
-        });
+        filterInput.start(socket);
 
         socket.on("disconnect", () => {
           function debugSocket() {

@@ -10,6 +10,13 @@ const { Server: ioServer } = require("socket.io");
 const portTest = process.env.PORT_TEST || 4001;
 const port = process.env.PORT != portTest ? portTest : portTest + 1;
 
+const supportedEvents = {
+  JOIN_ROOM: "joinRoom",
+  CHANGE_STATE_SERVER: "changeStateServer",
+  CHANGE_VIDEO_SERVER: "changeVideoServer",
+  SYNC_CLIENT: "syncClient",
+};
+
 /** @type {ioServer} */
 let io;
 
@@ -21,6 +28,11 @@ beforeEach(() => {
 
 afterEach(() => {
   return ioServerSetup.close(io);
+});
+
+it("verify supported events", () => {
+  expect(ioServerSetup.supportedEvents).toStrictEqual(supportedEvents);
+  return Promise.resolve();
 });
 
 describe("test argument middleware", function () {
@@ -66,14 +78,14 @@ describe("test argument middleware", function () {
   });
 
   it("accepts without data and callback", () => {
-    ioServerSetup.supportedEvents.map((supportedEvent) =>
+    Object.values(supportedEvents).map((supportedEvent) =>
       socket.emit(supportedEvent)
     );
     return new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
   it("accepts without callback", () => {
-    ioServerSetup.supportedEvents.map((supportedEvent) =>
+    Object.values(supportedEvents).map((supportedEvent) =>
       socket.emit(supportedEvent, {})
     );
     return new Promise((resolve) => setTimeout(resolve, 1000));
@@ -81,7 +93,7 @@ describe("test argument middleware", function () {
 
   it("accepts without data", () => {
     return Promise.all(
-      ioServerSetup.supportedEvents.map((supportedEvent) => {
+      Object.values(supportedEvents).map((supportedEvent) => {
         return new Promise((resolve) => {
           socket.emit(supportedEvent, (err, data) => {
             expect(err).not.toBe("data is not valid");
@@ -95,7 +107,7 @@ describe("test argument middleware", function () {
 
   it("accepts with undefined data", () => {
     return Promise.all(
-      ioServerSetup.supportedEvents.map((supportedEvent) => {
+      Object.values(supportedEvents).map((supportedEvent) => {
         return new Promise((resolve) => {
           socket.emit(supportedEvent, undefined, (err, data) => {
             expect(err).not.toBe("data is not valid");
@@ -109,7 +121,7 @@ describe("test argument middleware", function () {
 
   it("accepts with null data", () => {
     return Promise.all(
-      ioServerSetup.supportedEvents.map((supportedEvent) => {
+      Object.values(supportedEvents).map((supportedEvent) => {
         return new Promise((resolve) => {
           socket.emit(supportedEvent, null, (err, data) => {
             expect(err).not.toBe("data is not valid");
@@ -123,7 +135,7 @@ describe("test argument middleware", function () {
 
   it("callback error with invalid data", () => {
     return Promise.all(
-      ioServerSetup.supportedEvents.map((supportedEvent) => {
+      Object.values(supportedEvents).map((supportedEvent) => {
         return new Promise((resolve) => {
           socket.emit(supportedEvent, 0, (err, data) => {
             expect(err).toBe("data is not valid");
