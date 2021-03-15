@@ -108,24 +108,13 @@ module.exports = {
           }
           debugSocket(`applied to room-${socket.roomnum}`);
 
-          if (socket.username != null) {
-            const index = room.users.indexOf(socket.username);
-            if (index > -1) {
-              room.users.splice(index, 1);
-              updateRoomUsers(debugSocket);
-            }
-          }
+          updateRoomUsers(debugSocket);
         });
 
         socket.on("joinRoom", (debugSocket, roomnum, callback) => {
           if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
             debugSocket("roomnum is not a valid string");
             return callback("wrong input");
-          }
-
-          if (socket.username == null) {
-            debugSocket("socket is not connected");
-            return callback("not connected");
           }
 
           let init = false;
@@ -140,11 +129,7 @@ module.exports = {
               return callback("error server");
             }
             socket.leave(`room-${socket.roomnum}`);
-            const index = room.users.indexOf(socket.username);
-            if (index > -1) {
-              room.users.splice(index, 1);
-              updateRoomUsers(debugSocket);
-            }
+            updateRoomUsers(debugSocket);
           }
 
           init = io.sockets.adapter.rooms.get(`room-${newRoomnum}`) == null;
@@ -163,29 +148,16 @@ module.exports = {
               room.currVideo = null;
               room.site = null;
               room.location = null;
-              room.users = [socket.username];
-              room.hostName = "";
               room.state = false;
               room.currTime = 0;
               room.lastChange = performance.now();
             }
-            if (socket.username.toLowerCase() === newRoomnum) {
+            if (room.host == null) {
               debugSocket("socket is host");
 
-              if (room.host != null) {
-                socket.broadcast.to(room.host).emit("unSetHost");
-              }
               room.host = socket.id;
-              room.hostName = socket.username;
-
-              io.sockets.to(`room-${newRoomnum}`).emit("changeHostLabel", {
-                username: room.hostName,
-              });
             }
             if (!init) {
-              if (!room.users.includes(socket.username)) {
-                room.users.push(socket.username);
-              }
               setTimeout(() => {
                 syncClient(debugSocket, () => null);
               }, 1000);
@@ -196,8 +168,6 @@ module.exports = {
             callback(null, {
               roomnum: socket.roomnum,
               host: socket.id === room.host,
-              username: socket.username,
-              hostName: room.hostName,
             });
           }
         });
@@ -332,7 +302,7 @@ module.exports = {
           debugSocket(`applied to room-${socket.roomnum}`);
 
           io.sockets.to(`room-${socket.roomnum}`).emit("getUsers", {
-            onlineUsers: room.users.length,
+            onlineUsers: room.size,
           });
         }
       }

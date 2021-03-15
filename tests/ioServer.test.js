@@ -160,15 +160,6 @@ describe("test arguments", function () {
   });
 
   describe("emit joinRoom", () => {
-    it("callback error without connection", (done) => {
-      expect.assertions(2);
-      socket.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
-        expect(err).toBe("not connected");
-        expect(data).toBeUndefined();
-        done();
-      });
-    });
-
     it("callback error without roomnum", (done) => {
       expect.assertions(2);
       socket.emit("joinRoom", { roomnum: null }, (err, data) => {
@@ -197,22 +188,18 @@ describe("test arguments", function () {
     });
 
     it("reaches connection with 1 char", (done) => {
-      expect.assertions(2);
       socket.emit("joinRoom", { roomnum: "_" }, (err, data) => {
-        expect(err).toBe("not connected");
-        expect(data).toBeUndefined();
+        expect(err).not.toBe("wrong input");
         done();
       });
     });
 
     it("reaches connection with 30 char", (done) => {
-      expect.assertions(2);
       socket.emit(
         "joinRoom",
         { roomnum: "abcabcabcabcabcabcabcabcabcabc" },
         (err, data) => {
-          expect(err).toBe("not connected");
-          expect(data).toBeUndefined();
+          expect(err).not.toBe("wrong input");
           done();
         }
       );
@@ -328,14 +315,6 @@ describe("test arguments", function () {
 });
 
 describe("test connection", function () {
-  beforeEach(() => {
-    io.use((socket, next) => {
-      socket.username = socket.handshake.query.username;
-      next();
-    });
-    return Promise.resolve();
-  });
-
   describe("with one socket", function () {
     /** @type {ioClient.Socket} */
     let socket;
@@ -344,9 +323,6 @@ describe("test connection", function () {
       socket = ioClient.io(`http://localhost:${port}`, {
         reconnectionDelay: 0,
         forceNew: true,
-        query: {
-          username: "socket",
-        },
       });
       return new Promise((resolve) =>
         socket.on("connect", function () {
@@ -374,10 +350,8 @@ describe("test connection", function () {
         socket.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
           expect(err).toBeNull();
           expect(data).toEqual({
-            host: false,
-            hostName: "",
+            host: true,
             roomnum: "roomnum",
-            username: "socket",
           });
           resolve();
         })
@@ -408,16 +382,10 @@ describe("test connection", function () {
       socket1 = ioClient.io(`http://localhost:${port}`, {
         reconnectionDelay: 0,
         forceNew: true,
-        query: {
-          username: "socket1",
-        },
       });
       socket2 = ioClient.io(`http://localhost:${port}`, {
         reconnectionDelay: 0,
         forceNew: true,
-        query: {
-          username: "socket2",
-        },
       });
 
       return Promise.all([
@@ -459,10 +427,8 @@ describe("test connection", function () {
           socket1.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
             expect(err).toBeNull();
             expect(data).toEqual({
-              host: false,
-              hostName: "",
+              host: true,
               roomnum: "roomnum",
-              username: "socket1",
             });
             resolve();
           })
@@ -472,9 +438,7 @@ describe("test connection", function () {
             expect(err).toBeNull();
             expect(data).toEqual({
               host: false,
-              hostName: "",
               roomnum: "roomnum",
-              username: "socket2",
             });
             resolve();
           })

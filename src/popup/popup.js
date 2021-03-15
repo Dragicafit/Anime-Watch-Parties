@@ -55,17 +55,11 @@ function chat() {
   });
 }
 
-function sendInfo(username, roomnum, hostName, onlineUsers) {
+function sendInfo(roomnum, onlineUsers) {
   console.log("get info");
 
-  if (username != null) {
-    document.getElementById("username").innerHTML = username;
-  }
   if (roomnum != null) {
     document.getElementById("roomnum").value = roomnum;
-  }
-  if (hostName != null) {
-    document.getElementById("hostName").innerHTML = hostName;
   }
   if (onlineUsers != null) {
     document.getElementById("online-users").innerHTML = onlineUsers;
@@ -79,12 +73,7 @@ browser.runtime.sendMessage({
 browser.runtime.onMessage.addListener((message) => {
   switch (message?.command) {
     case "sendInfo":
-      sendInfo(
-        message.username,
-        message.roomnum,
-        message.hostName,
-        message.onlineUsers
-      );
+      sendInfo(message.roomnum, message.onlineUsers);
       break;
     case "scriptLoaded":
       scriptLoaded();

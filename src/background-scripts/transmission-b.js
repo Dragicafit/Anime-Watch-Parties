@@ -42,4 +42,3 @@ socket.on("unSetHost", () => unSetHost());
 socket.on("changeVideoClient", (data) =>
   changeVideoClient(data?.site, data?.location, data?.videoId)
 );
-socket.on("changeHostLabel", (data) => changeHostLabel(data?.username));

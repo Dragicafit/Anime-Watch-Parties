@@ -4,8 +4,6 @@ function askInfo(tabId) {
   browser.runtime.sendMessage({
     command: "sendInfo",
     roomnum: infoTabs[tabId]?.roomnum,
-    username: username,
-    hostName: infoTabs[tabId]?.hostName,
     onlineUsers: infoTabs[tabId]?.onlineUsers,
   });
 
@@ -37,12 +35,10 @@ function joinRoom(tab, tabId, roomnum) {
       }
       return;
     }
-    username = data.username;
 
     if (infoTabs[tabId] == null) infoTabs[tabId] = {};
     infoTabs[tabId].roomnum = data.roomnum;
     infoTabs[tabId].host = data.host;
-    infoTabs[tabId].hostName = data.hostName;
 
     if (data.host) {
       console.log("You are the new host!");
@@ -51,7 +47,6 @@ function joinRoom(tab, tabId, roomnum) {
     } else {
       startEmbed(tabId);
     }
-    console.log(`send user name after new user ${username}`);
     console.log(`send room number after joinRoom ${data.roomnum}`);
 
     askInfo(tabId);
@@ -145,17 +140,6 @@ function changeVideoClient(site, location, videoId) {
       });
     })
     .catch(reportError);
-}
-
-function changeHostLabel(username) {
-  console.log("change host label");
-  //
-  if (Object.keys(infoTabs).length == 0) return;
-  let tabId = +Object.keys(infoTabs)[0];
-  //
-  if (infoTabs[tabId] == null) return;
-
-  infoTabs[tabId].hostName = username;
 }
 
 function restartSocket(tabId, roomnum) {
