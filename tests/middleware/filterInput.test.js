@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 "use strict";
 
-require("dotenv").config();
-
 const filterInput = require("../../src/server/middleware/filterInput");
 
 const supportedEvents = {

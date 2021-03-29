@@ -39,23 +39,22 @@ describe("test argument middleware", function () {
   /** @type {ioClient.Socket} */
   let socket;
 
-  beforeEach((done) => {
-    socket = ioClient.io(`http://localhost:${port}`, {
-      reconnectionDelay: 0,
-      forceNew: true,
-    });
-    socket.on("connect", function () {
-      done();
+  beforeEach(() => {
+    return new Promise((resolve) => {
+      socket = ioClient.io(`http://localhost:${port}`, {
+        reconnectionDelay: 0,
+        forceNew: true,
+      });
+      socket.on("connect", resolve);
     });
   });
 
-  afterEach((done) => {
+  afterEach(() => {
     if (socket?.connected) {
       socket.disconnect();
     } else {
       console.error("no connection to break...");
     }
-    done();
   });
 
   it("throw an error", () => {
