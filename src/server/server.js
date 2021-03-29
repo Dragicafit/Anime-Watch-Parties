@@ -23,11 +23,15 @@ const io = new ioServer(server, {
 });
 const redisAdapter = require("socket.io-redis");
 const redisClient = require("redis").createClient();
+const rateLimiter = require("./middleware/rateLimiter");
+const passport = require("./middleware/passport");
+const ioServerSetup = require("./ioServerSetup");
+const httpServerSetup = require("./httpServerSetup");
 
-require("./middleware/rateLimiter").start(app, io, redisClient);
-require("./middleware/passport").start(app, io, redisClient);
-require("./ioServerSetup").start(io);
-require("./httpServerSetup").start(app);
+rateLimiter.start(app, io, redisClient);
+passport.start(app, io, redisClient);
+ioServerSetup.start(io);
+httpServerSetup.start(app);
 
 const port = process.env.PORT || 4000;
 

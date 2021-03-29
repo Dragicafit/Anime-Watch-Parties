@@ -4,16 +4,16 @@ const debug = require("debug")("ioServerAWP");
 const { Server: ioServer, Socket } = require("socket.io");
 const performance = require("perf_hooks").performance;
 const filterInput = require("./middleware/filterInput");
+const ioDisconnect = require("./io/ioDisconnect");
+const ioChangeVideoServer = require("./io/ioChangeVideoServer");
+const ioChangeStateServer = require("./io/ioChangeStateServer");
+const ioJoinRoom = require("./io/ioJoinRoom");
+const ioSyncClient = require("./io/ioSyncClient");
 
 const debugConnection = debug.extend("connection");
 const debugDisconnect = debug.extend("disconnect");
 
 const supportedEvents = filterInput.supportedEvents;
-
-const regexRoom = /^\w{1,30}$/;
-const regexVideoId = /^[\w\/-]{1,300}$/;
-const regexSite = /^(wakanim|crunchyroll)$/;
-const regexLocation = /^[a-zA-Z]{2}$/;
 
 module.exports = {
   /** @param {ioServer} io */
@@ -28,169 +28,11 @@ module.exports = {
 
         filterInput.start(socket);
 
-        socket.on("disconnect", () => {
-          function debugSocket() {
-            debugDisconnect(`${socket.id}:`, ...arguments);
-          }
-          debugSocket(`${io.sockets.sockets.size} sockets connected`);
-
-          if (socket.roomnum == null) {
-            return;
-          }
-          let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
-          if (room == null) {
-            return debugSocket("room is null (empty room)");
-          }
-          if (socket.id === room.host) {
-            room.host = undefined;
-          }
-          debugSocket(`applied to room-${socket.roomnum}`);
-
-          updateRoomUsers(debugSocket);
-        });
-
-        socket.on("joinRoom", (debugSocket, roomnum, callback) => {
-          if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
-            debugSocket("roomnum is not a valid string");
-            return callback("wrong input");
-          }
-
-          let init = false;
-          let newRoomnum = roomnum.toLowerCase();
-          if (socket.roomnum === newRoomnum) {
-            return configure();
-          }
-          if (socket.roomnum != null) {
-            let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
-            if (room == null) {
-              debugSocket("room is null (error server)");
-              return callback("error server");
-            }
-            socket.leave(`room-${socket.roomnum}`);
-            updateRoomUsers(debugSocket);
-          }
-
-          init = io.sockets.adapter.rooms.get(`room-${newRoomnum}`) == null;
-          socket.join(`room-${newRoomnum}`);
-          configure();
-
-          function configure() {
-            debugSocket(`connected to room-${newRoomnum}`);
-
-            let room = io.sockets.adapter.rooms.get(`room-${newRoomnum}`);
-            if (room == null) {
-              debugSocket("room is null (error server)");
-              return callback("error server");
-            }
-            if (init) {
-              room.currVideo = null;
-              room.site = null;
-              room.location = null;
-              room.state = false;
-              room.currTime = 0;
-              room.lastChange = performance.now();
-            }
-            if (room.host == null) {
-              debugSocket("socket is host");
-
-              room.host = socket.id;
-            }
-            if (!init) {
-              setTimeout(() => {
-                syncClient(debugSocket, () => null);
-              }, 1000);
-            }
-            socket.roomnum = newRoomnum;
-            updateRoomUsers(debugSocket);
-
-            callback(null, {
-              roomnum: socket.roomnum,
-              host: socket.id === room.host,
-            });
-          }
-        });
-
-        socket.on("changeStateServer", (debugSocket, state, time, callback) => {
-          if (typeof state !== "boolean") {
-            debugSocket("state is not boolean");
-            return callback("wrong input");
-          }
-          if (!Number.isFinite(time)) {
-            debugSocket("time is not int");
-            return callback("wrong input");
-          }
-
-          if (socket.roomnum == null) {
-            debugSocket("socket is not connected to room");
-            return callback("access denied");
-          }
-          let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
-          if (room == null) {
-            debugSocket("room is null (error server)");
-            return callback("error server");
-          }
-          if (socket.id !== room.host) {
-            debugSocket("socket is not host");
-            return callback("access denied");
-          }
-          debugSocket(`applied to room-${socket.roomnum}`);
-
-          room.currTime = time;
-          room.state = state;
-          room.lastChange = performance.now();
-          socket.broadcast
-            .to(`room-${socket.roomnum}`)
-            .emit("changeStateClient", {
-              time: room.currTime,
-              state: room.state,
-            });
-        });
-
-        socket.on(
-          "changeVideoServer",
-          (debugSocket, videoId, site, location, callback) => {
-            if (typeof videoId !== "string" || !regexVideoId.test(videoId)) {
-              debugSocket("videoId is not a valid string");
-              return callback("wrong input");
-            }
-            if (typeof site !== "string" || !regexSite.test(site)) {
-              debugSocket("site is not a valid string");
-              return callback("wrong input");
-            }
-            if (typeof location !== "string" || !regexLocation.test(location)) {
-              debugSocket("location is not a valid string");
-              return callback("wrong input");
-            }
-
-            if (socket.roomnum == null) {
-              debugSocket("socket is not connected to room");
-              return callback("access denied");
-            }
-            let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
-            if (room == null) {
-              debugSocket("room is null (error server)");
-              return callback("error server");
-            }
-            if (socket.id !== room.host) {
-              debugSocket("socket is not host");
-              return callback("access denied");
-            }
-            debugSocket(`applied to room-${socket.roomnum}`);
-
-            room.currVideo = videoId;
-            room.site = site;
-            room.location = location;
-            socket.broadcast
-              .to(`room-${socket.roomnum}`)
-              .emit("changeVideoClient", {
-                videoId: room.currVideo,
-                site: room.site,
-                location: room.location,
-              });
-          }
-        );
-
-        socket.on("syncClient", syncClient);
+        ioDisconnect.start(io, socket, debugDisconnect, updateRoomUsers);
+        ioJoinRoom.start(io, socket, syncClient, updateRoomUsers, performance);
+        ioChangeStateServer.start(io, socket, performance);
+        ioChangeVideoServer.start(io, socket);
+        ioSyncClient.start(socket, syncClient);
 
         function syncClient(debugSocket, callback) {
           if (socket.roomnum == null) {
