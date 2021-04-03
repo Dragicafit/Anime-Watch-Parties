@@ -3,6 +3,7 @@
 
 const { Server: ioServer, Socket: SocketServer } = require("socket.io");
 const ioChangeVideoServer = require("../../src/server/io/ioChangeVideoServer");
+const Room = require("../../src/server/io/room");
 
 /** @type {ioServer} */
 let io;
@@ -18,6 +19,7 @@ let location;
 /** @type {jest.Mock} */
 let callback;
 
+/** @type {Room} */
 let room;
 /** @type {jest.Mock} */
 let emit;

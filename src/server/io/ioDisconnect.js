@@ -1,4 +1,5 @@
 const { Server: ioServer, Socket } = require("socket.io");
+const Room = require("./room");
 
 module.exports = {
   /** @param {ioServer} io @param {Socket} socket */
@@ -12,6 +13,7 @@ module.exports = {
       if (socket.roomnum == null) {
         return;
       }
+      /** @type {Room} */
       let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
       if (room == null) {
         return debugSocket("room is null (empty room)");

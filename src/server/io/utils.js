@@ -1,4 +1,5 @@
 const { Server: ioServer, Socket } = require("socket.io");
+const Room = require("./room");
 
 module.exports = {
   /** @param {ioServer} io @param {Socket} socket @param {Performance} performance */
@@ -9,6 +10,7 @@ module.exports = {
           debugSocket("socket is not connected to room");
           return callback("access denied");
         }
+        /** @type {Room} */
         let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
         if (room == null) {
           debugSocket("room is null (error server)");
@@ -44,6 +46,7 @@ module.exports = {
         if (socket.roomnum == null) {
           return debugSocket("socket is not connected to room");
         }
+        /** @type {Room} */
         let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
         if (room == null) {
           return debugSocket("room is null (empty room)");

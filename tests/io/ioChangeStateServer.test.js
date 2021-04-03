@@ -3,6 +3,7 @@
 
 const { Server: ioServer, Socket: SocketServer } = require("socket.io");
 const ioChangeStateServer = require("../../src/server/io/ioChangeStateServer");
+const Room = require("../../src/server/io/room");
 
 /** @type {ioServer} */
 let io;
@@ -17,6 +18,7 @@ let time;
 /** @type {jest.Mock} */
 let callback;
 
+/** @type {Room} */
 let room;
 /** @type {jest.Mock} */
 let emit;

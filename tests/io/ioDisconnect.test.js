@@ -3,6 +3,7 @@
 
 const { Server: ioServer, Socket: SocketServer } = require("socket.io");
 const ioDisconnect = require("../../src/server/io/ioDisconnect");
+const Room = require("../../src/server/io/room");
 
 /** @type {ioServer} */
 let io;
@@ -15,6 +16,7 @@ let debugDisconnect;
 /** @type {jest.Mock} */
 let updateRoomUsers;
 
+/** @type {Room} */
 let room;
 
 beforeEach(() => {

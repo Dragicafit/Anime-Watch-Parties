@@ -1,4 +1,5 @@
 const { Server: ioServer, Socket } = require("socket.io");
+const Room = require("./room");
 
 const regexVideoId = /^[\w\/-]{1,300}$/;
 const regexSite = /^(wakanim|crunchyroll)$/;
@@ -27,6 +28,7 @@ module.exports = {
           debugSocket("socket is not connected to room");
           return callback("access denied");
         }
+        /** @type {Room} */
         let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
         if (room == null) {
           debugSocket("room is null (error server)");

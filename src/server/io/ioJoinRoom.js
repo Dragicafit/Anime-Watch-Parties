@@ -1,4 +1,5 @@
 const { Server: ioServer, Socket } = require("socket.io");
+const Room = require("./room");
 
 const regexRoom = /^\w{1,30}$/;
 
@@ -17,6 +18,7 @@ module.exports = {
         return configure();
       }
       if (socket.roomnum != null) {
+        /** @type {Room} */
         let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
         if (room == null) {
           debugSocket("room is null (error server)");
@@ -33,6 +35,7 @@ module.exports = {
       function configure() {
         debugSocket(`connected to room-${newRoomnum}`);
 
+        /** @type {Room} */
         let room = io.sockets.adapter.rooms.get(`room-${newRoomnum}`);
         if (room == null) {
           debugSocket("room is null (error server)");

@@ -3,6 +3,7 @@
 
 const { Server: ioServer, Socket } = require("socket.io");
 const utils = require("../../src/server/io/utils");
+const Room = require("../../src/server/io/room");
 
 /** @type {ioServer} */
 let io;
@@ -14,6 +15,7 @@ let updateRoomUsers;
 /** @type {jest.Mock} */
 let debugSocket;
 
+/** @type {Room} */
 let room;
 let performance;
 
