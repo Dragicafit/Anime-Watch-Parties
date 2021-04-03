@@ -1,12 +1,12 @@
-const { Server: ioServer, Socket } = require("socket.io");
 const Room = require("./room");
+const Utils = require("./utils");
 
 const regexRoom = /^\w{1,30}$/;
 
 module.exports = {
-  /** @param {ioServer} io @param {Socket} socket */
-  start: function (io, socket, syncClient, updateRoomUsers, performance) {
-    socket.on("joinRoom", (debugSocket, roomnum, callback) => {
+  /** @param {Utils} utils */
+  start: function (utils) {
+    utils.socket.on("joinRoom", (debugSocket, roomnum, callback) => {
       if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
         debugSocket("roomnum is not a valid string");
         return callback("wrong input");
@@ -14,29 +14,27 @@ module.exports = {
 
       let init = false;
       let newRoomnum = roomnum.toLowerCase();
-      if (socket.roomnum === newRoomnum) {
+      if (utils.socket.roomnum === newRoomnum) {
         return configure();
       }
-      if (socket.roomnum != null) {
-        /** @type {Room} */
-        let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
+      if (utils.socket.roomnum != null) {
+        let room = utils.getRoom();
         if (room == null) {
           debugSocket("room is null (error server)");
           return callback("error server");
         }
-        socket.leave(`room-${socket.roomnum}`);
-        updateRoomUsers(debugSocket);
+        utils.socket.leave(`room-${utils.socket.roomnum}`);
+        utils.updateRoomUsers(debugSocket);
       }
 
-      init = io.sockets.adapter.rooms.get(`room-${newRoomnum}`) == null;
-      socket.join(`room-${newRoomnum}`);
+      init = utils.getRoom(newRoomnum) == null;
+      utils.socket.join(`room-${newRoomnum}`);
       configure();
 
       function configure() {
         debugSocket(`connected to room-${newRoomnum}`);
 
-        /** @type {Room} */
-        let room = io.sockets.adapter.rooms.get(`room-${newRoomnum}`);
+        let room = utils.getRoom(newRoomnum);
         if (room == null) {
           debugSocket("room is null (error server)");
           return callback("error server");
@@ -47,24 +45,24 @@ module.exports = {
           room.location = null;
           room.state = false;
           room.currTime = 0;
-          room.lastChange = performance.now();
+          room.lastChange = utils.performance.now();
         }
         if (room.host == null) {
           debugSocket("socket is host");
 
-          room.host = socket.id;
+          room.host = utils.socket.id;
         }
         if (!init) {
           setTimeout(() => {
-            syncClient(debugSocket, () => null);
+            utils.syncClient(debugSocket, () => null);
           }, 1000);
         }
-        socket.roomnum = newRoomnum;
-        updateRoomUsers(debugSocket);
+        utils.socket.roomnum = newRoomnum;
+        utils.updateRoomUsers(debugSocket);
 
         callback(null, {
-          roomnum: socket.roomnum,
-          host: socket.id === room.host,
+          roomnum: utils.socket.roomnum,
+          host: utils.socket.id === room.host,
         });
       }
     });

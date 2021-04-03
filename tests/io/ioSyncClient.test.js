@@ -3,6 +3,7 @@
 
 const { Socket: SocketServer } = require("socket.io");
 const ioSyncClient = require("../../src/server/io/ioSyncClient");
+const Utils = require("../../src/server/io/utils");
 
 /** @type {SocketServer} */
 let socket;
@@ -21,13 +22,15 @@ beforeEach(() => {
   };
   syncClientMock = jest.fn();
 
-  ioSyncClient.start(socket, syncClientMock);
+  let utils = new Utils(null, socket);
+  utils.syncClient = syncClientMock;
+  ioSyncClient.start(utils);
 });
 
 it("Valid", () => {
   syncClient();
 
-  expect(syncClientMock).toHaveBeenCalledTimes(1);
+  expect(syncClientMock).toHaveBeenNthCalledWith(1, undefined, undefined);
 
-  expect(syncClientMock).toHaveBeenNthCalledWith(1);
+  expect(syncClientMock).toHaveBeenCalledTimes(1);
 });

@@ -3,6 +3,7 @@
 
 const { Server: ioServer, Socket: SocketServer } = require("socket.io");
 const ioJoinRoom = require("../../src/server/io/ioJoinRoom");
+const Utils = require("../../src/server/io/utils");
 
 /** @type {ioServer} */
 let io;
@@ -16,12 +17,13 @@ let roomnum;
 /** @type {jest.Mock} */
 let callback;
 
+/** @type {Room} */
 let room1;
+/** @type {Room} */
 let room2;
+/** @type {Performance} */
 let performance;
 
-/** @type {jest.Mock} */
-let debugDisconnect;
 /** @type {jest.Mock} */
 let syncClient;
 /** @type {jest.Mock} */
@@ -75,12 +77,14 @@ beforeEach(() => {
   room2 = null;
   io.sockets.adapter.rooms.set("room-roomnum1", room1);
 
-  debugDisconnect = jest.fn();
   syncClient = jest.fn();
   updateRoomUsers = jest.fn((cb) => cb("updateRoomUsers"));
   performance = { now: jest.fn(() => 5) };
 
-  ioJoinRoom.start(io, socket, syncClient, updateRoomUsers, performance);
+  let utils = new Utils(io, socket, performance);
+  utils.syncClient = syncClient;
+  utils.updateRoomUsers = updateRoomUsers;
+  ioJoinRoom.start(utils);
 });
 
 it.each(["r", "roomnum_", Array(31).join("x")])(
@@ -88,10 +92,6 @@ it.each(["r", "roomnum_", Array(31).join("x")])(
   (roomnum2) => {
     roomnum = roomnum2;
     joinRoom(debugSocket, roomnum, callback);
-
-    expect(debugSocket).toHaveBeenCalledTimes(4);
-    expect(callback).toHaveBeenCalledTimes(1);
-    expect(performance.now).toHaveBeenCalledTimes(1);
 
     expect(debugSocket).toHaveBeenNthCalledWith(1, "updateRoomUsers");
     expect(debugSocket).toHaveBeenNthCalledWith(
@@ -105,6 +105,10 @@ it.each(["r", "roomnum_", Array(31).join("x")])(
       host: true,
     });
     expect(performance.now).toHaveBeenNthCalledWith(1);
+
+    expect(debugSocket).toHaveBeenCalledTimes(4);
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(performance.now).toHaveBeenCalledTimes(1);
 
     expect(room1).toBeNull();
     expect(room2).toStrictEqual({
@@ -124,10 +128,6 @@ it("Change room from non-existing room to new room", () => {
   io.sockets.adapter.rooms.delete("room-roomnum1");
   joinRoom(debugSocket, roomnum, callback);
 
-  expect(debugSocket).toHaveBeenCalledTimes(3);
-  expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(1);
-
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
     `connected to room-${roomnum}`
@@ -139,6 +139,10 @@ it("Change room from non-existing room to new room", () => {
     host: true,
   });
   expect(performance.now).toHaveBeenNthCalledWith(1);
+
+  expect(debugSocket).toHaveBeenCalledTimes(3);
+  expect(callback).toHaveBeenCalledTimes(1);
+  expect(performance.now).toHaveBeenCalledTimes(1);
 
   expect(room1).toStrictEqual({
     currTime: 0,
@@ -172,10 +176,6 @@ it("Change room from existing room to existing room", () => {
 
   joinRoom(debugSocket, roomnum, callback);
 
-  expect(debugSocket).toHaveBeenCalledTimes(4);
-  expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
-
   expect(debugSocket).toHaveBeenNthCalledWith(1, "updateRoomUsers");
   expect(debugSocket).toHaveBeenNthCalledWith(
     2,
@@ -187,6 +187,10 @@ it("Change room from existing room to existing room", () => {
     roomnum: roomnum,
     host: true,
   });
+
+  expect(debugSocket).toHaveBeenCalledTimes(4);
+  expect(callback).toHaveBeenCalledTimes(1);
+  expect(performance.now).toHaveBeenCalledTimes(0);
 
   expect(room1).toBeNull();
   expect(room2).toStrictEqual({
@@ -213,10 +217,6 @@ it("Change room from non-existing room to existing room", () => {
   };
   joinRoom(debugSocket, roomnum, callback);
 
-  expect(debugSocket).toHaveBeenCalledTimes(3);
-  expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(1);
-
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
     `connected to room-${roomnum}`
@@ -228,6 +228,10 @@ it("Change room from non-existing room to existing room", () => {
     host: true,
   });
   expect(performance.now).toHaveBeenNthCalledWith(1);
+
+  expect(debugSocket).toHaveBeenCalledTimes(3);
+  expect(callback).toHaveBeenCalledTimes(1);
+  expect(performance.now).toHaveBeenCalledTimes(1);
 
   expect(room1).toStrictEqual({
     currTime: 0,
@@ -252,10 +256,6 @@ it("Change room to same room", () => {
   roomnum = "roomnum1";
   joinRoom(debugSocket, roomnum, callback);
 
-  expect(debugSocket).toHaveBeenCalledTimes(3);
-  expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
-
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
     `connected to room-${roomnum}`
@@ -266,6 +266,10 @@ it("Change room to same room", () => {
     roomnum: roomnum,
     host: true,
   });
+
+  expect(debugSocket).toHaveBeenCalledTimes(3);
+  expect(callback).toHaveBeenCalledTimes(1);
+  expect(performance.now).toHaveBeenCalledTimes(0);
 
   expect(room1).toStrictEqual({
     host: "1",
@@ -293,15 +297,15 @@ it.each([
   roomnum = roomnum2;
   joinRoom(debugSocket, roomnum, callback);
 
-  expect(debugSocket).toHaveBeenCalledTimes(1);
-  expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
-
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
     "roomnum is not a valid string"
   );
   expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
+
+  expect(debugSocket).toHaveBeenCalledTimes(1);
+  expect(callback).toHaveBeenCalledTimes(1);
+  expect(performance.now).toHaveBeenCalledTimes(0);
 
   expect(room1).toStrictEqual({
     currTime: 0,
@@ -318,12 +322,12 @@ it("With error", () => {
   socket.roomnum = "2";
   joinRoom(debugSocket, roomnum, callback);
 
+  expect(debugSocket).toHaveBeenNthCalledWith(1, "room is null (error server)");
+  expect(callback).toHaveBeenNthCalledWith(1, "error server");
+
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
   expect(performance.now).toHaveBeenCalledTimes(0);
-
-  expect(debugSocket).toHaveBeenNthCalledWith(1, "room is null (error server)");
-  expect(callback).toHaveBeenNthCalledWith(1, "error server");
 
   expect(room1).toStrictEqual({
     currTime: 0,
@@ -341,13 +345,13 @@ it("With error, same room", () => {
   socket.roomnum = "2";
   joinRoom(debugSocket, roomnum, callback);
 
-  expect(debugSocket).toHaveBeenCalledTimes(2);
-  expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
-
   expect(debugSocket).toHaveBeenNthCalledWith(1, "connected to room-2");
   expect(debugSocket).toHaveBeenNthCalledWith(2, "room is null (error server)");
   expect(callback).toHaveBeenNthCalledWith(1, "error server");
+
+  expect(debugSocket).toHaveBeenCalledTimes(2);
+  expect(callback).toHaveBeenCalledTimes(1);
+  expect(performance.now).toHaveBeenCalledTimes(0);
 
   expect(room1).toStrictEqual({
     currTime: 0,

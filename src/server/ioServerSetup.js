@@ -9,7 +9,7 @@ const ioChangeVideoServer = require("./io/ioChangeVideoServer");
 const ioChangeStateServer = require("./io/ioChangeStateServer");
 const ioJoinRoom = require("./io/ioJoinRoom");
 const ioSyncClient = require("./io/ioSyncClient");
-const utils = require("./io/utils");
+const Utils = require("./io/utils");
 
 const debugConnection = debug.extend("connection");
 const debugDisconnect = debug.extend("disconnect");
@@ -29,12 +29,12 @@ module.exports = {
 
         filterInput.start(socket);
 
-        let { syncClient, updateRoomUsers } = utils.start(io, socket);
-        ioDisconnect.start(io, socket, debugDisconnect, updateRoomUsers);
-        ioJoinRoom.start(io, socket, syncClient, updateRoomUsers, performance);
-        ioChangeStateServer.start(io, socket, performance);
-        ioChangeVideoServer.start(io, socket);
-        ioSyncClient.start(socket, syncClient);
+        let utils = new Utils(io, socket, performance);
+        ioDisconnect.start(utils, debugDisconnect);
+        ioJoinRoom.start(utils);
+        ioChangeStateServer.start(utils);
+        ioChangeVideoServer.start(utils);
+        ioSyncClient.start(utils);
       }
     );
   },

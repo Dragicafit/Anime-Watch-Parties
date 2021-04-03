@@ -1,8 +1,10 @@
-const { Socket } = require("socket.io");
+const Utils = require("./utils");
 
 module.exports = {
-  /** @param {Socket} socket */
-  start: function (socket, syncClient) {
-    socket.on("syncClient", syncClient);
+  /** @param {Utils} utils */
+  start: function (utils) {
+    utils.socket.on("syncClient", (debugSocket, callback) =>
+      utils.syncClient(debugSocket, callback)
+    );
   },
 };

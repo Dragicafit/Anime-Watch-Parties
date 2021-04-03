@@ -1,29 +1,27 @@
-const { Server: ioServer, Socket } = require("socket.io");
-const Room = require("./room");
+const Utils = require("./utils");
 
 module.exports = {
-  /** @param {ioServer} io @param {Socket} socket */
-  start: function (io, socket, debugDisconnect, updateRoomUsers) {
-    socket.on("disconnect", () => {
+  /** @param {Utils} utils @param {debug.Debugger} debugDisconnect */
+  start: function (utils, debugDisconnect) {
+    utils.socket.on("disconnect", () => {
       function debugSocket() {
-        debugDisconnect(`${socket.id}:`, ...arguments);
+        debugDisconnect(`${utils.socket.id}:`, ...arguments);
       }
-      debugSocket(`${io.sockets.sockets.size} sockets connected`);
+      debugSocket(`${utils.io.sockets.sockets.size} sockets connected`);
 
-      if (socket.roomnum == null) {
+      if (utils.socket.roomnum == null) {
         return;
       }
-      /** @type {Room} */
-      let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
+      let room = utils.getRoom();
       if (room == null) {
         return debugSocket("room is null (empty room)");
       }
-      if (socket.id === room.host) {
+      if (utils.socket.id === room.host) {
         room.host = undefined;
       }
-      debugSocket(`applied to room-${socket.roomnum}`);
+      debugSocket(`applied to room-${utils.socket.roomnum}`);
 
-      updateRoomUsers(debugSocket);
+      utils.updateRoomUsers(debugSocket);
     });
   },
 };

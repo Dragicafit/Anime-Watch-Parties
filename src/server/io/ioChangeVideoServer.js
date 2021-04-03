@@ -1,14 +1,14 @@
-const { Server: ioServer, Socket } = require("socket.io");
 const Room = require("./room");
+const Utils = require("./utils");
 
 const regexVideoId = /^[\w\/-]{1,300}$/;
 const regexSite = /^(wakanim|crunchyroll)$/;
 const regexLocation = /^[a-zA-Z]{2}$/;
 
 module.exports = {
-  /** @param {ioServer} io @param {Socket} socket */
-  start: function (io, socket) {
-    socket.on(
+  /** @param {Utils} utils */
+  start: function (utils) {
+    utils.socket.on(
       "changeVideoServer",
       (debugSocket, videoId, site, location, callback) => {
         if (typeof videoId !== "string" || !regexVideoId.test(videoId)) {
@@ -24,27 +24,27 @@ module.exports = {
           return callback("wrong input");
         }
 
-        if (socket.roomnum == null) {
+        if (utils.socket.roomnum == null) {
           debugSocket("socket is not connected to room");
           return callback("access denied");
         }
         /** @type {Room} */
-        let room = io.sockets.adapter.rooms.get(`room-${socket.roomnum}`);
+        let room = utils.getRoom();
         if (room == null) {
           debugSocket("room is null (error server)");
           return callback("error server");
         }
-        if (socket.id !== room.host) {
+        if (utils.socket.id !== room.host) {
           debugSocket("socket is not host");
           return callback("access denied");
         }
-        debugSocket(`applied to room-${socket.roomnum}`);
+        debugSocket(`applied to room-${utils.socket.roomnum}`);
 
         room.currVideo = videoId;
         room.site = site;
         room.location = location;
-        socket.broadcast
-          .to(`room-${socket.roomnum}`)
+        utils.socket.broadcast
+          .to(`room-${utils.socket.roomnum}`)
           .emit("changeVideoClient", {
             videoId: room.currVideo,
             site: room.site,

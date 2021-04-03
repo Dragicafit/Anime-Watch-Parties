@@ -4,6 +4,7 @@
 const { Server: ioServer, Socket: SocketServer } = require("socket.io");
 const ioChangeStateServer = require("../../src/server/io/ioChangeStateServer");
 const Room = require("../../src/server/io/room");
+const Utils = require("../../src/server/io/utils");
 
 /** @type {ioServer} */
 let io;
@@ -22,6 +23,7 @@ let callback;
 let room;
 /** @type {jest.Mock} */
 let emit;
+/** @type {Performance} */
 let performance;
 
 beforeEach(() => {
@@ -58,7 +60,7 @@ beforeEach(() => {
 
   performance = { now: jest.fn(() => 5) };
 
-  ioChangeStateServer.start(io, socket, performance);
+  ioChangeStateServer.start(new Utils(io, socket, performance));
 });
 
 it.each([
@@ -71,17 +73,17 @@ it.each([
   time = time2;
   changeStateServer(debugSocket, state, time, callback);
 
-  expect(emit).toHaveBeenCalledTimes(1);
-  expect(debugSocket).toHaveBeenCalledTimes(1);
-  expect(callback).toHaveBeenCalledTimes(0);
-  expect(performance.now).toHaveBeenCalledTimes(1);
-
   expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
     time: time,
     state: state,
   });
   expect(debugSocket).toHaveBeenNthCalledWith(1, "applied to room-roomnum");
   expect(performance.now).toHaveBeenNthCalledWith(1);
+
+  expect(emit).toHaveBeenCalledTimes(1);
+  expect(debugSocket).toHaveBeenCalledTimes(1);
+  expect(callback).toHaveBeenCalledTimes(0);
+  expect(performance.now).toHaveBeenCalledTimes(1);
 
   expect(room).toStrictEqual({
     host: "1",
@@ -105,13 +107,13 @@ it.each([
   state = state2;
   changeStateServer(debugSocket, state, time, callback);
 
+  expect(debugSocket).toHaveBeenNthCalledWith(1, "state is not boolean");
+  expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
+
   expect(emit).toHaveBeenCalledTimes(0);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
   expect(performance.now).toHaveBeenCalledTimes(0);
-
-  expect(debugSocket).toHaveBeenNthCalledWith(1, "state is not boolean");
-  expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
 
   expect(room).toStrictEqual({ host: "1" });
 });
@@ -130,13 +132,13 @@ it.each([
   time = time2;
   changeStateServer(debugSocket, state, time, callback);
 
+  expect(debugSocket).toHaveBeenNthCalledWith(1, "time is not int");
+  expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
+
   expect(emit).toHaveBeenCalledTimes(0);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
   expect(performance.now).toHaveBeenCalledTimes(0);
-
-  expect(debugSocket).toHaveBeenNthCalledWith(1, "time is not int");
-  expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
 
   expect(room).toStrictEqual({ host: "1" });
 });
@@ -145,16 +147,16 @@ it("Not connected to a room", () => {
   socket.roomnum = null;
   changeStateServer(debugSocket, state, time, callback);
 
-  expect(emit).toHaveBeenCalledTimes(0);
-  expect(debugSocket).toHaveBeenCalledTimes(1);
-  expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
-
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
     "socket is not connected to room"
   );
   expect(callback).toHaveBeenNthCalledWith(1, "access denied");
+
+  expect(emit).toHaveBeenCalledTimes(0);
+  expect(debugSocket).toHaveBeenCalledTimes(1);
+  expect(callback).toHaveBeenCalledTimes(1);
+  expect(performance.now).toHaveBeenCalledTimes(0);
 
   expect(room).toStrictEqual({ host: "1" });
 });
@@ -163,13 +165,13 @@ it("With error", () => {
   socket.roomnum = "2";
   changeStateServer(debugSocket, state, time, callback);
 
+  expect(debugSocket).toHaveBeenNthCalledWith(1, "room is null (error server)");
+  expect(callback).toHaveBeenNthCalledWith(1, "error server");
+
   expect(emit).toHaveBeenCalledTimes(0);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
   expect(performance.now).toHaveBeenCalledTimes(0);
-
-  expect(debugSocket).toHaveBeenNthCalledWith(1, "room is null (error server)");
-  expect(callback).toHaveBeenNthCalledWith(1, "error server");
 
   expect(room).toStrictEqual({ host: "1" });
 });
@@ -178,13 +180,13 @@ it("Not host", () => {
   room.host = "2";
   changeStateServer(debugSocket, state, time, callback);
 
+  expect(debugSocket).toHaveBeenNthCalledWith(1, "socket is not host");
+  expect(callback).toHaveBeenNthCalledWith(1, "access denied");
+
   expect(emit).toHaveBeenCalledTimes(0);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
   expect(performance.now).toHaveBeenCalledTimes(0);
-
-  expect(debugSocket).toHaveBeenNthCalledWith(1, "socket is not host");
-  expect(callback).toHaveBeenNthCalledWith(1, "access denied");
 
   expect(room).toStrictEqual({ host: "2" });
 });

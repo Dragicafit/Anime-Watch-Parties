@@ -4,6 +4,7 @@
 const { Server: ioServer, Socket: SocketServer } = require("socket.io");
 const ioChangeVideoServer = require("../../src/server/io/ioChangeVideoServer");
 const Room = require("../../src/server/io/room");
+const Utils = require("../../src/server/io/utils");
 
 /** @type {ioServer} */
 let io;
@@ -57,7 +58,7 @@ beforeEach(() => {
   room = { host: "1" };
   io.sockets.adapter.rooms.set("room-roomnum", room);
 
-  ioChangeVideoServer.start(io, socket);
+  ioChangeVideoServer.start(new Utils(io, socket));
 });
 
 it.each([
@@ -71,16 +72,16 @@ it.each([
   location = location2;
   changeVideoServer(debugSocket, videoId, site, location, callback);
 
-  expect(emit).toHaveBeenCalledTimes(1);
-  expect(debugSocket).toHaveBeenCalledTimes(1);
-  expect(callback).toHaveBeenCalledTimes(0);
-
   expect(emit).toHaveBeenNthCalledWith(1, "changeVideoClient", {
     videoId: videoId,
     site: site,
     location: location,
   });
   expect(debugSocket).toHaveBeenNthCalledWith(1, "applied to room-roomnum");
+
+  expect(emit).toHaveBeenCalledTimes(1);
+  expect(debugSocket).toHaveBeenCalledTimes(1);
+  expect(callback).toHaveBeenCalledTimes(0);
 
   expect(room).toStrictEqual({
     host: "1",
@@ -106,15 +107,15 @@ it.each([
   videoId = videoId2;
   changeVideoServer(debugSocket, videoId, site, location, callback);
 
-  expect(emit).toHaveBeenCalledTimes(0);
-  expect(debugSocket).toHaveBeenCalledTimes(1);
-  expect(callback).toHaveBeenCalledTimes(1);
-
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
     "videoId is not a valid string"
   );
   expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
+
+  expect(emit).toHaveBeenCalledTimes(0);
+  expect(debugSocket).toHaveBeenCalledTimes(1);
+  expect(callback).toHaveBeenCalledTimes(1);
 
   expect(room).toStrictEqual({ host: "1" });
 });
@@ -136,12 +137,12 @@ it.each([
   site = site2;
   changeVideoServer(debugSocket, videoId, site, location, callback);
 
+  expect(debugSocket).toHaveBeenNthCalledWith(1, "site is not a valid string");
+  expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
+
   expect(emit).toHaveBeenCalledTimes(0);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
-
-  expect(debugSocket).toHaveBeenNthCalledWith(1, "site is not a valid string");
-  expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
 
   expect(room).toStrictEqual({ host: "1" });
 });
@@ -166,15 +167,15 @@ it.each([
   location = location2;
   changeVideoServer(debugSocket, videoId, site, location, callback);
 
-  expect(emit).toHaveBeenCalledTimes(0);
-  expect(debugSocket).toHaveBeenCalledTimes(1);
-  expect(callback).toHaveBeenCalledTimes(1);
-
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
     "location is not a valid string"
   );
   expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
+
+  expect(emit).toHaveBeenCalledTimes(0);
+  expect(debugSocket).toHaveBeenCalledTimes(1);
+  expect(callback).toHaveBeenCalledTimes(1);
 
   expect(room).toStrictEqual({ host: "1" });
 });
@@ -183,15 +184,15 @@ it("Not connected to a room", () => {
   socket.roomnum = null;
   changeVideoServer(debugSocket, videoId, site, location, callback);
 
-  expect(emit).toHaveBeenCalledTimes(0);
-  expect(debugSocket).toHaveBeenCalledTimes(1);
-  expect(callback).toHaveBeenCalledTimes(1);
-
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
     "socket is not connected to room"
   );
   expect(callback).toHaveBeenNthCalledWith(1, "access denied");
+
+  expect(emit).toHaveBeenCalledTimes(0);
+  expect(debugSocket).toHaveBeenCalledTimes(1);
+  expect(callback).toHaveBeenCalledTimes(1);
 
   expect(room).toStrictEqual({ host: "1" });
 });
@@ -200,12 +201,12 @@ it("With error", () => {
   socket.roomnum = "2";
   changeVideoServer(debugSocket, videoId, site, location, callback);
 
+  expect(debugSocket).toHaveBeenNthCalledWith(1, "room is null (error server)");
+  expect(callback).toHaveBeenNthCalledWith(1, "error server");
+
   expect(emit).toHaveBeenCalledTimes(0);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
-
-  expect(debugSocket).toHaveBeenNthCalledWith(1, "room is null (error server)");
-  expect(callback).toHaveBeenNthCalledWith(1, "error server");
 
   expect(room).toStrictEqual({ host: "1" });
 });
@@ -214,12 +215,12 @@ it("Not host", () => {
   room.host = "2";
   changeVideoServer(debugSocket, videoId, site, location, callback);
 
+  expect(debugSocket).toHaveBeenNthCalledWith(1, "socket is not host");
+  expect(callback).toHaveBeenNthCalledWith(1, "access denied");
+
   expect(emit).toHaveBeenCalledTimes(0);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
-
-  expect(debugSocket).toHaveBeenNthCalledWith(1, "socket is not host");
-  expect(callback).toHaveBeenNthCalledWith(1, "access denied");
 
   expect(room).toStrictEqual({ host: "2" });
 });
