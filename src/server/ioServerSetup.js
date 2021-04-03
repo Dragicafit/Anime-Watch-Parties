@@ -22,10 +22,10 @@ module.exports = {
     io.on(
       "connection",
       /** @param {Socket} socket */ (socket) => {
-        function debugConnection2() {
-          debugConnection(`${socket.id}:`, ...arguments);
-        }
-        debugConnection2(`${io.sockets.sockets.size} sockets connected`);
+        let debugSocket = (...args) => {
+          debugConnection(`${socket.id}:`, ...args);
+        };
+        debugSocket(`${io.sockets.sockets.size} sockets connected`);
 
         filterInput.start(socket);
 
