@@ -34,7 +34,7 @@ beforeEach(() => {
       }
     },
     id: "1",
-    roomnum: "roomnum",
+    rooms: new Set("1"),
     broadcast: {
       to: (roomKey) => {
         if (roomKey === "room-roomnum") {
@@ -55,8 +55,10 @@ beforeEach(() => {
   location = "FR";
   callback = jest.fn();
 
+  // join room
   room = { host: "1" };
   io.sockets.adapter.rooms.set("room-roomnum", room);
+  socket.rooms.add("roomnum");
 
   ioChangeVideoServer.start(new Utils(io, socket));
 });
@@ -181,7 +183,7 @@ it.each([
 });
 
 it("Not connected to a room", () => {
-  socket.roomnum = null;
+  socket.rooms.delete("roomnum");
   changeVideoServer(debugSocket, videoId, site, location, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(
@@ -198,11 +200,15 @@ it("Not connected to a room", () => {
 });
 
 it("With error", () => {
-  socket.roomnum = "2";
+  socket.rooms.delete("roomnum");
+  socket.rooms.add("2");
   changeVideoServer(debugSocket, videoId, site, location, callback);
 
-  expect(debugSocket).toHaveBeenNthCalledWith(1, "room is null (error server)");
-  expect(callback).toHaveBeenNthCalledWith(1, "error server");
+  expect(debugSocket).toHaveBeenNthCalledWith(
+    1,
+    "socket is not connected to room"
+  );
+  expect(callback).toHaveBeenNthCalledWith(1, "access denied");
 
   expect(emit).toHaveBeenCalledTimes(0);
   expect(debugSocket).toHaveBeenCalledTimes(1);

@@ -1,6 +1,8 @@
 const { Server: ioServer, Socket } = require("socket.io");
 const Room = require("./room");
 
+const regexPrefix = /^room-/g;
+
 class Utils {
   /** @type {ioServer} */
   io;
@@ -17,16 +19,12 @@ class Utils {
   }
 
   syncClient(debugSocket, callback) {
-    if (this.socket.roomnum == null) {
+    let room = this.getRoom();
+    if (room == null) {
       debugSocket("socket is not connected to room");
       return callback("access denied");
     }
-    let room = this.getRoom();
-    if (room == null) {
-      debugSocket("room is null (error server)");
-      return callback("error server");
-    }
-    debugSocket(`applied to room-${this.socket.roomnum}`);
+    debugSocket(`applied to room-${this.roomnum}`);
 
     if (
       room.currTime != null &&
@@ -54,23 +52,24 @@ class Utils {
   }
 
   updateRoomUsers(debugSocket) {
-    if (this.socket.roomnum == null) {
-      return debugSocket("socket is not connected to room");
-    }
     let room = this.getRoom();
     if (room == null) {
-      return debugSocket("room is null (empty room)");
+      return debugSocket("socket is not connected to room");
     }
-    debugSocket(`applied to room-${this.socket.roomnum}`);
+    debugSocket(`applied to room-${this.roomnum}`);
 
-    this.io.sockets.to(`room-${this.socket.roomnum}`).emit("getUsers", {
+    this.io.sockets.to(`room-${this.roomnum}`).emit("getUsers", {
       onlineUsers: room.size,
     });
   }
 
   /** @param String @returns {Room} */
-  getRoom(roomnum = this.socket.roomnum) {
+  getRoom(roomnum = this.roomnum) {
     return this.io.sockets.adapter.rooms.get(`room-${roomnum}`);
+  }
+
+  get roomnum() {
+    return [...this.socket.rooms][1]?.replace(regexPrefix, "");
   }
 }
 

@@ -16,27 +16,22 @@ module.exports = {
           return callback("wrong input");
         }
 
-        if (utils.socket.roomnum == null) {
-          debugSocket("socket is not connected to room");
-          return callback("access denied");
-        }
-        /** @type {Room} */
         let room = utils.getRoom();
         if (room == null) {
-          debugSocket("room is null (error server)");
-          return callback("error server");
+          debugSocket("socket is not connected to room");
+          return callback("access denied");
         }
         if (utils.socket.id !== room.host) {
           debugSocket("socket is not host");
           return callback("access denied");
         }
-        debugSocket(`applied to room-${utils.socket.roomnum}`);
+        debugSocket(`applied to room-${utils.roomnum}`);
 
         room.currTime = time;
         room.state = state;
         room.lastChange = utils.performance.now();
         utils.socket.broadcast
-          .to(`room-${utils.socket.roomnum}`)
+          .to(`room-${utils.roomnum}`)
           .emit("changeStateClient", {
             time: room.currTime,
             state: room.state,

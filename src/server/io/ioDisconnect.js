@@ -9,17 +9,14 @@ module.exports = {
       }
       debugSocket(`${utils.io.sockets.sockets.size} sockets connected`);
 
-      if (utils.socket.roomnum == null) {
-        return;
-      }
       let room = utils.getRoom();
       if (room == null) {
-        return debugSocket("room is null (empty room)");
+        return;
       }
       if (utils.socket.id === room.host) {
         room.host = undefined;
       }
-      debugSocket(`applied to room-${utils.socket.roomnum}`);
+      debugSocket(`applied to room-${utils.roomnum}`);
 
       utils.updateRoomUsers(debugSocket);
     });

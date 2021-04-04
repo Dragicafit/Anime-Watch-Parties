@@ -27,13 +27,18 @@ beforeEach(() => {
   emit = jest.fn();
 
   socket = {
-    roomnum: "roomnum",
+    rooms: new Set("1"),
   };
   io = {
     sockets: {
       adapter: { rooms: new Map() },
     },
   };
+
+  // join room
+  room = { host: "1" };
+  io.sockets.adapter.rooms.set("room-roomnum", room);
+  socket.rooms.add("roomnum");
 
   debugSocket = jest.fn();
   performance = { now: jest.fn(() => 5) };
@@ -172,7 +177,7 @@ describe("syncClient", () => {
   });
 
   it("Without roomnum", () => {
-    delete socket.roomnum;
+    socket.rooms.delete("roomnum");
     utils.syncClient(debugSocket, callback);
 
     expect(debugSocket).toHaveBeenNthCalledWith(
@@ -201,9 +206,9 @@ describe("syncClient", () => {
 
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
-      "room is null (error server)"
+      "socket is not connected to room"
     );
-    expect(callback).toHaveBeenNthCalledWith(1, "error server");
+    expect(callback).toHaveBeenNthCalledWith(1, "access denied");
 
     expect(emit).toHaveBeenCalledTimes(0);
     expect(debugSocket).toHaveBeenCalledTimes(1);
@@ -219,6 +224,7 @@ describe("syncClient", () => {
     });
   });
 });
+
 describe("updateRoomUsers", () => {
   beforeEach(() => {
     socket.emit = emit;
@@ -250,7 +256,7 @@ describe("updateRoomUsers", () => {
   });
 
   it("Without roomnum", () => {
-    delete socket.roomnum;
+    socket.rooms.delete("roomnum");
     utils.updateRoomUsers(debugSocket);
 
     expect(debugSocket).toHaveBeenNthCalledWith(
@@ -269,7 +275,10 @@ describe("updateRoomUsers", () => {
     io.sockets.adapter.rooms.delete("room-roomnum");
     utils.updateRoomUsers(debugSocket);
 
-    expect(debugSocket).toHaveBeenNthCalledWith(1, "room is null (empty room)");
+    expect(debugSocket).toHaveBeenNthCalledWith(
+      1,
+      "socket is not connected to room"
+    );
 
     expect(emit).toHaveBeenCalledTimes(0);
     expect(debugSocket).toHaveBeenCalledTimes(1);

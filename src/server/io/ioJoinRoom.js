@@ -14,16 +14,12 @@ module.exports = {
 
       let init = false;
       let newRoomnum = roomnum.toLowerCase();
-      if (utils.socket.roomnum === newRoomnum) {
+      let oldRoomnum = utils.roomnum;
+      if (oldRoomnum === newRoomnum) {
         return configure();
       }
-      if (utils.socket.roomnum != null) {
-        let room = utils.getRoom();
-        if (room == null) {
-          debugSocket("room is null (error server)");
-          return callback("error server");
-        }
-        utils.socket.leave(`room-${utils.socket.roomnum}`);
+      if (oldRoomnum != null) {
+        utils.socket.leave(`room-${oldRoomnum}`);
         utils.updateRoomUsers(debugSocket);
       }
 
@@ -57,11 +53,10 @@ module.exports = {
             utils.syncClient(debugSocket, () => null);
           }, 1000);
         }
-        utils.socket.roomnum = newRoomnum;
         utils.updateRoomUsers(debugSocket);
 
         callback(null, {
-          roomnum: utils.socket.roomnum,
+          roomnum: utils.roomnum,
           host: utils.socket.id === room.host,
         });
       }
