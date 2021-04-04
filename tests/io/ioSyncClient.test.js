@@ -2,6 +2,7 @@
 "use strict";
 
 const { Socket: SocketServer } = require("socket.io");
+const IoContext = require("../../src/server/io/ioContext");
 const ioSyncClient = require("../../src/server/io/ioSyncClient");
 const IoUtils = require("../../src/server/io/ioUtils");
 
@@ -22,9 +23,10 @@ beforeEach(() => {
   };
   syncClientMock = jest.fn();
 
-  let ioUtils = new IoUtils(null, socket);
+  let ioContext = new IoContext(null, socket);
+  let ioUtils = new IoUtils(ioContext);
   ioUtils.syncClient = syncClientMock;
-  ioSyncClient.start(ioUtils);
+  ioSyncClient.start(ioContext, ioUtils);
 });
 
 it("Valid", () => {

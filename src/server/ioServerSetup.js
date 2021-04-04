@@ -9,6 +9,8 @@ const ioChangeVideoServer = require("./io/ioChangeVideoServer");
 const ioChangeStateServer = require("./io/ioChangeStateServer");
 const ioJoinRoom = require("./io/ioJoinRoom");
 const ioSyncClient = require("./io/ioSyncClient");
+const IoRoom = require("./io/ioRoom");
+const IoContext = require("./io/ioContext");
 const IoUtils = require("./io/ioUtils");
 
 const debugConnection = debug.extend("connection");
@@ -19,6 +21,8 @@ const supportedEvents = filterInput.supportedEvents;
 module.exports = {
   /** @param {ioServer} io */
   start: function (io) {
+    IoRoom.ioContext = new IoContext(io, null, performance);
+
     io.on(
       "connection",
       /** @param {Socket} socket */ (socket) => {
@@ -29,12 +33,13 @@ module.exports = {
 
         filterInput.start(socket);
 
-        let ioUtils = new IoUtils(io, socket, performance);
-        ioDisconnect.start(ioUtils, debugDisconnect);
-        ioJoinRoom.start(ioUtils);
-        ioChangeStateServer.start(ioUtils);
-        ioChangeVideoServer.start(ioUtils);
-        ioSyncClient.start(ioUtils);
+        let ioContext = new IoContext(io, socket, performance);
+        let ioUtils = new IoUtils(ioContext);
+        ioDisconnect.start(ioContext, ioUtils, debugDisconnect);
+        ioJoinRoom.start(ioContext, ioUtils);
+        ioChangeStateServer.start(ioContext, ioUtils);
+        ioChangeVideoServer.start(ioContext, ioUtils);
+        ioSyncClient.start(ioContext, ioUtils);
       }
     );
   },

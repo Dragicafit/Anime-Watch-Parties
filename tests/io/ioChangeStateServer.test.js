@@ -3,6 +3,7 @@
 
 const { Server: ioServer, Socket: SocketServer } = require("socket.io");
 const ioChangeStateServer = require("../../src/server/io/ioChangeStateServer");
+const IoContext = require("../../src/server/io/ioContext");
 const IoRoom = require("../../src/server/io/ioRoom");
 const IoUtils = require("../../src/server/io/ioUtils");
 
@@ -57,13 +58,16 @@ beforeEach(() => {
 
   performance = { now: jest.fn(() => 5) };
 
+  IoRoom.ioContext = new IoContext(io, null, performance);
+
   // join room
-  ioRoom = new IoRoom({ performance: performance });
+  ioRoom = new IoRoom();
   ioRoom.host = "1";
   io.sockets.adapter.rooms.set("room-roomnum", { ioRoom: ioRoom });
   socket.rooms.add("roomnum");
 
-  ioChangeStateServer.start(new IoUtils(io, socket, performance));
+  let ioContext = new IoContext(io, socket, performance);
+  ioChangeStateServer.start(ioContext, new IoUtils(ioContext));
 });
 
 it.each([

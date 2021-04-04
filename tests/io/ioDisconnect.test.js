@@ -2,6 +2,7 @@
 "use strict";
 
 const { Server: ioServer, Socket: SocketServer } = require("socket.io");
+const IoContext = require("../../src/server/io/ioContext");
 const ioDisconnect = require("../../src/server/io/ioDisconnect");
 const IoRoom = require("../../src/server/io/ioRoom");
 const IoUtils = require("../../src/server/io/ioUtils");
@@ -39,15 +40,18 @@ beforeEach(() => {
   debugDisconnect = jest.fn();
   updateRoomUsers = jest.fn((cb) => cb("updateRoomUsers"));
 
+  IoRoom.ioContext = new IoContext(io, null, { now: () => 5 });
+
   // join room
-  ioRoom = new IoRoom({ performance: { now: () => 5 } });
+  ioRoom = new IoRoom();
   ioRoom.host = "1";
   io.sockets.adapter.rooms.set("room-roomnum", { ioRoom: ioRoom });
   socket.rooms.add("roomnum");
 
-  let ioUtils = new IoUtils(io, socket, null);
+  let ioContext = new IoContext(io, socket);
+  let ioUtils = new IoUtils(ioContext);
   ioUtils.updateRoomUsers = updateRoomUsers;
-  ioDisconnect.start(ioUtils, debugDisconnect);
+  ioDisconnect.start(ioContext, ioUtils, debugDisconnect);
 });
 
 it("With Roomnum and is host", () => {

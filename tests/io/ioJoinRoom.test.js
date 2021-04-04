@@ -5,6 +5,7 @@ const { Server: ioServer, Socket: SocketServer } = require("socket.io");
 const ioJoinRoom = require("../../src/server/io/ioJoinRoom");
 const IoUtils = require("../../src/server/io/ioUtils");
 const IoRoom = require("../../src/server/io/ioRoom");
+const IoContext = require("../../src/server/io/ioContext");
 
 /** @type {ioServer} */
 let io;
@@ -75,16 +76,19 @@ beforeEach(() => {
   updateRoomUsers = jest.fn((cb) => cb("updateRoomUsers"));
   performance = { now: jest.fn(() => 5) };
 
+  IoRoom.ioContext = new IoContext(io, null, performance);
+
   room2 = null;
   //join room
-  room1 = { ioRoom: new IoRoom({ performance: performance }) };
+  room1 = { ioRoom: new IoRoom() };
   io.sockets.adapter.rooms.set("room-roomnum1", room1);
   socket.rooms.add("roomnum1");
 
-  let ioUtils = new IoUtils(io, socket, performance);
+  let ioContext = new IoContext(io, socket, performance);
+  let ioUtils = new IoUtils(ioContext);
   ioUtils.syncClient = syncClient;
   ioUtils.updateRoomUsers = updateRoomUsers;
-  ioJoinRoom.start(ioUtils);
+  ioJoinRoom.start(ioContext, ioUtils);
 });
 
 it.each(["r", "roomnum_", Array(31).join("x")])(
@@ -169,7 +173,7 @@ it("Change room from non-existing room to new room", () => {
 });
 
 it("Change room from existing room to existing room", () => {
-  room2 = { ioRoom: new IoRoom({ performance: performance }) };
+  room2 = { ioRoom: new IoRoom() };
   io.sockets.adapter.rooms.set("room-roomnum2", room2);
 
   joinRoom(debugSocket, roomnum, callback);
@@ -207,7 +211,7 @@ it("Change room from existing room to existing room", () => {
 it("Change room from non-existing room to existing room", () => {
   socket.rooms.delete("roomnum1");
   io.sockets.adapter.rooms.delete("room-roomnum1");
-  room2 = { ioRoom: new IoRoom({ performance: performance }) };
+  room2 = { ioRoom: new IoRoom() };
 
   joinRoom(debugSocket, roomnum, callback);
 

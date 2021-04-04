@@ -4,6 +4,7 @@
 const { Server: ioServer, Socket } = require("socket.io");
 const IoUtils = require("../../src/server/io/ioUtils");
 const IoRoom = require("../../src/server/io/ioRoom");
+const IoContext = require("../../src/server/io/ioContext");
 
 /** @type {ioServer} */
 let io;
@@ -39,8 +40,10 @@ beforeEach(() => {
 
   performance = { now: jest.fn(() => 5) };
 
+  IoRoom.ioContext = new IoContext(io, null, performance);
+
   // join room
-  ioRoom = new IoRoom({ performance: performance });
+  ioRoom = new IoRoom();
   ioRoom.host = "1";
   room = { ioRoom: ioRoom };
   io.sockets.adapter.rooms.set("room-roomnum", room);
@@ -48,7 +51,8 @@ beforeEach(() => {
 
   debugSocket = jest.fn();
 
-  ioUtils = new IoUtils(io, socket, performance);
+  let ioContext = new IoContext(io, socket, performance);
+  ioUtils = new IoUtils(ioContext);
 });
 
 describe("syncClient", () => {

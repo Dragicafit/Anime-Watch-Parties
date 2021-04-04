@@ -1,12 +1,13 @@
 const IoRoom = require("./ioRoom");
+const IoContext = require("./ioContext");
 const IoUtils = require("./ioUtils");
 
 const regexRoom = /^\w{1,30}$/;
 
 module.exports = {
-  /** @param {IoUtils} ioUtils */
-  start: function (ioUtils) {
-    ioUtils.socket.on("joinRoom", (debugSocket, roomnum, callback) => {
+  /** @param {IoContext} ioContext @param {IoUtils} ioUtils */
+  start: function (ioContext, ioUtils) {
+    ioContext.socket.on("joinRoom", (debugSocket, roomnum, callback) => {
       if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
         debugSocket("roomnum is not a valid string");
         return callback("wrong input");
@@ -18,11 +19,11 @@ module.exports = {
         return configure();
       }
       if (oldRoomnum != null) {
-        ioUtils.socket.leave(`room-${oldRoomnum}`);
+        ioContext.socket.leave(`room-${oldRoomnum}`);
         ioUtils.updateRoomUsers(debugSocket);
       }
 
-      ioUtils.socket.join(`room-${newRoomnum}`);
+      ioContext.socket.join(`room-${newRoomnum}`);
       configure();
 
       function configure() {
@@ -37,11 +38,11 @@ module.exports = {
         let ioRoom = room.ioRoom;
         let init = ioRoom == null;
         if (init) {
-          ioRoom = room.ioRoom = new IoRoom(ioUtils);
+          ioRoom = room.ioRoom = new IoRoom();
         }
         if (ioRoom.host == null) {
           debugSocket("socket is host");
-          ioRoom.host = ioUtils.socket.id;
+          ioRoom.host = ioContext.socket.id;
         }
         if (!init) {
           setTimeout(() => {
@@ -52,7 +53,7 @@ module.exports = {
 
         callback(null, {
           roomnum: ioUtils.roomnum,
-          host: ioUtils.socket.id === ioRoom.host,
+          host: ioContext.socket.id === ioRoom.host,
         });
       }
     });

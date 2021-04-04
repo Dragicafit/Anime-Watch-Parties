@@ -1,7 +1,10 @@
 const { SocketId } = require("socket.io-adapter");
-const IoUtils = require("./ioUtils");
+const IoContext = require("./ioContext");
 
 class IoRoom {
+  /** @type {IoContext} */
+  static ioContext;
+
   /** @type {SocketId} */
   host;
   /** @type {Boolean} */
@@ -17,13 +20,7 @@ class IoRoom {
   /** @type {String} */
   location;
 
-  /** @type {IoUtils} */
-  ioUtils;
-
-  /** @param {IoUtils} ioUtils */
-  constructor(ioUtils) {
-    this.ioUtils = ioUtils;
-
+  constructor() {
     this.updateState(false, 0);
   }
 
@@ -31,7 +28,7 @@ class IoRoom {
   updateState(state, currTime) {
     this.state = state;
     this.currTime = currTime;
-    this.lastChange = this.ioUtils.performance.now();
+    this.lastChange = IoRoom.ioContext.performance.now();
   }
 
   /** @param {String} currVideo @param {String} site @param {String} location */
@@ -54,7 +51,7 @@ class IoRoom {
   get stateObject() {
     let currTime = this.currTime;
     if (this.state) {
-      currTime += (this.ioUtils.performance.now() - this.lastChange) / 1000;
+      currTime += (IoRoom.ioContext.performance.now() - this.lastChange) / 1000;
     }
     return {
       state: this.state,
