@@ -16,6 +16,8 @@ let ioUtils;
 let debugSocket;
 
 /** @type {IoRoom} */
+let ioRoom;
+/** @type {Set<string>} */
 let room;
 /** @type {Performance} */
 let performance;
@@ -35,13 +37,16 @@ beforeEach(() => {
     },
   };
 
+  performance = { now: jest.fn(() => 5) };
+
   // join room
-  room = { host: "1" };
+  ioRoom = new IoRoom({ performance: performance });
+  ioRoom.host = "1";
+  room = { ioRoom: ioRoom };
   io.sockets.adapter.rooms.set("room-roomnum", room);
   socket.rooms.add("roomnum");
 
   debugSocket = jest.fn();
-  performance = { now: jest.fn(() => 5) };
 
   ioUtils = new IoUtils(io, socket, performance);
 });
@@ -54,21 +59,17 @@ describe("syncClient", () => {
     socket.emit = emit;
     callback = jest.fn();
 
-    room = {
-      host: "1",
-      currTime: 0,
-      currVideo: "videoId",
-      state: true,
-      lastChange: 10,
-    };
-    io.sockets.adapter.rooms.set("room-roomnum", room);
+    ioRoom.state = true;
+    ioRoom.currTime = 0;
+    ioRoom.lastChange = 2;
+    ioRoom.currVideo = "videoId";
   });
 
   it("sync state and video and state is true", () => {
     ioUtils.syncClient(debugSocket, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
-      time: -0.005,
+      time: 0.003,
       state: true,
     });
     expect(emit).toHaveBeenNthCalledWith(2, "changeVideoClient", {
@@ -79,24 +80,25 @@ describe("syncClient", () => {
     expect(debugSocket).toHaveBeenNthCalledWith(1, "applied to room-roomnum");
     expect(debugSocket).toHaveBeenNthCalledWith(2, "change state client");
     expect(debugSocket).toHaveBeenNthCalledWith(3, "change video client");
-    expect(performance.now).toHaveBeenNthCalledWith(1);
 
     expect(emit).toHaveBeenCalledTimes(2);
     expect(debugSocket).toHaveBeenCalledTimes(3);
-    expect(performance.now).toHaveBeenCalledTimes(1);
+    expect(performance.now).toHaveBeenCalledTimes(2);
     expect(callback).toHaveBeenCalledTimes(0);
 
-    expect(room).toStrictEqual({
+    expect(ioRoom).toMatchObject({
       host: "1",
-      currTime: 0,
-      currVideo: "videoId",
       state: true,
-      lastChange: 10,
+      currTime: 0,
+      lastChange: 2,
+      currVideo: "videoId",
+      site: undefined,
+      location: undefined,
     });
   });
 
   it("sync state and video and state is false", () => {
-    room.state = false;
+    ioRoom.state = false;
     ioUtils.syncClient(debugSocket, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
@@ -114,47 +116,51 @@ describe("syncClient", () => {
 
     expect(emit).toHaveBeenCalledTimes(2);
     expect(debugSocket).toHaveBeenCalledTimes(3);
-    expect(performance.now).toHaveBeenCalledTimes(0);
+    expect(performance.now).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledTimes(0);
 
-    expect(room).toStrictEqual({
+    expect(ioRoom).toMatchObject({
       host: "1",
-      currTime: 0,
-      currVideo: "videoId",
       state: false,
-      lastChange: 10,
+      currTime: 0,
+      lastChange: 2,
+      currVideo: "videoId",
+      site: undefined,
+      location: undefined,
     });
   });
 
   it("sync state", () => {
-    delete room.currVideo;
+    ioRoom.currVideo = undefined;
     ioUtils.syncClient(debugSocket, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
-      time: -0.005,
+      time: 0.003,
       state: true,
     });
     expect(debugSocket).toHaveBeenNthCalledWith(1, "applied to room-roomnum");
     expect(debugSocket).toHaveBeenNthCalledWith(2, "change state client");
-    expect(performance.now).toHaveBeenNthCalledWith(1);
 
     expect(emit).toHaveBeenCalledTimes(1);
     expect(debugSocket).toHaveBeenCalledTimes(2);
-    expect(performance.now).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledTimes(0);
+    expect(performance.now).toHaveBeenCalledTimes(2);
 
-    expect(room).toStrictEqual({
+    expect(ioRoom).toMatchObject({
       host: "1",
-      currTime: 0,
       state: true,
-      lastChange: 10,
+      currTime: 0,
+      lastChange: 2,
+      currVideo: undefined,
+      site: undefined,
+      location: undefined,
     });
   });
 
   it("sync video", () => {
-    delete room.currTime;
-    delete room.state;
-    delete room.lastChange;
+    ioRoom.currTime = undefined;
+    ioRoom.state = undefined;
+    ioRoom.lastChange = undefined;
     ioUtils.syncClient(debugSocket, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeVideoClient", {
@@ -167,12 +173,17 @@ describe("syncClient", () => {
 
     expect(emit).toHaveBeenCalledTimes(1);
     expect(debugSocket).toHaveBeenCalledTimes(2);
-    expect(performance.now).toHaveBeenCalledTimes(0);
+    expect(performance.now).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledTimes(0);
 
-    expect(room).toStrictEqual({
+    expect(ioRoom).toMatchObject({
       host: "1",
+      state: undefined,
+      currTime: undefined,
+      lastChange: undefined,
       currVideo: "videoId",
+      site: undefined,
+      location: undefined,
     });
   });
 
@@ -188,15 +199,17 @@ describe("syncClient", () => {
 
     expect(emit).toHaveBeenCalledTimes(0);
     expect(debugSocket).toHaveBeenCalledTimes(1);
-    expect(performance.now).toHaveBeenCalledTimes(0);
+    expect(performance.now).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledTimes(1);
 
-    expect(room).toStrictEqual({
+    expect(ioRoom).toMatchObject({
       host: "1",
-      currTime: 0,
-      currVideo: "videoId",
       state: true,
-      lastChange: 10,
+      currTime: 0,
+      lastChange: 2,
+      currVideo: "videoId",
+      site: undefined,
+      location: undefined,
     });
   });
 
@@ -212,15 +225,17 @@ describe("syncClient", () => {
 
     expect(emit).toHaveBeenCalledTimes(0);
     expect(debugSocket).toHaveBeenCalledTimes(1);
-    expect(performance.now).toHaveBeenCalledTimes(0);
+    expect(performance.now).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledTimes(1);
 
-    expect(room).toStrictEqual({
+    expect(ioRoom).toMatchObject({
       host: "1",
-      currTime: 0,
-      currVideo: "videoId",
       state: true,
-      lastChange: 10,
+      currTime: 0,
+      lastChange: 2,
+      currVideo: "videoId",
+      site: undefined,
+      location: undefined,
     });
   });
 });
@@ -250,7 +265,7 @@ describe("updateRoomUsers", () => {
 
     expect(emit).toHaveBeenCalledTimes(1);
     expect(debugSocket).toHaveBeenCalledTimes(1);
-    expect(performance.now).toHaveBeenCalledTimes(0);
+    expect(performance.now).toHaveBeenCalledTimes(1);
 
     expect(room).toStrictEqual({ size: 1 });
   });
@@ -266,7 +281,7 @@ describe("updateRoomUsers", () => {
 
     expect(emit).toHaveBeenCalledTimes(0);
     expect(debugSocket).toHaveBeenCalledTimes(1);
-    expect(performance.now).toHaveBeenCalledTimes(0);
+    expect(performance.now).toHaveBeenCalledTimes(1);
 
     expect(room).toStrictEqual({ size: 1 });
   });
@@ -282,7 +297,7 @@ describe("updateRoomUsers", () => {
 
     expect(emit).toHaveBeenCalledTimes(0);
     expect(debugSocket).toHaveBeenCalledTimes(1);
-    expect(performance.now).toHaveBeenCalledTimes(0);
+    expect(performance.now).toHaveBeenCalledTimes(1);
 
     expect(room).toStrictEqual({ size: 1 });
   });

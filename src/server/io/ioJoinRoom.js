@@ -1,3 +1,4 @@
+const IoRoom = require("./ioRoom");
 const IoUtils = require("./ioUtils");
 
 const regexRoom = /^\w{1,30}$/;
@@ -11,7 +12,6 @@ module.exports = {
         return callback("wrong input");
       }
 
-      let init = false;
       let newRoomnum = roomnum.toLowerCase();
       let oldRoomnum = ioUtils.roomnum;
       if (oldRoomnum === newRoomnum) {
@@ -22,7 +22,6 @@ module.exports = {
         ioUtils.updateRoomUsers(debugSocket);
       }
 
-      init = ioUtils.getRoom(newRoomnum) == null;
       ioUtils.socket.join(`room-${newRoomnum}`);
       configure();
 
@@ -34,18 +33,15 @@ module.exports = {
           debugSocket("room is null (error server)");
           return callback("error server");
         }
+        /** @type {IoRoom} */
+        let ioRoom = room.ioRoom;
+        let init = ioRoom == null;
         if (init) {
-          room.currVideo = null;
-          room.site = null;
-          room.location = null;
-          room.state = false;
-          room.currTime = 0;
-          room.lastChange = ioUtils.performance.now();
+          ioRoom = room.ioRoom = new IoRoom(ioUtils);
         }
-        if (room.host == null) {
+        if (ioRoom.host == null) {
           debugSocket("socket is host");
-
-          room.host = ioUtils.socket.id;
+          ioRoom.host = ioUtils.socket.id;
         }
         if (!init) {
           setTimeout(() => {
@@ -56,7 +52,7 @@ module.exports = {
 
         callback(null, {
           roomnum: ioUtils.roomnum,
-          host: ioUtils.socket.id === room.host,
+          host: ioUtils.socket.id === ioRoom.host,
         });
       }
     });

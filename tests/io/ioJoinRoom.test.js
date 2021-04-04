@@ -4,6 +4,7 @@
 const { Server: ioServer, Socket: SocketServer } = require("socket.io");
 const ioJoinRoom = require("../../src/server/io/ioJoinRoom");
 const IoUtils = require("../../src/server/io/ioUtils");
+const IoRoom = require("../../src/server/io/ioRoom");
 
 /** @type {ioServer} */
 let io;
@@ -17,9 +18,9 @@ let roomnum;
 /** @type {jest.Mock} */
 let callback;
 
-/** @type {IoRoom} */
+/** @type {Set<string>} */
 let room1;
-/** @type {IoRoom} */
+/** @type {Set<string>} */
 let room2;
 /** @type {Performance} */
 let performance;
@@ -70,22 +71,15 @@ beforeEach(() => {
   roomnum = "roomnum2";
   callback = jest.fn();
 
-  room2 = null;
-  //join room
-  room1 = {
-    currTime: 0,
-    currVideo: null,
-    lastChange: 5,
-    state: false,
-    location: null,
-    site: null,
-  };
-  io.sockets.adapter.rooms.set("room-roomnum1", room1);
-  socket.rooms.add("roomnum1");
-
   syncClient = jest.fn();
   updateRoomUsers = jest.fn((cb) => cb("updateRoomUsers"));
   performance = { now: jest.fn(() => 5) };
+
+  room2 = null;
+  //join room
+  room1 = { ioRoom: new IoRoom({ performance: performance }) };
+  io.sockets.adapter.rooms.set("room-roomnum1", room1);
+  socket.rooms.add("roomnum1");
 
   let ioUtils = new IoUtils(io, socket, performance);
   ioUtils.syncClient = syncClient;
@@ -110,21 +104,22 @@ it.each(["r", "roomnum_", Array(31).join("x")])(
       roomnum: roomnum,
       host: true,
     });
-    expect(performance.now).toHaveBeenNthCalledWith(1);
 
     expect(debugSocket).toHaveBeenCalledTimes(4);
     expect(callback).toHaveBeenCalledTimes(1);
-    expect(performance.now).toHaveBeenCalledTimes(1);
+    expect(performance.now).toHaveBeenCalledTimes(2);
 
     expect(room1).toBeNull();
-    expect(room2).toStrictEqual({
-      currTime: 0,
-      currVideo: null,
-      host: "1",
-      lastChange: 5,
-      state: false,
-      location: null,
-      site: null,
+    expect(room2).toMatchObject({
+      ioRoom: {
+        currTime: 0,
+        currVideo: undefined,
+        host: "1",
+        lastChange: 5,
+        state: false,
+        location: undefined,
+        site: undefined,
+      },
     });
   }
 );
@@ -144,40 +139,37 @@ it("Change room from non-existing room to new room", () => {
     roomnum: roomnum,
     host: true,
   });
-  expect(performance.now).toHaveBeenNthCalledWith(1);
 
   expect(debugSocket).toHaveBeenCalledTimes(3);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(1);
+  expect(performance.now).toHaveBeenCalledTimes(2);
 
-  expect(room1).toStrictEqual({
-    currTime: 0,
-    currVideo: null,
-    lastChange: 5,
-    location: null,
-    site: null,
-    state: false,
+  expect(room1).toMatchObject({
+    ioRoom: {
+      currTime: 0,
+      currVideo: undefined,
+      host: undefined,
+      lastChange: 5,
+      location: undefined,
+      site: undefined,
+      state: false,
+    },
   });
-  expect(room2).toStrictEqual({
-    currTime: 0,
-    currVideo: null,
-    host: "1",
-    lastChange: 5,
-    state: false,
-    location: null,
-    site: null,
+  expect(room2).toMatchObject({
+    ioRoom: {
+      currTime: 0,
+      currVideo: undefined,
+      host: "1",
+      lastChange: 5,
+      state: false,
+      location: undefined,
+      site: undefined,
+    },
   });
 });
 
 it("Change room from existing room to existing room", () => {
-  room2 = {
-    currTime: 0,
-    currVideo: null,
-    lastChange: 5,
-    state: false,
-    location: null,
-    site: null,
-  };
+  room2 = { ioRoom: new IoRoom({ performance: performance }) };
   io.sockets.adapter.rooms.set("room-roomnum2", room2);
 
   joinRoom(debugSocket, roomnum, callback);
@@ -196,31 +188,27 @@ it("Change room from existing room to existing room", () => {
 
   expect(debugSocket).toHaveBeenCalledTimes(4);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
+  expect(performance.now).toHaveBeenCalledTimes(2);
 
   expect(room1).toBeNull();
-  expect(room2).toStrictEqual({
-    currTime: 0,
-    currVideo: null,
-    host: "1",
-    lastChange: 5,
-    state: false,
-    location: null,
-    site: null,
+  expect(room2).toMatchObject({
+    ioRoom: {
+      currTime: 0,
+      currVideo: undefined,
+      host: "1",
+      lastChange: 5,
+      state: false,
+      location: undefined,
+      site: undefined,
+    },
   });
 });
 
 it("Change room from non-existing room to existing room", () => {
   socket.rooms.delete("roomnum1");
   io.sockets.adapter.rooms.delete("room-roomnum1");
-  room2 = {
-    currTime: 0,
-    currVideo: null,
-    lastChange: 5,
-    state: false,
-    location: null,
-    site: null,
-  };
+  room2 = { ioRoom: new IoRoom({ performance: performance }) };
+
   joinRoom(debugSocket, roomnum, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(
@@ -233,28 +221,32 @@ it("Change room from non-existing room to existing room", () => {
     roomnum: roomnum,
     host: true,
   });
-  expect(performance.now).toHaveBeenNthCalledWith(1);
 
   expect(debugSocket).toHaveBeenCalledTimes(3);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(1);
+  expect(performance.now).toHaveBeenCalledTimes(2);
 
-  expect(room1).toStrictEqual({
-    currTime: 0,
-    currVideo: null,
-    lastChange: 5,
-    location: null,
-    site: null,
-    state: false,
+  expect(room1).toMatchObject({
+    ioRoom: {
+      currTime: 0,
+      currVideo: undefined,
+      host: undefined,
+      lastChange: 5,
+      location: undefined,
+      site: undefined,
+      state: false,
+    },
   });
-  expect(room2).toStrictEqual({
-    currTime: 0,
-    currVideo: null,
-    host: "1",
-    lastChange: 5,
-    state: false,
-    location: null,
-    site: null,
+  expect(room2).toMatchObject({
+    ioRoom: {
+      currTime: 0,
+      currVideo: undefined,
+      host: "1",
+      lastChange: 5,
+      state: false,
+      location: undefined,
+      site: undefined,
+    },
   });
 });
 
@@ -275,16 +267,18 @@ it("Change room to same room", () => {
 
   expect(debugSocket).toHaveBeenCalledTimes(3);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
+  expect(performance.now).toHaveBeenCalledTimes(1);
 
-  expect(room1).toStrictEqual({
-    host: "1",
-    currTime: 0,
-    currVideo: null,
-    lastChange: 5,
-    location: null,
-    site: null,
-    state: false,
+  expect(room1).toMatchObject({
+    ioRoom: {
+      currTime: 0,
+      currVideo: undefined,
+      host: "1",
+      lastChange: 5,
+      location: undefined,
+      site: undefined,
+      state: false,
+    },
   });
   expect(room2).toBeNull();
 });
@@ -311,17 +305,20 @@ it.each([
 
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
+  expect(performance.now).toHaveBeenCalledTimes(1);
 
-  expect(room1).toStrictEqual({
-    currTime: 0,
-    currVideo: null,
-    lastChange: 5,
-    location: null,
-    site: null,
-    state: false,
+  expect(room1).toMatchObject({
+    ioRoom: {
+      currTime: 0,
+      currVideo: undefined,
+      host: undefined,
+      lastChange: 5,
+      location: undefined,
+      site: undefined,
+      state: false,
+    },
   });
-  expect(room2).toStrictEqual(null);
+  expect(room2).toBeNull();
 });
 
 it("With error", () => {
@@ -337,28 +334,32 @@ it("With error", () => {
     host: true,
     roomnum: "roomnum2",
   });
-  expect(performance.now).toHaveBeenNthCalledWith(1);
 
   expect(debugSocket).toHaveBeenCalledTimes(4);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(1);
+  expect(performance.now).toHaveBeenCalledTimes(2);
 
-  expect(room1).toStrictEqual({
-    currTime: 0,
-    currVideo: null,
-    lastChange: 5,
-    location: null,
-    site: null,
-    state: false,
+  expect(room1).toMatchObject({
+    ioRoom: {
+      currTime: 0,
+      currVideo: undefined,
+      host: undefined,
+      lastChange: 5,
+      location: undefined,
+      site: undefined,
+      state: false,
+    },
   });
-  expect(room2).toStrictEqual({
-    currTime: 0,
-    currVideo: null,
-    host: "1",
-    lastChange: 5,
-    location: null,
-    site: null,
-    state: false,
+  expect(room2).toMatchObject({
+    ioRoom: {
+      currTime: 0,
+      currVideo: undefined,
+      host: "1",
+      lastChange: 5,
+      location: undefined,
+      site: undefined,
+      state: false,
+    },
   });
 });
 
@@ -374,15 +375,18 @@ it("With error, same room", () => {
 
   expect(debugSocket).toHaveBeenCalledTimes(2);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
+  expect(performance.now).toHaveBeenCalledTimes(1);
 
-  expect(room1).toStrictEqual({
-    currTime: 0,
-    currVideo: null,
-    lastChange: 5,
-    location: null,
-    site: null,
-    state: false,
+  expect(room1).toMatchObject({
+    ioRoom: {
+      currTime: 0,
+      currVideo: undefined,
+      host: undefined,
+      lastChange: 5,
+      location: undefined,
+      site: undefined,
+      state: false,
+    },
   });
-  expect(room2).toStrictEqual(null);
+  expect(room2).toBeNull();
 });

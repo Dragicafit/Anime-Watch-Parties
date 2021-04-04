@@ -23,27 +23,21 @@ module.exports = {
           return callback("wrong input");
         }
 
-        let room = ioUtils.getRoom();
-        if (room == null) {
+        let ioRoom = ioUtils.getIoRoom();
+        if (ioRoom == null) {
           debugSocket("socket is not connected to room");
           return callback("access denied");
         }
-        if (ioUtils.socket.id !== room.host) {
+        if (ioUtils.socket.id !== ioRoom.host) {
           debugSocket("socket is not host");
           return callback("access denied");
         }
         debugSocket(`applied to room-${ioUtils.roomnum}`);
 
-        room.currVideo = videoId;
-        room.site = site;
-        room.location = location;
+        ioRoom.updateVideo(videoId, site, location);
         ioUtils.socket.broadcast
           .to(`room-${ioUtils.roomnum}`)
-          .emit("changeVideoClient", {
-            videoId: room.currVideo,
-            site: room.site,
-            location: room.location,
-          });
+          .emit("changeVideoClient", ioRoom.videoObject);
       }
     );
   },

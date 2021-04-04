@@ -9,12 +9,12 @@ module.exports = {
       }
       debugSocket(`${ioUtils.io.sockets.sockets.size} sockets connected`);
 
-      let room = ioUtils.getRoom();
-      if (room == null) {
+      let ioRoom = ioUtils.getIoRoom();
+      if (ioRoom == null) {
         return;
       }
-      if (ioUtils.socket.id === room.host) {
-        room.host = undefined;
+      if (ioUtils.socket.id === ioRoom.host) {
+        ioRoom.host = undefined;
       }
       debugSocket(`applied to room-${ioUtils.roomnum}`);
 

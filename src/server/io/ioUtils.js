@@ -1,4 +1,4 @@
-const { Server: ioServer, Socket } = require("socket.io");
+const { Server: ioServer, Socket, SocketId } = require("socket.io");
 const IoRoom = require("./ioRoom");
 
 const regexPrefix = /^room-/g;
@@ -19,35 +19,20 @@ class IoUtils {
   }
 
   syncClient(debugSocket, callback) {
-    let room = this.getRoom();
-    if (room == null) {
+    let ioRoom = this.getIoRoom();
+    if (ioRoom == null) {
       debugSocket("socket is not connected to room");
       return callback("access denied");
     }
     debugSocket(`applied to room-${this.roomnum}`);
 
-    if (
-      room.currTime != null &&
-      room.state != null &&
-      room.lastChange != null
-    ) {
+    if (ioRoom.isStateDefined()) {
       debugSocket("change state client");
-      let currTime = room.currTime;
-      if (room.state) {
-        currTime += (this.performance.now() - room.lastChange) / 1000;
-      }
-      this.socket.emit("changeStateClient", {
-        time: currTime,
-        state: room.state,
-      });
+      this.socket.emit("changeStateClient", ioRoom.stateObject);
     }
-    if (room.currVideo != null) {
+    if (ioRoom.isVideoDefined()) {
       debugSocket("change video client");
-      this.socket.emit("changeVideoClient", {
-        videoId: room.currVideo,
-        site: room.site,
-        location: room.location,
-      });
+      this.socket.emit("changeVideoClient", ioRoom.videoObject);
     }
   }
 
@@ -63,9 +48,14 @@ class IoUtils {
     });
   }
 
-  /** @param String @returns {IoRoom} */
+  /** @param String */
   getRoom(roomnum = this.roomnum) {
     return this.io.sockets.adapter.rooms.get(`room-${roomnum}`);
+  }
+
+  /** @param String @returns {IoRoom} */
+  getIoRoom(roomnum = this.roomnum) {
+    return this.getRoom(roomnum)?.ioRoom;
   }
 
   get roomnum() {

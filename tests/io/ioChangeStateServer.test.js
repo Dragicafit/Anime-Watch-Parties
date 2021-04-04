@@ -20,7 +20,7 @@ let time;
 let callback;
 
 /** @type {IoRoom} */
-let room;
+let ioRoom;
 /** @type {jest.Mock} */
 let emit;
 /** @type {Performance} */
@@ -55,12 +55,13 @@ beforeEach(() => {
   time = 1;
   callback = jest.fn();
 
-  // join room
-  room = { host: "1" };
-  io.sockets.adapter.rooms.set("room-roomnum", room);
-  socket.rooms.add("roomnum");
-
   performance = { now: jest.fn(() => 5) };
+
+  // join room
+  ioRoom = new IoRoom({ performance: performance });
+  ioRoom.host = "1";
+  io.sockets.adapter.rooms.set("room-roomnum", { ioRoom: ioRoom });
+  socket.rooms.add("roomnum");
 
   ioChangeStateServer.start(new IoUtils(io, socket, performance));
 });
@@ -80,18 +81,20 @@ it.each([
     state: state,
   });
   expect(debugSocket).toHaveBeenNthCalledWith(1, "applied to room-roomnum");
-  expect(performance.now).toHaveBeenNthCalledWith(1);
 
   expect(emit).toHaveBeenCalledTimes(1);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(0);
-  expect(performance.now).toHaveBeenCalledTimes(1);
+  expect(performance.now).toHaveBeenCalledTimes(2 + state);
 
-  expect(room).toStrictEqual({
+  expect(ioRoom).toMatchObject({
     host: "1",
+    state: state,
     currTime: time,
     lastChange: 5,
-    state: state,
+    currVideo: undefined,
+    site: undefined,
+    location: undefined,
   });
 });
 
@@ -115,9 +118,17 @@ it.each([
   expect(emit).toHaveBeenCalledTimes(0);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
+  expect(performance.now).toHaveBeenCalledTimes(1);
 
-  expect(room).toStrictEqual({ host: "1" });
+  expect(ioRoom).toMatchObject({
+    host: "1",
+    state: false,
+    currTime: 0,
+    lastChange: 5,
+    currVideo: undefined,
+    site: undefined,
+    location: undefined,
+  });
 });
 
 it.each([
@@ -140,9 +151,17 @@ it.each([
   expect(emit).toHaveBeenCalledTimes(0);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
+  expect(performance.now).toHaveBeenCalledTimes(1);
 
-  expect(room).toStrictEqual({ host: "1" });
+  expect(ioRoom).toMatchObject({
+    host: "1",
+    state: false,
+    currTime: 0,
+    lastChange: 5,
+    currVideo: undefined,
+    site: undefined,
+    location: undefined,
+  });
 });
 
 it("Not connected to a room", () => {
@@ -158,9 +177,17 @@ it("Not connected to a room", () => {
   expect(emit).toHaveBeenCalledTimes(0);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
+  expect(performance.now).toHaveBeenCalledTimes(1);
 
-  expect(room).toStrictEqual({ host: "1" });
+  expect(ioRoom).toMatchObject({
+    host: "1",
+    state: false,
+    currTime: 0,
+    lastChange: 5,
+    currVideo: undefined,
+    site: undefined,
+    location: undefined,
+  });
 });
 
 it("is in an non-existent room", () => {
@@ -177,13 +204,21 @@ it("is in an non-existent room", () => {
   expect(emit).toHaveBeenCalledTimes(0);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
+  expect(performance.now).toHaveBeenCalledTimes(1);
 
-  expect(room).toStrictEqual({ host: "1" });
+  expect(ioRoom).toMatchObject({
+    host: "1",
+    state: false,
+    currTime: 0,
+    lastChange: 5,
+    currVideo: undefined,
+    site: undefined,
+    location: undefined,
+  });
 });
 
 it("Not host", () => {
-  room.host = "2";
+  ioRoom.host = "2";
   changeStateServer(debugSocket, state, time, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(1, "socket is not host");
@@ -192,7 +227,15 @@ it("Not host", () => {
   expect(emit).toHaveBeenCalledTimes(0);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(0);
+  expect(performance.now).toHaveBeenCalledTimes(1);
 
-  expect(room).toStrictEqual({ host: "2" });
+  expect(ioRoom).toMatchObject({
+    host: "2",
+    state: false,
+    currTime: 0,
+    lastChange: 5,
+    currVideo: undefined,
+    site: undefined,
+    location: undefined,
+  });
 });

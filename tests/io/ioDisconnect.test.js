@@ -18,7 +18,7 @@ let debugDisconnect;
 let updateRoomUsers;
 
 /** @type {IoRoom} */
-let room;
+let ioRoom;
 
 beforeEach(() => {
   socket = {
@@ -40,8 +40,9 @@ beforeEach(() => {
   updateRoomUsers = jest.fn((cb) => cb("updateRoomUsers"));
 
   // join room
-  room = { host: "1" };
-  io.sockets.adapter.rooms.set("room-roomnum", room);
+  ioRoom = new IoRoom({ performance: { now: () => 5 } });
+  ioRoom.host = "1";
+  io.sockets.adapter.rooms.set("room-roomnum", { ioRoom: ioRoom });
   socket.rooms.add("roomnum");
 
   let ioUtils = new IoUtils(io, socket, null);
@@ -68,11 +69,19 @@ it("With Roomnum and is host", () => {
   expect(debugDisconnect).toHaveBeenCalledTimes(3);
   expect(updateRoomUsers).toHaveBeenCalledTimes(1);
 
-  expect(room).toStrictEqual({ host: undefined });
+  expect(ioRoom).toMatchObject({
+    host: undefined,
+    state: false,
+    currTime: 0,
+    lastChange: 5,
+    currVideo: undefined,
+    site: undefined,
+    location: undefined,
+  });
 });
 
 it("With Roomnum and is not host", () => {
-  room.host = "2";
+  ioRoom.host = "2";
   disconnect();
 
   expect(debugDisconnect).toHaveBeenNthCalledWith(
@@ -91,7 +100,15 @@ it("With Roomnum and is not host", () => {
   expect(debugDisconnect).toHaveBeenCalledTimes(3);
   expect(updateRoomUsers).toHaveBeenCalledTimes(1);
 
-  expect(room).toStrictEqual({ host: "2" });
+  expect(ioRoom).toMatchObject({
+    host: "2",
+    state: false,
+    currTime: 0,
+    lastChange: 5,
+    currVideo: undefined,
+    site: undefined,
+    location: undefined,
+  });
 });
 
 it("Without Roomnum", () => {
@@ -107,7 +124,15 @@ it("Without Roomnum", () => {
   expect(debugDisconnect).toHaveBeenCalledTimes(1);
   expect(updateRoomUsers).toHaveBeenCalledTimes(0);
 
-  expect(room).toStrictEqual({ host: "1" });
+  expect(ioRoom).toMatchObject({
+    host: "1",
+    state: false,
+    currTime: 0,
+    lastChange: 5,
+    currVideo: undefined,
+    site: undefined,
+    location: undefined,
+  });
 });
 
 it("With error", () => {
@@ -124,5 +149,13 @@ it("With error", () => {
   expect(debugDisconnect).toHaveBeenCalledTimes(1);
   expect(updateRoomUsers).toHaveBeenCalledTimes(0);
 
-  expect(room).toStrictEqual({ host: "1" });
+  expect(ioRoom).toMatchObject({
+    host: "1",
+    state: false,
+    currTime: 0,
+    lastChange: 5,
+    currVideo: undefined,
+    site: undefined,
+    location: undefined,
+  });
 });

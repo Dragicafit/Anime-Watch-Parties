@@ -15,26 +15,21 @@ module.exports = {
           return callback("wrong input");
         }
 
-        let room = ioUtils.getRoom();
-        if (room == null) {
+        let ioRoom = ioUtils.getIoRoom();
+        if (ioRoom == null) {
           debugSocket("socket is not connected to room");
           return callback("access denied");
         }
-        if (ioUtils.socket.id !== room.host) {
+        if (ioUtils.socket.id !== ioRoom.host) {
           debugSocket("socket is not host");
           return callback("access denied");
         }
         debugSocket(`applied to room-${ioUtils.roomnum}`);
 
-        room.currTime = time;
-        room.state = state;
-        room.lastChange = ioUtils.performance.now();
+        ioRoom.updateState(state, time);
         ioUtils.socket.broadcast
           .to(`room-${ioUtils.roomnum}`)
-          .emit("changeStateClient", {
-            time: room.currTime,
-            state: room.state,
-          });
+          .emit("changeStateClient", ioRoom.stateObject);
       }
     );
   },
