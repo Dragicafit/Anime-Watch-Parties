@@ -1,9 +1,9 @@
 const { Server: ioServer, Socket } = require("socket.io");
-const Room = require("./room");
+const IoRoom = require("./ioRoom");
 
 const regexPrefix = /^room-/g;
 
-class Utils {
+class IoUtils {
   /** @type {ioServer} */
   io;
   /** @type {Socket} */
@@ -63,7 +63,7 @@ class Utils {
     });
   }
 
-  /** @param String @returns {Room} */
+  /** @param String @returns {IoRoom} */
   getRoom(roomnum = this.roomnum) {
     return this.io.sockets.adapter.rooms.get(`room-${roomnum}`);
   }
@@ -73,4 +73,4 @@ class Utils {
   }
 }
 
-module.exports = Utils;
+module.exports = IoUtils;

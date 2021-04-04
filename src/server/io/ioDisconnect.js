@@ -1,24 +1,24 @@
-const Utils = require("./utils");
+const IoUtils = require("./ioUtils");
 
 module.exports = {
-  /** @param {Utils} utils @param {debug.Debugger} debugDisconnect */
-  start: function (utils, debugDisconnect) {
-    utils.socket.on("disconnect", () => {
+  /** @param {IoUtils} ioUtils @param {debug.Debugger} debugDisconnect */
+  start: function (ioUtils, debugDisconnect) {
+    ioUtils.socket.on("disconnect", () => {
       function debugSocket() {
-        debugDisconnect(`${utils.socket.id}:`, ...arguments);
+        debugDisconnect(`${ioUtils.socket.id}:`, ...arguments);
       }
-      debugSocket(`${utils.io.sockets.sockets.size} sockets connected`);
+      debugSocket(`${ioUtils.io.sockets.sockets.size} sockets connected`);
 
-      let room = utils.getRoom();
+      let room = ioUtils.getRoom();
       if (room == null) {
         return;
       }
-      if (utils.socket.id === room.host) {
+      if (ioUtils.socket.id === room.host) {
         room.host = undefined;
       }
-      debugSocket(`applied to room-${utils.roomnum}`);
+      debugSocket(`applied to room-${ioUtils.roomnum}`);
 
-      utils.updateRoomUsers(debugSocket);
+      ioUtils.updateRoomUsers(debugSocket);
     });
   },
 };

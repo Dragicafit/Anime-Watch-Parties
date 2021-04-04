@@ -3,8 +3,8 @@
 
 const { Server: ioServer, Socket: SocketServer } = require("socket.io");
 const ioDisconnect = require("../../src/server/io/ioDisconnect");
-const Room = require("../../src/server/io/room");
-const Utils = require("../../src/server/io/utils");
+const IoRoom = require("../../src/server/io/ioRoom");
+const IoUtils = require("../../src/server/io/ioUtils");
 
 /** @type {ioServer} */
 let io;
@@ -17,7 +17,7 @@ let debugDisconnect;
 /** @type {jest.Mock} */
 let updateRoomUsers;
 
-/** @type {Room} */
+/** @type {IoRoom} */
 let room;
 
 beforeEach(() => {
@@ -44,9 +44,9 @@ beforeEach(() => {
   io.sockets.adapter.rooms.set("room-roomnum", room);
   socket.rooms.add("roomnum");
 
-  let utils = new Utils(io, socket, null);
-  utils.updateRoomUsers = updateRoomUsers;
-  ioDisconnect.start(utils, debugDisconnect);
+  let ioUtils = new IoUtils(io, socket, null);
+  ioUtils.updateRoomUsers = updateRoomUsers;
+  ioDisconnect.start(ioUtils, debugDisconnect);
 });
 
 it("With Roomnum and is host", () => {

@@ -1,6 +1,6 @@
 const { SocketId } = require("socket.io-adapter");
 
-class Room extends Set {
+class IoRoom extends Set {
   /** @type {SocketId} */
   host;
   /** @type {Number} */
@@ -17,4 +17,4 @@ class Room extends Set {
   location;
 }
 
-module.exports = Room;
+module.exports = IoRoom;

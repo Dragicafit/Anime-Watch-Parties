@@ -2,20 +2,20 @@
 "use strict";
 
 const { Server: ioServer, Socket } = require("socket.io");
-const Utils = require("../../src/server/io/utils");
-const Room = require("../../src/server/io/room");
+const IoUtils = require("../../src/server/io/ioUtils");
+const IoRoom = require("../../src/server/io/ioRoom");
 
 /** @type {ioServer} */
 let io;
 /** @type {Socket} */
 let socket;
-/** @type {Utils} */
-let utils;
+/** @type {IoUtils} */
+let ioUtils;
 
 /** @type {jest.Mock} */
 let debugSocket;
 
-/** @type {Room} */
+/** @type {IoRoom} */
 let room;
 /** @type {Performance} */
 let performance;
@@ -43,7 +43,7 @@ beforeEach(() => {
   debugSocket = jest.fn();
   performance = { now: jest.fn(() => 5) };
 
-  utils = new Utils(io, socket, performance);
+  ioUtils = new IoUtils(io, socket, performance);
 });
 
 describe("syncClient", () => {
@@ -65,7 +65,7 @@ describe("syncClient", () => {
   });
 
   it("sync state and video and state is true", () => {
-    utils.syncClient(debugSocket, callback);
+    ioUtils.syncClient(debugSocket, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
       time: -0.005,
@@ -97,7 +97,7 @@ describe("syncClient", () => {
 
   it("sync state and video and state is false", () => {
     room.state = false;
-    utils.syncClient(debugSocket, callback);
+    ioUtils.syncClient(debugSocket, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
       time: 0,
@@ -128,7 +128,7 @@ describe("syncClient", () => {
 
   it("sync state", () => {
     delete room.currVideo;
-    utils.syncClient(debugSocket, callback);
+    ioUtils.syncClient(debugSocket, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
       time: -0.005,
@@ -155,7 +155,7 @@ describe("syncClient", () => {
     delete room.currTime;
     delete room.state;
     delete room.lastChange;
-    utils.syncClient(debugSocket, callback);
+    ioUtils.syncClient(debugSocket, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeVideoClient", {
       site: undefined,
@@ -178,7 +178,7 @@ describe("syncClient", () => {
 
   it("Without roomnum", () => {
     socket.rooms.delete("roomnum");
-    utils.syncClient(debugSocket, callback);
+    ioUtils.syncClient(debugSocket, callback);
 
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
@@ -202,7 +202,7 @@ describe("syncClient", () => {
 
   it("With error", () => {
     io.sockets.adapter.rooms.delete("room-roomnum");
-    utils.syncClient(debugSocket, callback);
+    ioUtils.syncClient(debugSocket, callback);
 
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
@@ -241,7 +241,7 @@ describe("updateRoomUsers", () => {
   });
 
   it("Valid", () => {
-    utils.updateRoomUsers(debugSocket);
+    ioUtils.updateRoomUsers(debugSocket);
 
     expect(emit).toHaveBeenNthCalledWith(1, "getUsers", {
       onlineUsers: 1,
@@ -257,7 +257,7 @@ describe("updateRoomUsers", () => {
 
   it("Without roomnum", () => {
     socket.rooms.delete("roomnum");
-    utils.updateRoomUsers(debugSocket);
+    ioUtils.updateRoomUsers(debugSocket);
 
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
@@ -273,7 +273,7 @@ describe("updateRoomUsers", () => {
 
   it("With error", () => {
     io.sockets.adapter.rooms.delete("room-roomnum");
-    utils.updateRoomUsers(debugSocket);
+    ioUtils.updateRoomUsers(debugSocket);
 
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,

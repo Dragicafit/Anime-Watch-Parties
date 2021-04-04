@@ -3,7 +3,7 @@
 
 const { Server: ioServer, Socket: SocketServer } = require("socket.io");
 const ioJoinRoom = require("../../src/server/io/ioJoinRoom");
-const Utils = require("../../src/server/io/utils");
+const IoUtils = require("../../src/server/io/ioUtils");
 
 /** @type {ioServer} */
 let io;
@@ -17,9 +17,9 @@ let roomnum;
 /** @type {jest.Mock} */
 let callback;
 
-/** @type {Room} */
+/** @type {IoRoom} */
 let room1;
-/** @type {Room} */
+/** @type {IoRoom} */
 let room2;
 /** @type {Performance} */
 let performance;
@@ -87,10 +87,10 @@ beforeEach(() => {
   updateRoomUsers = jest.fn((cb) => cb("updateRoomUsers"));
   performance = { now: jest.fn(() => 5) };
 
-  let utils = new Utils(io, socket, performance);
-  utils.syncClient = syncClient;
-  utils.updateRoomUsers = updateRoomUsers;
-  ioJoinRoom.start(utils);
+  let ioUtils = new IoUtils(io, socket, performance);
+  ioUtils.syncClient = syncClient;
+  ioUtils.updateRoomUsers = updateRoomUsers;
+  ioJoinRoom.start(ioUtils);
 });
 
 it.each(["r", "roomnum_", Array(31).join("x")])(

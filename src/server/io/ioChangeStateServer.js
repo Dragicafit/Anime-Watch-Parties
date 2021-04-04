@@ -1,10 +1,9 @@
-const Room = require("./room");
-const Utils = require("./utils");
+const IoUtils = require("./ioUtils");
 
 module.exports = {
-  /** @param {Utils} utils */
-  start: function (utils) {
-    utils.socket.on(
+  /** @param {IoUtils} ioUtils */
+  start: function (ioUtils) {
+    ioUtils.socket.on(
       "changeStateServer",
       (debugSocket, state, time, callback) => {
         if (state !== true && state !== false) {
@@ -16,22 +15,22 @@ module.exports = {
           return callback("wrong input");
         }
 
-        let room = utils.getRoom();
+        let room = ioUtils.getRoom();
         if (room == null) {
           debugSocket("socket is not connected to room");
           return callback("access denied");
         }
-        if (utils.socket.id !== room.host) {
+        if (ioUtils.socket.id !== room.host) {
           debugSocket("socket is not host");
           return callback("access denied");
         }
-        debugSocket(`applied to room-${utils.roomnum}`);
+        debugSocket(`applied to room-${ioUtils.roomnum}`);
 
         room.currTime = time;
         room.state = state;
-        room.lastChange = utils.performance.now();
-        utils.socket.broadcast
-          .to(`room-${utils.roomnum}`)
+        room.lastChange = ioUtils.performance.now();
+        ioUtils.socket.broadcast
+          .to(`room-${ioUtils.roomnum}`)
           .emit("changeStateClient", {
             time: room.currTime,
             state: room.state,

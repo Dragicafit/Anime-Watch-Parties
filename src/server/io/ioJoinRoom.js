@@ -1,12 +1,11 @@
-const Room = require("./room");
-const Utils = require("./utils");
+const IoUtils = require("./ioUtils");
 
 const regexRoom = /^\w{1,30}$/;
 
 module.exports = {
-  /** @param {Utils} utils */
-  start: function (utils) {
-    utils.socket.on("joinRoom", (debugSocket, roomnum, callback) => {
+  /** @param {IoUtils} ioUtils */
+  start: function (ioUtils) {
+    ioUtils.socket.on("joinRoom", (debugSocket, roomnum, callback) => {
       if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
         debugSocket("roomnum is not a valid string");
         return callback("wrong input");
@@ -14,23 +13,23 @@ module.exports = {
 
       let init = false;
       let newRoomnum = roomnum.toLowerCase();
-      let oldRoomnum = utils.roomnum;
+      let oldRoomnum = ioUtils.roomnum;
       if (oldRoomnum === newRoomnum) {
         return configure();
       }
       if (oldRoomnum != null) {
-        utils.socket.leave(`room-${oldRoomnum}`);
-        utils.updateRoomUsers(debugSocket);
+        ioUtils.socket.leave(`room-${oldRoomnum}`);
+        ioUtils.updateRoomUsers(debugSocket);
       }
 
-      init = utils.getRoom(newRoomnum) == null;
-      utils.socket.join(`room-${newRoomnum}`);
+      init = ioUtils.getRoom(newRoomnum) == null;
+      ioUtils.socket.join(`room-${newRoomnum}`);
       configure();
 
       function configure() {
         debugSocket(`connected to room-${newRoomnum}`);
 
-        let room = utils.getRoom(newRoomnum);
+        let room = ioUtils.getRoom(newRoomnum);
         if (room == null) {
           debugSocket("room is null (error server)");
           return callback("error server");
@@ -41,23 +40,23 @@ module.exports = {
           room.location = null;
           room.state = false;
           room.currTime = 0;
-          room.lastChange = utils.performance.now();
+          room.lastChange = ioUtils.performance.now();
         }
         if (room.host == null) {
           debugSocket("socket is host");
 
-          room.host = utils.socket.id;
+          room.host = ioUtils.socket.id;
         }
         if (!init) {
           setTimeout(() => {
-            utils.syncClient(debugSocket, () => null);
+            ioUtils.syncClient(debugSocket, () => null);
           }, 1000);
         }
-        utils.updateRoomUsers(debugSocket);
+        ioUtils.updateRoomUsers(debugSocket);
 
         callback(null, {
-          roomnum: utils.roomnum,
-          host: utils.socket.id === room.host,
+          roomnum: ioUtils.roomnum,
+          host: ioUtils.socket.id === room.host,
         });
       }
     });

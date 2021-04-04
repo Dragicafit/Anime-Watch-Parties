@@ -3,8 +3,8 @@
 
 const { Server: ioServer, Socket: SocketServer } = require("socket.io");
 const ioChangeStateServer = require("../../src/server/io/ioChangeStateServer");
-const Room = require("../../src/server/io/room");
-const Utils = require("../../src/server/io/utils");
+const IoRoom = require("../../src/server/io/ioRoom");
+const IoUtils = require("../../src/server/io/ioUtils");
 
 /** @type {ioServer} */
 let io;
@@ -19,7 +19,7 @@ let time;
 /** @type {jest.Mock} */
 let callback;
 
-/** @type {Room} */
+/** @type {IoRoom} */
 let room;
 /** @type {jest.Mock} */
 let emit;
@@ -62,7 +62,7 @@ beforeEach(() => {
 
   performance = { now: jest.fn(() => 5) };
 
-  ioChangeStateServer.start(new Utils(io, socket, performance));
+  ioChangeStateServer.start(new IoUtils(io, socket, performance));
 });
 
 it.each([

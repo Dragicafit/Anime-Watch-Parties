@@ -3,8 +3,8 @@
 
 const { Server: ioServer, Socket: SocketServer } = require("socket.io");
 const ioChangeVideoServer = require("../../src/server/io/ioChangeVideoServer");
-const Room = require("../../src/server/io/room");
-const Utils = require("../../src/server/io/utils");
+const IoRoom = require("../../src/server/io/ioRoom");
+const IoUtils = require("../../src/server/io/ioUtils");
 
 /** @type {ioServer} */
 let io;
@@ -20,7 +20,7 @@ let location;
 /** @type {jest.Mock} */
 let callback;
 
-/** @type {Room} */
+/** @type {IoRoom} */
 let room;
 /** @type {jest.Mock} */
 let emit;
@@ -60,7 +60,7 @@ beforeEach(() => {
   io.sockets.adapter.rooms.set("room-roomnum", room);
   socket.rooms.add("roomnum");
 
-  ioChangeVideoServer.start(new Utils(io, socket));
+  ioChangeVideoServer.start(new IoUtils(io, socket));
 });
 
 it.each([
