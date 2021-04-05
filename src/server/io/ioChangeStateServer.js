@@ -28,7 +28,7 @@ module.exports = {
         debugSocket(`applied to room-${ioUtils.roomnum}`);
 
         ioRoom.updateState(state, time);
-        ioContext.socket.broadcast
+        ioContext.socket
           .to(`room-${ioUtils.roomnum}`)
           .emit("changeStateClient", ioRoom.stateObject);
       }

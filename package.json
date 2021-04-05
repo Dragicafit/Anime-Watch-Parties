@@ -16,19 +16,19 @@
   "author": "Dragicafit",
   "license": "MIT",
   "dependencies": {
-    "connect-redis": "^5.0.0",
+    "connect-redis": "^5.1.0",
     "debug": "^4.3.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
-    "handlebars": "^4.7.6",
+    "handlebars": "^4.7.7",
     "passport": "^0.4.1",
     "passport-twitch-new": "^0.0.2",
     "rate-limiter-flexible": "^2.2.1",
-    "redis": "^3.0.2",
-    "socket.io": "^3.1.0",
-    "socket.io-client": "^3.1.0",
-    "socket.io-redis": "^6.0.1"
+    "redis": "^3.1.0",
+    "socket.io": "^4.0.1",
+    "socket.io-client": "^4.0.1",
+    "socket.io-redis": "^6.1.0"
   },
   "bugs": {
     "url": "https://github.com/Dragicafit/Anime-Watch-Parties/issues"

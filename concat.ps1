@@ -35,7 +35,7 @@ cd web-accessible-resources/
 cd ../
 cd background-scripts/
 echo "\"use strict\";" > background-script2.js
-cat "../dependencies/socket.io.js" >> background-script2.js
+cat "../dependencies/socket.io.min.js" >> background-script2.js
 echo "" >> background-script2.js
 cat "background-script.js" >> background-script2.js
 echo "" >> background-script2.js

@@ -36,7 +36,7 @@ module.exports = {
         debugSocket(`applied to room-${ioUtils.roomnum}`);
 
         ioRoom.updateVideo(videoId, site, location);
-        ioContext.socket.broadcast
+        ioContext.socket
           .to(`room-${ioUtils.roomnum}`)
           .emit("changeVideoClient", ioRoom.videoObject);
       }

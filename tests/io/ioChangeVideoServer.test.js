@@ -36,12 +36,10 @@ beforeEach(() => {
     },
     id: "1",
     rooms: new Set("1"),
-    broadcast: {
-      to: (roomKey) => {
-        if (roomKey === "room-roomnum") {
-          return { emit: emit };
-        }
-      },
+    to: (roomKey) => {
+      if (roomKey === "room-roomnum") {
+        return { emit: emit };
+      }
     },
   };
   io = {
