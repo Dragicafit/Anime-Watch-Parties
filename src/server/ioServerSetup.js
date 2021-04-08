@@ -4,7 +4,7 @@ const debug = require("debug")("ioServerAWP");
 const { Server: ioServer, Socket } = require("socket.io");
 const performance = require("perf_hooks").performance;
 const filterInput = require("./middleware/filterInput");
-const ioDisconnect = require("./io/ioDisconnect");
+const ioDisconnecting = require("./io/ioDisconnecting");
 const ioChangeVideoServer = require("./io/ioChangeVideoServer");
 const ioChangeStateServer = require("./io/ioChangeStateServer");
 const ioJoinRoom = require("./io/ioJoinRoom");
@@ -14,7 +14,7 @@ const { IoContext } = require("./io/ioContext");
 const { IoUtils } = require("./io/ioUtils");
 
 const debugConnection = debug.extend("connection");
-const debugDisconnect = debug.extend("disconnect");
+const debugDisconnecting = debug.extend("disconnecting");
 
 const supportedEvents = filterInput.supportedEvents;
 
@@ -35,7 +35,7 @@ module.exports = {
 
         let ioContext = new IoContext(io, socket, performance);
         let ioUtils = new IoUtils(ioContext);
-        ioDisconnect.start(ioContext, ioUtils, debugDisconnect);
+        ioDisconnecting.start(ioContext, ioUtils, debugDisconnecting);
         ioJoinRoom.start(ioContext, ioUtils);
         ioChangeStateServer.start(ioContext, ioUtils);
         ioChangeVideoServer.start(ioContext, ioUtils);

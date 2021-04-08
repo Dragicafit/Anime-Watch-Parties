@@ -156,86 +156,89 @@ it("Join new room but too many rooms joined", () => {
   expect(ioUtils.getRoom(roomnum)).toBeUndefined();
 });
 
-it("Join existing room", () => {
-  socket.join(`room-${roomnum}`);
+it("Join existing room", (done) => {
+  let socket2 = io.sockets._add(
+    { conn: { protocol: 3, readyState: "open" }, id: "socket-2" },
+    null,
+    () => {
+      socket2.join(`room-${roomnum}`);
+      ioUtils.getRoom(roomnum).ioRoom = new IoRoom();
 
-  joinRoom(debugSocket, roomnum, callback);
+      joinRoom(debugSocket, roomnum, callback);
 
-  expect(debugSocket).toHaveBeenNthCalledWith(
-    1,
-    `connected to room-${roomnum}`
+      expect(debugSocket).toHaveBeenNthCalledWith(
+        1,
+        `connected to room-${roomnum}`
+      );
+      expect(debugSocket).toHaveBeenNthCalledWith(2, "socket is host");
+      expect(debugSocket).toHaveBeenNthCalledWith(3, "updateRoomUsers");
+      expect(callback).toHaveBeenNthCalledWith(1, null, {
+        roomnum: roomnum,
+        host: true,
+      });
+      expect(ioUtils.updateRoomUsers).toHaveBeenNthCalledWith(
+        1,
+        expect.any(Function),
+        roomnum
+      );
+
+      expect(debugSocket).toHaveBeenCalledTimes(3);
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(ioUtils.syncClient).toHaveBeenCalledTimes(0);
+      expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(1);
+      expect(performance.now).toHaveBeenCalledTimes(1);
+
+      expect(ioUtils.getRoom(roomnum)).toMatchObject({
+        ioRoom: {
+          currTime: 0,
+          currVideo: undefined,
+          host: "socket-1",
+          lastChange: 5,
+          state: false,
+          location: undefined,
+          site: undefined,
+        },
+      });
+      done();
+    }
   );
-  expect(debugSocket).toHaveBeenNthCalledWith(2, "socket is host");
-  expect(debugSocket).toHaveBeenNthCalledWith(3, "updateRoomUsers");
-  expect(callback).toHaveBeenNthCalledWith(1, null, {
-    roomnum: roomnum,
-    host: true,
-  });
-  expect(ioUtils.updateRoomUsers).toHaveBeenNthCalledWith(
-    1,
-    expect.any(Function),
-    roomnum
-  );
-
-  expect(debugSocket).toHaveBeenCalledTimes(3);
-  expect(callback).toHaveBeenCalledTimes(1);
-  expect(ioUtils.syncClient).toHaveBeenCalledTimes(0);
-  expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(1);
-
-  expect(ioUtils.getRoom(roomnum)).toMatchObject({
-    ioRoom: {
-      currTime: 0,
-      currVideo: undefined,
-      host: "socket-1",
-      lastChange: 5,
-      state: false,
-      location: undefined,
-      site: undefined,
-    },
-  });
 });
 
-it("Join existing room but too many rooms joined", () => {
-  for (let i = 0; i < 9; i++) {
+it("Join existing room but too many rooms joined", (done) => {
+  for (let i = 0; i < 10; i++) {
     socket.join(`room-${roomnum}${i}`);
   }
-  socket.join(`room-${roomnum}`);
-  joinRoom(debugSocket, roomnum, callback);
+  let socket2 = io.sockets._add(
+    { conn: { protocol: 3, readyState: "open" }, id: "socket-2" },
+    null,
+    () => {
+      socket2.join(`room-${roomnum}`);
+      ioUtils.getRoom(roomnum).ioRoom = new IoRoom();
+      joinRoom(debugSocket, roomnum, callback);
 
-  expect(debugSocket).toHaveBeenNthCalledWith(
-    1,
-    `connected to room-${roomnum}`
+      expect(debugSocket).toHaveBeenNthCalledWith(1, "too many rooms joined");
+      expect(callback).toHaveBeenNthCalledWith(1, "access denied");
+
+      expect(debugSocket).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(ioUtils.syncClient).toHaveBeenCalledTimes(0);
+      expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(0);
+      expect(performance.now).toHaveBeenCalledTimes(1);
+
+      expect(ioUtils.getRoom(roomnum)).toMatchObject({
+        ioRoom: {
+          currTime: 0,
+          currVideo: undefined,
+          host: undefined,
+          lastChange: 5,
+          state: false,
+          location: undefined,
+          site: undefined,
+        },
+      });
+      done();
+    }
   );
-  expect(debugSocket).toHaveBeenNthCalledWith(2, "socket is host");
-  expect(debugSocket).toHaveBeenNthCalledWith(3, "updateRoomUsers");
-  expect(callback).toHaveBeenNthCalledWith(1, null, {
-    roomnum: roomnum,
-    host: true,
-  });
-  expect(ioUtils.updateRoomUsers).toHaveBeenNthCalledWith(
-    1,
-    expect.any(Function),
-    roomnum
-  );
-
-  expect(debugSocket).toHaveBeenCalledTimes(3);
-  expect(callback).toHaveBeenCalledTimes(1);
-  expect(ioUtils.syncClient).toHaveBeenCalledTimes(0);
-  expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(1);
-
-  expect(ioUtils.getRoom(roomnum)).toMatchObject({
-    ioRoom: {
-      currTime: 0,
-      currVideo: undefined,
-      host: "socket-1",
-      lastChange: 5,
-      state: false,
-      location: undefined,
-      site: undefined,
-    },
-  });
 });
 
 it("Change room to same room", () => {
@@ -248,21 +251,15 @@ it("Change room to same room", () => {
     `connected to room-${roomnum}`
   );
   expect(debugSocket).toHaveBeenNthCalledWith(2, "socket is host");
-  expect(debugSocket).toHaveBeenNthCalledWith(3, "updateRoomUsers");
   expect(callback).toHaveBeenNthCalledWith(1, null, {
     roomnum: roomnum,
     host: true,
   });
-  expect(ioUtils.updateRoomUsers).toHaveBeenNthCalledWith(
-    1,
-    expect.any(Function),
-    roomnum
-  );
 
-  expect(debugSocket).toHaveBeenCalledTimes(3);
+  expect(debugSocket).toHaveBeenCalledTimes(2);
   expect(callback).toHaveBeenCalledTimes(1);
   expect(ioUtils.syncClient).toHaveBeenCalledTimes(0);
-  expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(1);
+  expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(0);
   expect(performance.now).toHaveBeenCalledTimes(1);
 
   expect(ioUtils.getRoom(roomnum)).toMatchObject({

@@ -60,8 +60,8 @@ describe("test argument middleware", function () {
 
   it("throw an error", () => {
     return new Promise((resolve) => {
-      expect(() => socket.emit("disconnect")).toThrow(
-        new Error('"disconnect" is a reserved event name')
+      expect(() => socket.emit("disconnecting")).toThrow(
+        new Error('"disconnecting" is a reserved event name')
       );
       resolve();
     });

@@ -7,13 +7,13 @@ const regexRoom = /^\w{1,30}$/;
 module.exports = {
   /** @param {IoContext} ioContext @param {IoUtils} ioUtils */
   start: function (ioContext, ioUtils) {
-    ioContext.socket.on("joinRoom", (debugSocket, roomnum, callback) => {
+    ioContext.socket.on("leaveRoom", (debugSocket, roomnum, callback) => {
       if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
         debugSocket("roomnum is not a valid string");
         return callback("wrong input");
       }
 
-      ioUtils.joinRoom(debugSocket, roomnum, callback);
+      ioUtils.leaveRoom(debugSocket, roomnum);
     });
   },
 };
