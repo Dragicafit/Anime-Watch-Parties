@@ -1,5 +1,5 @@
-const IoContext = require("./ioContext");
-const IoUtils = require("./ioUtils");
+const { IoContext } = require("./ioContext");
+const { IoUtils } = require("./ioUtils");
 
 module.exports = {
   /** @param {IoContext} ioContext @param {IoUtils} ioUtils @param {debug.Debugger} debugDisconnect */

@@ -1,5 +1,5 @@
-const IoContext = require("./ioContext");
-const IoUtils = require("./ioUtils");
+const { IoContext } = require("./ioContext");
+const { IoUtils } = require("./ioUtils");
 
 const regexVideoId = /^[\w\/-]{1,300}$/;
 const regexSite = /^(wakanim|crunchyroll)$/;

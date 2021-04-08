@@ -1,57 +1,54 @@
 #!/usr/bin/env node
 "use strict";
 
-const { Server: ioServer, Socket: SocketServer } = require("socket.io");
-const IoContext = require("../../src/server/io/ioContext");
+const { Server: Server, Socket: Socket } = require("socket.io");
+const { IoContext } = require("../../src/server/io/ioContext");
 const ioDisconnect = require("../../src/server/io/ioDisconnect");
-const IoRoom = require("../../src/server/io/ioRoom");
-const IoUtils = require("../../src/server/io/ioUtils");
+const { IoRoom } = require("../../src/server/io/ioRoom");
+const { IoUtils } = require("../../src/server/io/ioUtils");
 
-/** @type {ioServer} */
+/** @type {Server} */
 let io;
-/** @type {SocketServer} */
+/** @type {Socket} */
 let socket;
 let disconnect;
+
+/** @type {IoUtils} */
+let ioUtils;
+/** @type {String} */
+let roomnum;
 
 /** @type {jest.Mock} */
 let debugDisconnect;
 /** @type {jest.Mock} */
 let updateRoomUsers;
 
-/** @type {IoRoom} */
-let ioRoom;
+beforeEach((done) => {
+  io = new Server();
+  socket = io.sockets._add(
+    { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
+    null,
+    () => {
+      roomnum = "roomnum";
+      debugDisconnect = jest.fn();
+      updateRoomUsers = jest.fn((cb) => cb("updateRoomUsers"));
 
-beforeEach(() => {
-  socket = {
-    on: (event, callback) => {
-      if (event === "disconnect") {
-        disconnect = callback;
-      }
-    },
-    id: "1",
-    rooms: new Set("1"),
-  };
-  io = {
-    sockets: {
-      sockets: new Map([[socket.id, socket]]),
-      adapter: { rooms: new Map() },
-    },
-  };
-  debugDisconnect = jest.fn();
-  updateRoomUsers = jest.fn((cb) => cb("updateRoomUsers"));
+      IoRoom.ioContext = new IoContext(io, null, { now: () => 5 });
+      let ioContext = new IoContext(io, socket);
+      ioUtils = new IoUtils(ioContext);
+      ioUtils.updateRoomUsers = updateRoomUsers;
 
-  IoRoom.ioContext = new IoContext(io, null, { now: () => 5 });
+      // join room
+      socket.join(`room-${roomnum}`);
+      let ioRoom = new IoRoom();
+      ioRoom.host = "socket-1";
+      ioUtils.getRoom(roomnum).ioRoom = ioRoom;
 
-  // join room
-  ioRoom = new IoRoom();
-  ioRoom.host = "1";
-  io.sockets.adapter.rooms.set("room-roomnum", { ioRoom: ioRoom });
-  socket.rooms.add("roomnum");
-
-  let ioContext = new IoContext(io, socket);
-  let ioUtils = new IoUtils(ioContext);
-  ioUtils.updateRoomUsers = updateRoomUsers;
-  ioDisconnect.start(ioContext, ioUtils, debugDisconnect);
+      ioDisconnect.start(ioContext, ioUtils, debugDisconnect);
+      disconnect = socket.events.disconnect;
+      done();
+    }
+  );
 });
 
 it("With Roomnum and is host", () => {
@@ -59,107 +56,106 @@ it("With Roomnum and is host", () => {
 
   expect(debugDisconnect).toHaveBeenNthCalledWith(
     1,
-    "1:",
+    "socket-1:",
     "1 sockets connected"
   );
   expect(debugDisconnect).toHaveBeenNthCalledWith(
     2,
-    "1:",
-    "applied to room-roomnum"
+    "socket-1:",
+    `applied to room-${roomnum}`
   );
-  expect(debugDisconnect).toHaveBeenNthCalledWith(3, "1:", "updateRoomUsers");
+  expect(debugDisconnect).toHaveBeenNthCalledWith(
+    3,
+    "socket-1:",
+    "updateRoomUsers"
+  );
   expect(updateRoomUsers).toHaveBeenNthCalledWith(1, expect.any(Function));
 
   expect(debugDisconnect).toHaveBeenCalledTimes(3);
   expect(updateRoomUsers).toHaveBeenCalledTimes(1);
 
-  expect(ioRoom).toMatchObject({
-    host: undefined,
-    state: false,
-    currTime: 0,
-    lastChange: 5,
-    currVideo: undefined,
-    site: undefined,
-    location: undefined,
+  expect(ioUtils.getRoom(roomnum)).toMatchObject({
+    ioRoom: {
+      host: undefined,
+      state: false,
+      currTime: 0,
+      lastChange: 5,
+      currVideo: undefined,
+      site: undefined,
+      location: undefined,
+    },
   });
 });
 
 it("With Roomnum and is not host", () => {
-  ioRoom.host = "2";
+  ioUtils.getIoRoom(roomnum).host = "2";
   disconnect();
 
   expect(debugDisconnect).toHaveBeenNthCalledWith(
     1,
-    "1:",
+    "socket-1:",
     "1 sockets connected"
   );
   expect(debugDisconnect).toHaveBeenNthCalledWith(
     2,
-    "1:",
-    "applied to room-roomnum"
+    "socket-1:",
+    `applied to room-${roomnum}`
   );
-  expect(debugDisconnect).toHaveBeenNthCalledWith(3, "1:", "updateRoomUsers");
+  expect(debugDisconnect).toHaveBeenNthCalledWith(
+    3,
+    "socket-1:",
+    "updateRoomUsers"
+  );
   expect(updateRoomUsers).toHaveBeenNthCalledWith(1, expect.any(Function));
 
   expect(debugDisconnect).toHaveBeenCalledTimes(3);
   expect(updateRoomUsers).toHaveBeenCalledTimes(1);
 
-  expect(ioRoom).toMatchObject({
-    host: "2",
-    state: false,
-    currTime: 0,
-    lastChange: 5,
-    currVideo: undefined,
-    site: undefined,
-    location: undefined,
+  expect(ioUtils.getRoom(roomnum)).toMatchObject({
+    ioRoom: {
+      host: "2",
+      state: false,
+      currTime: 0,
+      lastChange: 5,
+      currVideo: undefined,
+      site: undefined,
+      location: undefined,
+    },
   });
 });
 
 it("Without Roomnum", () => {
-  socket.rooms.delete("roomnum");
+  socket.leave(`room-${roomnum}`);
   disconnect();
 
   expect(debugDisconnect).toHaveBeenNthCalledWith(
     1,
-    "1:",
+    "socket-1:",
     "1 sockets connected"
   );
 
   expect(debugDisconnect).toHaveBeenCalledTimes(1);
   expect(updateRoomUsers).toHaveBeenCalledTimes(0);
 
-  expect(ioRoom).toMatchObject({
-    host: "1",
-    state: false,
-    currTime: 0,
-    lastChange: 5,
-    currVideo: undefined,
-    site: undefined,
-    location: undefined,
-  });
+  expect(ioUtils.getRoom(roomnum)).toBeUndefined();
 });
 
 it("With error", () => {
-  socket.rooms.delete("roomnum");
-  socket.rooms.add("2");
+  socket.leave(`room-${roomnum}`);
+  socket.join(roomnum);
   disconnect();
 
   expect(debugDisconnect).toHaveBeenNthCalledWith(
     1,
-    "1:",
+    "socket-1:",
     "1 sockets connected"
   );
 
   expect(debugDisconnect).toHaveBeenCalledTimes(1);
   expect(updateRoomUsers).toHaveBeenCalledTimes(0);
 
-  expect(ioRoom).toMatchObject({
-    host: "1",
-    state: false,
-    currTime: 0,
-    lastChange: 5,
-    currVideo: undefined,
-    site: undefined,
-    location: undefined,
-  });
+  expect(ioUtils.getRoom(roomnum)).toBeUndefined();
+  expect(io.sockets.adapter.rooms.get(roomnum)).toStrictEqual(
+    new Set(["socket-1"])
+  );
 });

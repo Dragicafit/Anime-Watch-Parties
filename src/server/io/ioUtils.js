@@ -1,5 +1,5 @@
-const IoRoom = require("./ioRoom");
-const IoContext = require("./ioContext");
+const { IoRoom, Room } = require("./ioRoom");
+const { IoContext } = require("./ioContext");
 
 const regexPrefix = /^room-/g;
 
@@ -42,12 +42,12 @@ class IoUtils {
     });
   }
 
-  /** @param String */
+  /** @param {String} roomnum @returns {Room} */
   getRoom(roomnum = this.roomnum) {
     return this.ioContext.io.sockets.adapter.rooms.get(`room-${roomnum}`);
   }
 
-  /** @param String @returns {IoRoom} */
+  /** @param {String} roomnum @returns {IoRoom} */
   getIoRoom(roomnum = this.roomnum) {
     return this.getRoom(roomnum)?.ioRoom;
   }
@@ -57,4 +57,4 @@ class IoUtils {
   }
 }
 
-module.exports = IoUtils;
+exports.IoUtils = IoUtils;

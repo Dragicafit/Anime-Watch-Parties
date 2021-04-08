@@ -3,9 +3,10 @@
 
 require("dotenv").config();
 
-const ioClient = require("socket.io-client");
+const { Socket: SocketClient, io: ioClient } = require("socket.io-client");
 const ioServerSetup = require("../src/server/ioServerSetup");
-const { Server: ioServer } = require("socket.io");
+const { Server } = require("socket.io");
+jest.unmock("socket.io");
 
 const portTest = process.env.PORT_TEST || 4001;
 const port = process.env.PORT != portTest ? portTest : portTest + 1;
@@ -17,11 +18,11 @@ const supportedEvents = {
   SYNC_CLIENT: "syncClient",
 };
 
-/** @type {ioServer} */
+/** @type {Server} */
 let io;
 
 beforeEach(() => {
-  io = new ioServer(port);
+  io = new Server(port);
   ioServerSetup.start(io);
   return Promise.resolve();
 });
@@ -36,12 +37,12 @@ it("verify supported events", () => {
 });
 
 describe("test argument middleware", function () {
-  /** @type {ioClient.Socket} */
+  /** @type {SocketClient} */
   let socket;
 
   beforeEach(() => {
     return new Promise((resolve) => {
-      socket = ioClient.io(`http://localhost:${port}`, {
+      socket = ioClient(`http://localhost:${port}`, {
         reconnectionDelay: 0,
         forceNew: true,
       });
@@ -148,11 +149,11 @@ describe("test argument middleware", function () {
 });
 
 describe("test arguments", function () {
-  /** @type {ioClient.Socket} */
+  /** @type {SocketClient} */
   let socket;
 
   beforeEach((done) => {
-    socket = ioClient.io(`http://localhost:${port}`, {
+    socket = ioClient(`http://localhost:${port}`, {
       reconnectionDelay: 0,
       forceNew: true,
     });
@@ -327,11 +328,11 @@ describe("test arguments", function () {
 
 describe("test connection", function () {
   describe("with one socket", function () {
-    /** @type {ioClient.Socket} */
+    /** @type {SocketClient} */
     let socket;
 
     beforeEach(() => {
-      socket = ioClient.io(`http://localhost:${port}`, {
+      socket = ioClient(`http://localhost:${port}`, {
         reconnectionDelay: 0,
         forceNew: true,
       });
@@ -384,17 +385,17 @@ describe("test connection", function () {
   });
 
   describe("with two sockets", function () {
-    /** @type {ioClient.Socket} */
+    /** @type {SocketClient} */
     let socket1;
-    /** @type {ioClient.Socket} */
+    /** @type {SocketClient} */
     let socket2;
 
     beforeEach(() => {
-      socket1 = ioClient.io(`http://localhost:${port}`, {
+      socket1 = ioClient(`http://localhost:${port}`, {
         reconnectionDelay: 0,
         forceNew: true,
       });
-      socket2 = ioClient.io(`http://localhost:${port}`, {
+      socket2 = ioClient(`http://localhost:${port}`, {
         reconnectionDelay: 0,
         forceNew: true,
       });

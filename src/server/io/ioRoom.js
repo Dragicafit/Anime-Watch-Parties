@@ -1,5 +1,5 @@
 const { SocketId } = require("socket.io-adapter");
-const IoContext = require("./ioContext");
+const { IoContext } = require("./ioContext");
 
 class IoRoom {
   /** @type {IoContext} */
@@ -68,4 +68,10 @@ class IoRoom {
   }
 }
 
-module.exports = IoRoom;
+class Room extends Set {
+  /** @type {IoRoom} */
+  ioRoom;
+}
+
+exports.IoRoom = IoRoom;
+exports.Room = Room;

@@ -16,4 +16,4 @@ class IoContext {
   }
 }
 
-module.exports = IoContext;
+exports.IoContext = IoContext;

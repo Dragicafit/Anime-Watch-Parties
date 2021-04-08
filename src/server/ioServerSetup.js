@@ -9,9 +9,9 @@ const ioChangeVideoServer = require("./io/ioChangeVideoServer");
 const ioChangeStateServer = require("./io/ioChangeStateServer");
 const ioJoinRoom = require("./io/ioJoinRoom");
 const ioSyncClient = require("./io/ioSyncClient");
-const IoRoom = require("./io/ioRoom");
-const IoContext = require("./io/ioContext");
-const IoUtils = require("./io/ioUtils");
+const { IoRoom } = require("./io/ioRoom");
+const { IoContext } = require("./io/ioContext");
+const { IoUtils } = require("./io/ioUtils");
 
 const debugConnection = debug.extend("connection");
 const debugDisconnect = debug.extend("disconnect");

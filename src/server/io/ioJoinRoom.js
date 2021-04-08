@@ -1,6 +1,6 @@
-const IoRoom = require("./ioRoom");
-const IoContext = require("./ioContext");
-const IoUtils = require("./ioUtils");
+const { IoRoom } = require("./ioRoom");
+const { IoContext } = require("./ioContext");
+const { IoUtils } = require("./ioUtils");
 
 const regexRoom = /^\w{1,30}$/;
 
