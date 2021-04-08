@@ -10,32 +10,34 @@ const { IoContext } = require("../../src/server/io/ioContext");
 let io;
 /** @type {Socket} */
 let socket;
+/** @type {IoUtils} */
+let ioUtils;
 
 /** @type {jest.Mock} */
 let debugSocket;
-
-/** @type {IoUtils} */
-let ioUtils;
 /** @type {String} */
 let roomnum;
+/** @type {jest.Mock} */
+let callback;
+
 /** @type {Performance} */
 let performance;
-
 /** @type {jest.Mock} */
 let emit;
 
 beforeEach((done) => {
   emit = jest.fn();
+  performance = { now: jest.fn(() => 5) };
+
+  debugSocket = jest.fn();
+  roomnum = "roomnum";
+  callback = jest.fn();
 
   io = new Server();
   socket = io.sockets._add(
     { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
     () => {
-      roomnum = "roomnum";
-
-      performance = { now: jest.fn(() => 5) };
-
       IoRoom.ioContext = new IoContext(io, null, performance);
       let ioContext = new IoContext(io, socket, performance);
       ioUtils = new IoUtils(ioContext);
@@ -46,20 +48,14 @@ beforeEach((done) => {
       ioRoom.host = "socket-1";
       ioUtils.getRoom(roomnum).ioRoom = ioRoom;
 
-      debugSocket = jest.fn();
-
       done();
     }
   );
 });
 
 describe("syncClient", () => {
-  /** @type {jest.Mock} */
-  let callback;
-
   beforeEach(() => {
     socket.emit = emit;
-    callback = jest.fn();
 
     let ioRoom = ioUtils.getIoRoom(roomnum);
     ioRoom.state = true;
@@ -69,7 +65,7 @@ describe("syncClient", () => {
   });
 
   it("sync state and video and state is true", () => {
-    ioUtils.syncClient(debugSocket, callback);
+    ioUtils.syncClient(debugSocket, roomnum, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
       time: 0.003,
@@ -107,7 +103,7 @@ describe("syncClient", () => {
 
   it("sync state and video and state is false", () => {
     ioUtils.getIoRoom(roomnum).state = false;
-    ioUtils.syncClient(debugSocket, callback);
+    ioUtils.syncClient(debugSocket, roomnum, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
       time: 0,
@@ -145,7 +141,7 @@ describe("syncClient", () => {
 
   it("sync state", () => {
     ioUtils.getIoRoom(roomnum).currVideo = undefined;
-    ioUtils.syncClient(debugSocket, callback);
+    ioUtils.syncClient(debugSocket, roomnum, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
       time: 0.003,
@@ -179,7 +175,7 @@ describe("syncClient", () => {
     ioUtils.getIoRoom(roomnum).currTime = undefined;
     ioUtils.getIoRoom(roomnum).state = undefined;
     ioUtils.getIoRoom(roomnum).lastChange = undefined;
-    ioUtils.syncClient(debugSocket, callback);
+    ioUtils.syncClient(debugSocket, roomnum, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeVideoClient", {
       site: undefined,
@@ -212,7 +208,7 @@ describe("syncClient", () => {
 
   it("Without roomnum", () => {
     socket.leave(`room-${roomnum}`);
-    ioUtils.syncClient(debugSocket, callback);
+    ioUtils.syncClient(debugSocket, roomnum, callback);
 
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
@@ -230,7 +226,7 @@ describe("syncClient", () => {
 
   it("With error", () => {
     socket.leave(`room-${roomnum}`);
-    ioUtils.syncClient(debugSocket, callback);
+    ioUtils.syncClient(debugSocket, roomnum, callback);
 
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
@@ -249,8 +245,6 @@ describe("syncClient", () => {
 
 describe("updateRoomUsers", () => {
   beforeEach(() => {
-    socket.emit = emit;
-
     io.sockets.to = (roomKey) => {
       if (roomKey === `room-${roomnum}`) {
         return { emit: emit };
@@ -259,7 +253,7 @@ describe("updateRoomUsers", () => {
   });
 
   it("Valid", () => {
-    ioUtils.updateRoomUsers(debugSocket);
+    ioUtils.updateRoomUsers(debugSocket, roomnum);
 
     expect(emit).toHaveBeenNthCalledWith(1, "getUsers", {
       onlineUsers: 1,
@@ -289,7 +283,7 @@ describe("updateRoomUsers", () => {
 
   it("Without roomnum", () => {
     socket.leave(`room-${roomnum}`);
-    ioUtils.updateRoomUsers(debugSocket);
+    ioUtils.updateRoomUsers(debugSocket, roomnum);
 
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
@@ -305,7 +299,7 @@ describe("updateRoomUsers", () => {
 
   it("With error", () => {
     socket.leave(`room-${roomnum}`);
-    ioUtils.updateRoomUsers(debugSocket);
+    ioUtils.updateRoomUsers(debugSocket, roomnum);
 
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,

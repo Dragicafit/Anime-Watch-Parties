@@ -33,7 +33,7 @@ module.exports = {
         return callback("data is not valid");
       }
       if (typeof callback !== "function") {
-        callback = () => null;
+        callback = () => {};
       }
       switch (event) {
         case JOIN_ROOM:
@@ -47,24 +47,27 @@ module.exports = {
           events[1] = (...args) => {
             debugChangeStateServer(`${socket.id}:`, ...args);
           };
-          events[2] = data.state;
-          events[3] = data.time;
-          events[4] = callback;
+          events[2] = data.roomnum;
+          events[3] = data.state;
+          events[4] = data.time;
+          events[5] = callback;
           break;
         case CHANGE_VIDEO_SERVER:
           events[1] = (...args) => {
             debugChangeVideoServer(`${socket.id}:`, ...args);
           };
-          events[2] = data.videoId;
-          events[3] = data.site;
-          events[4] = data.location;
-          events[5] = callback;
+          events[2] = data.roomnum;
+          events[3] = data.videoId;
+          events[4] = data.site;
+          events[5] = data.location;
+          events[6] = callback;
           break;
         case SYNC_CLIENT:
           events[1] = (...args) => {
             debugSyncClient(`${socket.id}:`, ...args);
           };
-          events[2] = callback;
+          events[2] = data.roomnum;
+          events[3] = callback;
           break;
         default:
           return callback("event is not valid");

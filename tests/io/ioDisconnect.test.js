@@ -20,8 +20,6 @@ let roomnum;
 
 /** @type {jest.Mock} */
 let debugDisconnect;
-/** @type {jest.Mock} */
-let updateRoomUsers;
 
 beforeEach((done) => {
   io = new Server();
@@ -31,12 +29,11 @@ beforeEach((done) => {
     () => {
       roomnum = "roomnum";
       debugDisconnect = jest.fn();
-      updateRoomUsers = jest.fn((cb) => cb("updateRoomUsers"));
 
       IoRoom.ioContext = new IoContext(io, null, { now: () => 5 });
       let ioContext = new IoContext(io, socket);
       ioUtils = new IoUtils(ioContext);
-      ioUtils.updateRoomUsers = updateRoomUsers;
+      ioUtils.updateRoomUsers = jest.fn((cb) => cb("updateRoomUsers"));
 
       // join room
       socket.join(`room-${roomnum}`);
@@ -69,10 +66,14 @@ it("With Roomnum and is host", () => {
     "socket-1:",
     "updateRoomUsers"
   );
-  expect(updateRoomUsers).toHaveBeenNthCalledWith(1, expect.any(Function));
+  expect(ioUtils.updateRoomUsers).toHaveBeenNthCalledWith(
+    1,
+    expect.any(Function),
+    roomnum
+  );
 
   expect(debugDisconnect).toHaveBeenCalledTimes(3);
-  expect(updateRoomUsers).toHaveBeenCalledTimes(1);
+  expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(1);
 
   expect(ioUtils.getRoom(roomnum)).toMatchObject({
     ioRoom: {
@@ -106,10 +107,14 @@ it("With Roomnum and is not host", () => {
     "socket-1:",
     "updateRoomUsers"
   );
-  expect(updateRoomUsers).toHaveBeenNthCalledWith(1, expect.any(Function));
+  expect(ioUtils.updateRoomUsers).toHaveBeenNthCalledWith(
+    1,
+    expect.any(Function),
+    roomnum
+  );
 
   expect(debugDisconnect).toHaveBeenCalledTimes(3);
-  expect(updateRoomUsers).toHaveBeenCalledTimes(1);
+  expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(1);
 
   expect(ioUtils.getRoom(roomnum)).toMatchObject({
     ioRoom: {
@@ -135,7 +140,7 @@ it("Without Roomnum", () => {
   );
 
   expect(debugDisconnect).toHaveBeenCalledTimes(1);
-  expect(updateRoomUsers).toHaveBeenCalledTimes(0);
+  expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(0);
 
   expect(ioUtils.getRoom(roomnum)).toBeUndefined();
 });
@@ -152,7 +157,7 @@ it("With error", () => {
   );
 
   expect(debugDisconnect).toHaveBeenCalledTimes(1);
-  expect(updateRoomUsers).toHaveBeenCalledTimes(0);
+  expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(0);
 
   expect(ioUtils.getRoom(roomnum)).toBeUndefined();
   expect(io.sockets.adapter.rooms.get(roomnum)).toStrictEqual(

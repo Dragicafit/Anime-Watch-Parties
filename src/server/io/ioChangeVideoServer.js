@@ -1,6 +1,7 @@
 const { IoContext } = require("./ioContext");
 const { IoUtils } = require("./ioUtils");
 
+const regexRoom = /^\w{1,30}$/;
 const regexVideoId = /^[\w\/-]{1,300}$/;
 const regexSite = /^(wakanim|crunchyroll)$/;
 const regexLocation = /^[a-zA-Z]{2}$/;
@@ -10,7 +11,11 @@ module.exports = {
   start: function (ioContext, ioUtils) {
     ioContext.socket.on(
       "changeVideoServer",
-      (debugSocket, videoId, site, location, callback) => {
+      (debugSocket, roomnum, videoId, site, location, callback) => {
+        if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
+          debugSocket("roomnum is not a valid string");
+          return callback("wrong input");
+        }
         if (typeof videoId !== "string" || !regexVideoId.test(videoId)) {
           debugSocket("videoId is not a valid string");
           return callback("wrong input");
@@ -24,7 +29,7 @@ module.exports = {
           return callback("wrong input");
         }
 
-        let ioRoom = ioUtils.getIoRoom();
+        let ioRoom = ioUtils.getIoRoomIfIn(roomnum);
         if (ioRoom == null) {
           debugSocket("socket is not connected to room");
           return callback("access denied");
@@ -33,11 +38,11 @@ module.exports = {
           debugSocket("socket is not host");
           return callback("access denied");
         }
-        debugSocket(`applied to room-${ioUtils.roomnum}`);
+        debugSocket(`applied to room-${roomnum}`);
 
         ioRoom.updateVideo(videoId, site, location);
         ioContext.socket
-          .to(`room-${ioUtils.roomnum}`)
+          .to(`room-${roomnum}`)
           .emit("changeVideoClient", ioRoom.videoObject);
       }
     );

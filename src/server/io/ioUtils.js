@@ -12,13 +12,13 @@ class IoUtils {
     this.ioContext = ioContext;
   }
 
-  syncClient(debugSocket, callback) {
-    let ioRoom = this.getIoRoom();
+  syncClient(debugSocket, roomnum, callback) {
+    let ioRoom = this.getIoRoomIfIn(roomnum);
     if (ioRoom == null) {
       debugSocket("socket is not connected to room");
       return callback("access denied");
     }
-    debugSocket(`applied to room-${this.roomnum}`);
+    debugSocket(`applied to room-${roomnum}`);
 
     if (ioRoom.isStateDefined()) {
       debugSocket("change state client");
@@ -30,30 +30,42 @@ class IoUtils {
     }
   }
 
-  updateRoomUsers(debugSocket) {
-    let room = this.getRoom();
+  updateRoomUsers(debugSocket, roomnum) {
+    let room = this.getRoomIfIn(roomnum);
     if (room == null) {
       return debugSocket("socket is not connected to room");
     }
-    debugSocket(`applied to room-${this.roomnum}`);
+    debugSocket(`applied to room-${roomnum}`);
 
-    this.ioContext.io.sockets.to(`room-${this.roomnum}`).emit("getUsers", {
+    this.ioContext.io.sockets.to(`room-${roomnum}`).emit("getUsers", {
       onlineUsers: room.size,
     });
   }
 
   /** @param {String} roomnum @returns {Room} */
-  getRoom(roomnum = this.roomnum) {
+  getRoom(roomnum) {
     return this.ioContext.io.sockets.adapter.rooms.get(`room-${roomnum}`);
   }
 
-  /** @param {String} roomnum @returns {IoRoom} */
-  getIoRoom(roomnum = this.roomnum) {
+  /** @param {String} roomnum */
+  getIoRoom(roomnum) {
     return this.getRoom(roomnum)?.ioRoom;
   }
 
-  get roomnum() {
-    return [...this.ioContext.socket.rooms][1]?.replace(regexPrefix, "");
+  /** @param {String} roomnum */
+  getRoomIfIn(roomnum) {
+    return this.roomnums.includes(roomnum) ? this.getRoom(roomnum) : null;
+  }
+
+  /** @param {String} roomnum */
+  getIoRoomIfIn(roomnum) {
+    return this.roomnums.includes(roomnum) ? this.getIoRoom(roomnum) : null;
+  }
+
+  get roomnums() {
+    return [...this.ioContext.socket.rooms]
+      .slice(1)
+      .map((room) => room?.replace(regexPrefix, ""));
   }
 }
 

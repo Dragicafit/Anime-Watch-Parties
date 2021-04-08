@@ -11,19 +11,21 @@ const { IoUtils } = require("../../src/server/io/ioUtils");
 let io;
 /** @type {Socket} */
 let socket;
+/** @type {IoUtils} */
+let ioUtils;
 let changeStateServer;
 
 /** @type {jest.Mock} */
 let debugSocket;
+/** @type {String} */
+let roomnum;
+/** @type {Boolean} */
 let state;
+/** @type {Number} */
 let time;
 /** @type {jest.Mock} */
 let callback;
 
-/** @type {IoUtils} */
-let ioUtils;
-/** @type {String} */
-let roomnum;
 /** @type {jest.Mock} */
 let emit;
 /** @type {Performance} */
@@ -31,24 +33,24 @@ let performance;
 
 beforeEach((done) => {
   emit = jest.fn();
+  performance = { now: jest.fn(() => 5) };
+
+  debugSocket = jest.fn();
+  roomnum = "roomnum";
+  state = true;
+  time = 1;
+  callback = jest.fn();
+
   io = new Server();
   socket = io.sockets._add(
     { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
     () => {
-      roomnum = "roomnum";
       socket.to = (roomKey) => {
         if (roomKey === `room-${roomnum}`) {
           return { emit: emit };
         }
       };
-
-      debugSocket = jest.fn();
-      state = true;
-      time = 1;
-      callback = jest.fn();
-
-      performance = { now: jest.fn(() => 5) };
 
       IoRoom.ioContext = new IoContext(io, null, performance);
       let ioContext = new IoContext(io, socket, performance);
@@ -75,7 +77,7 @@ it.each([
 ])("Valid", (state2, time2) => {
   state = state2;
   time = time2;
-  changeStateServer(debugSocket, state, time, callback);
+  changeStateServer(debugSocket, roomnum, state, time, callback);
 
   expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
     time: time,
@@ -111,9 +113,35 @@ it.each([
   [true],
   () => {},
   function a() {},
+])("With invalid roomnum", (roomnum2) => {
+  roomnum = roomnum2;
+  changeStateServer(debugSocket, roomnum, state, time, callback);
+
+  expect(debugSocket).toHaveBeenNthCalledWith(
+    1,
+    "roomnum is not a valid string"
+  );
+  expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
+
+  expect(emit).toHaveBeenCalledTimes(0);
+  expect(debugSocket).toHaveBeenCalledTimes(1);
+  expect(callback).toHaveBeenCalledTimes(1);
+  expect(performance.now).toHaveBeenCalledTimes(1);
+});
+
+it.each([
+  null,
+  undefined,
+  Infinity,
+  NaN,
+  0,
+  "",
+  [true],
+  () => {},
+  function a() {},
 ])("With invalid state", (state2) => {
   state = state2;
-  changeStateServer(debugSocket, state, time, callback);
+  changeStateServer(debugSocket, roomnum, state, time, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(1, "state is not boolean");
   expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
@@ -148,7 +176,7 @@ it.each([
   function a() {},
 ])("With invalid time", (time2) => {
   time = time2;
-  changeStateServer(debugSocket, state, time, callback);
+  changeStateServer(debugSocket, roomnum, state, time, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(1, "time is not int");
   expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
@@ -173,7 +201,7 @@ it.each([
 
 it("Not connected to a room", () => {
   socket.leave(`room-${roomnum}`);
-  changeStateServer(debugSocket, state, time, callback);
+  changeStateServer(debugSocket, roomnum, state, time, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
@@ -194,7 +222,7 @@ it("is in an non-existent room", () => {
   socket.leave(`room-${roomnum}`);
   socket.join(roomnum);
   io.sockets.adapter.rooms.get(roomnum).ioRoom = ioRoom;
-  changeStateServer(debugSocket, state, time, callback);
+  changeStateServer(debugSocket, roomnum, state, time, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
@@ -226,7 +254,7 @@ it("is in an non-existent room", () => {
 
 it("Not host", () => {
   ioUtils.getIoRoom(roomnum).host = "socket-2";
-  changeStateServer(debugSocket, state, time, callback);
+  changeStateServer(debugSocket, roomnum, state, time, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(1, "socket is not host");
   expect(callback).toHaveBeenNthCalledWith(1, "access denied");

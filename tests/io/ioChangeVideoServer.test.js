@@ -11,44 +11,47 @@ const { IoUtils } = require("../../src/server/io/ioUtils");
 let io;
 /** @type {Socket} */
 let socket;
+/** @type {IoUtils} */
+let ioUtils;
 let changeVideoServer;
 
 /** @type {jest.Mock} */
 let debugSocket;
+/** @type {String} */
+let roomnum;
+/** @type {String} */
 let videoId;
+/** @type {String} */
 let site;
+/** @type {String} */
 let location;
 /** @type {jest.Mock} */
 let callback;
 
-/** @type {IoUtils} */
-let ioUtils;
-/** @type {String} */
-let roomnum;
 /** @type {jest.Mock} */
 let emit;
 
 beforeEach((done) => {
   emit = jest.fn();
+  let performance = { now: () => 5 };
+
+  debugSocket = jest.fn();
+  roomnum = "roomnum";
+  videoId = "videoId";
+  site = "wakanim";
+  location = "FR";
+  callback = jest.fn();
+
   io = new Server();
   socket = io.sockets._add(
     { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
     () => {
-      roomnum = "roomnum";
       socket.to = (roomKey) => {
         if (roomKey === `room-${roomnum}`) {
           return { emit: emit };
         }
       };
-
-      debugSocket = jest.fn();
-      videoId = "videoId";
-      site = "wakanim";
-      location = "FR";
-      callback = jest.fn();
-
-      let performance = { now: () => 5 };
 
       IoRoom.ioContext = new IoContext(io, null, performance);
       let ioContext = new IoContext(io, socket);
@@ -76,7 +79,7 @@ it.each([
   videoId = videoId2;
   site = site2;
   location = location2;
-  changeVideoServer(debugSocket, videoId, site, location, callback);
+  changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
 
   expect(emit).toHaveBeenNthCalledWith(1, "changeVideoClient", {
     videoId: videoId,
@@ -105,6 +108,31 @@ it.each([
 it.each([
   null,
   undefined,
+  Infinity,
+  NaN,
+  0,
+  "",
+  [true],
+  () => {},
+  function a() {},
+])("With invalid roomnum", (roomnum2) => {
+  roomnum = roomnum2;
+  changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
+
+  expect(debugSocket).toHaveBeenNthCalledWith(
+    1,
+    "roomnum is not a valid string"
+  );
+  expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
+
+  expect(emit).toHaveBeenCalledTimes(0);
+  expect(debugSocket).toHaveBeenCalledTimes(1);
+  expect(callback).toHaveBeenCalledTimes(1);
+});
+
+it.each([
+  null,
+  undefined,
   "",
   Array(302).join("x"),
   Infinity,
@@ -116,7 +144,7 @@ it.each([
   function a() {},
 ])("With invalid videoId", (videoId2) => {
   videoId = videoId2;
-  changeVideoServer(debugSocket, videoId, site, location, callback);
+  changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
@@ -156,7 +184,7 @@ it.each([
   function a() {},
 ])("With invalid time", (site2) => {
   site = site2;
-  changeVideoServer(debugSocket, videoId, site, location, callback);
+  changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(1, "site is not a valid string");
   expect(callback).toHaveBeenNthCalledWith(1, "wrong input");
@@ -196,7 +224,7 @@ it.each([
   function a() {},
 ])("With invalid time", (location2) => {
   location = location2;
-  changeVideoServer(debugSocket, videoId, site, location, callback);
+  changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
@@ -223,7 +251,7 @@ it.each([
 
 it("Not connected to a room", () => {
   socket.leave(`room-${roomnum}`);
-  changeVideoServer(debugSocket, videoId, site, location, callback);
+  changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
@@ -241,7 +269,7 @@ it("Not connected to a room", () => {
 it("With error", () => {
   socket.leave(`room-${roomnum}`);
   socket.join(roomnum);
-  changeVideoServer(debugSocket, videoId, site, location, callback);
+  changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(
     1,
@@ -261,7 +289,7 @@ it("With error", () => {
 
 it("Not host", () => {
   ioUtils.getIoRoom(roomnum).host = "2";
-  changeVideoServer(debugSocket, videoId, site, location, callback);
+  changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(1, "socket is not host");
   expect(callback).toHaveBeenNthCalledWith(1, "access denied");

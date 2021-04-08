@@ -13,25 +13,24 @@ module.exports = {
         return callback("wrong input");
       }
 
-      let newRoomnum = roomnum.toLowerCase();
-      let oldRoomnum = ioUtils.roomnum;
-      if (oldRoomnum === newRoomnum) {
+      let oldRoomnums = ioUtils.roomnums;
+      if (oldRoomnums.includes(roomnum)) {
         return configure();
       }
-      if (oldRoomnum != null) {
-        ioContext.socket.leave(`room-${oldRoomnum}`);
-        ioUtils.updateRoomUsers(debugSocket);
+      if (oldRoomnums.length >= 10) {
+        debugSocket("too many rooms joined");
+        return callback("access denied");
       }
 
-      ioContext.socket.join(`room-${newRoomnum}`);
+      ioContext.socket.join(`room-${roomnum}`);
       configure();
 
       function configure() {
-        debugSocket(`connected to room-${newRoomnum}`);
+        debugSocket(`connected to room-${roomnum}`);
 
-        let room = ioUtils.getRoom(newRoomnum);
+        let room = ioUtils.getRoom(roomnum);
         if (room == null) {
-          debugSocket("room is null (error server)");
+          debugSocket("room is null (error socket.io)");
           return callback("error server");
         }
         /** @type {IoRoom} */
@@ -46,13 +45,13 @@ module.exports = {
         }
         if (!init) {
           setTimeout(() => {
-            ioUtils.syncClient(debugSocket, () => null);
+            ioUtils.syncClient(debugSocket, roomnum, () => {});
           }, 1000);
         }
-        ioUtils.updateRoomUsers(debugSocket);
+        ioUtils.updateRoomUsers(debugSocket, roomnum);
 
         callback(null, {
-          roomnum: ioUtils.roomnum,
+          roomnum: roomnum,
           host: ioContext.socket.id === ioRoom.host,
         });
       }
