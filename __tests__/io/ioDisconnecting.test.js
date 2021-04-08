@@ -2,7 +2,7 @@
 "use strict";
 
 const { Server: Server, Socket: Socket } = require("socket.io");
-const { IoContext } = require("../../src/server/io/ioContext");
+const { IoContext, SocketContext } = require("../../src/server/io/ioContext");
 const ioDisconnecting = require("../../src/server/io/ioDisconnecting");
 const { IoRoom } = require("../../src/server/io/ioRoom");
 const { IoUtils } = require("../../src/server/io/ioUtils");
@@ -22,17 +22,17 @@ let roomnum;
 let debugDisconnecting;
 
 beforeEach((done) => {
+  roomnum = "roomnum";
+  debugDisconnecting = jest.fn();
+
   io = new Server();
+  IoRoom.ioContext = new IoContext(io, { now: () => 5 });
   socket = io.sockets._add(
     { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
     () => {
-      roomnum = "roomnum";
-      debugDisconnecting = jest.fn();
-
-      IoRoom.ioContext = new IoContext(io, null, { now: () => 5 });
-      let ioContext = new IoContext(io, socket);
-      ioUtils = new IoUtils(ioContext);
+      let socketContext = new SocketContext(io, socket);
+      ioUtils = new IoUtils(socketContext);
       ioUtils.updateRoomUsers = jest.fn((cb) => cb("updateRoomUsers"));
 
       // join room
@@ -41,7 +41,7 @@ beforeEach((done) => {
       ioRoom.host = "socket-1";
       ioUtils.getRoom(roomnum).ioRoom = ioRoom;
 
-      ioDisconnecting.start(ioContext, ioUtils, debugDisconnecting);
+      ioDisconnecting.start(socketContext, ioUtils, debugDisconnecting);
       disconnecting = socket.events.disconnecting;
       done();
     }

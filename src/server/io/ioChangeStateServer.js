@@ -1,12 +1,12 @@
-const { IoContext } = require("./ioContext");
+const { SocketContext } = require("./ioContext");
 const { IoUtils } = require("./ioUtils");
 
 const regexRoom = /^\w{1,30}$/;
 
 module.exports = {
-  /** @param {IoContext} ioContext @param {IoUtils} ioUtils */
-  start: function (ioContext, ioUtils) {
-    ioContext.socket.on(
+  /** @param {SocketContext} socketContext @param {IoUtils} ioUtils */
+  start: function (socketContext, ioUtils) {
+    socketContext.socket.on(
       "changeStateServer",
       (debugSocket, roomnum, state, time, callback) => {
         if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
@@ -27,14 +27,14 @@ module.exports = {
           debugSocket("socket is not connected to room");
           return callback("access denied");
         }
-        if (ioContext.socket.id !== ioRoom.host) {
+        if (socketContext.socket.id !== ioRoom.host) {
           debugSocket("socket is not host");
           return callback("access denied");
         }
         debugSocket(`applied to room-${roomnum}`);
 
         ioRoom.updateState(state, time);
-        ioContext.socket
+        socketContext.socket
           .to(`room-${roomnum}`)
           .emit("changeStateClient", ioRoom.stateObject);
       }

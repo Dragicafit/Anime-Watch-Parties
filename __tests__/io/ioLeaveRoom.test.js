@@ -2,7 +2,7 @@
 "use strict";
 
 const { Server, Socket } = require("socket.io");
-const { IoContext } = require("../../src/server/io/ioContext");
+const { SocketContext } = require("../../src/server/io/ioContext");
 const ioLeaveRoom = require("../../src/server/io/ioLeaveRoom");
 const { IoUtils } = require("../../src/server/io/ioUtils");
 
@@ -31,11 +31,11 @@ beforeEach((done) => {
     { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
     () => {
-      let ioContext = new IoContext(null, socket);
-      ioUtils = new IoUtils(ioContext);
+      let socketContext = new SocketContext(null, socket);
+      ioUtils = new IoUtils(socketContext);
       ioUtils.leaveRoom = jest.fn();
 
-      ioLeaveRoom.start(ioContext, ioUtils);
+      ioLeaveRoom.start(socketContext, ioUtils);
       leaveRoom = socket.events.leaveRoom;
       done();
     }

@@ -3,7 +3,7 @@
 
 const { Server, Socket } = require("socket.io");
 const ioChangeVideoServer = require("../../src/server/io/ioChangeVideoServer");
-const { IoContext } = require("../../src/server/io/ioContext");
+const { IoContext, SocketContext } = require("../../src/server/io/ioContext");
 const { IoRoom } = require("../../src/server/io/ioRoom");
 const { IoUtils } = require("../../src/server/io/ioUtils");
 
@@ -43,6 +43,7 @@ beforeEach((done) => {
   callback = jest.fn();
 
   io = new Server();
+  IoRoom.ioContext = new IoContext(io, performance);
   socket = io.sockets._add(
     { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
@@ -53,9 +54,8 @@ beforeEach((done) => {
         }
       };
 
-      IoRoom.ioContext = new IoContext(io, null, performance);
-      let ioContext = new IoContext(io, socket);
-      ioUtils = new IoUtils(ioContext);
+      let socketContext = new SocketContext(io, socket);
+      ioUtils = new IoUtils(socketContext);
 
       // join room
       socket.join(`room-${roomnum}`);
@@ -63,7 +63,7 @@ beforeEach((done) => {
       ioRoom.host = "socket-1";
       ioUtils.getRoom(roomnum).ioRoom = ioRoom;
 
-      ioChangeVideoServer.start(ioContext, ioUtils);
+      ioChangeVideoServer.start(socketContext, ioUtils);
       changeVideoServer = socket.events.changeVideoServer;
       done();
     }

@@ -1,15 +1,15 @@
 const { IoRoom, Room } = require("./ioRoom");
-const { IoContext } = require("./ioContext");
+const { SocketContext } = require("./ioContext");
 
 const regexPrefix = /^room-/g;
 
 class IoUtils {
-  /** @type {IoContext} */
-  ioContext;
+  /** @type {SocketContext} */
+  socketContext;
 
-  /** @param {IoContext} ioContext */
-  constructor(ioContext) {
-    this.ioContext = ioContext;
+  /** @param {SocketContext} socketContext */
+  constructor(socketContext) {
+    this.socketContext = socketContext;
   }
 
   syncClient(debugSocket, roomnum, callback) {
@@ -22,11 +22,11 @@ class IoUtils {
 
     if (ioRoom.isStateDefined()) {
       debugSocket("change state client");
-      this.ioContext.socket.emit("changeStateClient", ioRoom.stateObject);
+      this.socketContext.socket.emit("changeStateClient", ioRoom.stateObject);
     }
     if (ioRoom.isVideoDefined()) {
       debugSocket("change video client");
-      this.ioContext.socket.emit("changeVideoClient", ioRoom.videoObject);
+      this.socketContext.socket.emit("changeVideoClient", ioRoom.videoObject);
     }
   }
 
@@ -37,7 +37,7 @@ class IoUtils {
     }
     debugSocket(`applied to room-${roomnum}`);
 
-    this.ioContext.io.sockets.to(`room-${roomnum}`).emit("getUsers", {
+    this.socketContext.io.sockets.to(`room-${roomnum}`).emit("getUsers", {
       onlineUsers: room.size,
     });
   }
@@ -52,7 +52,7 @@ class IoUtils {
       return callback("access denied");
     }
 
-    this.ioContext.socket.join(`room-${roomnum}`);
+    this.socketContext.socket.join(`room-${roomnum}`);
     this._configure(debugSocket, roomnum, callback);
 
     setTimeout(() => {
@@ -77,7 +77,7 @@ class IoUtils {
     }
     if (ioRoom.host == null) {
       debugSocket("socket is host");
-      ioRoom.host = this.ioContext.socket.id;
+      ioRoom.host = this.socketContext.socket.id;
     }
 
     callback(null, {
@@ -94,7 +94,7 @@ class IoUtils {
     if (this.isHost(ioRoom)) {
       ioRoom.host = undefined;
     }
-    this.ioContext.socket.leave(`room-${roomnum}`);
+    this.socketContext.socket.leave(`room-${roomnum}`);
     debugSocket(`applied to room-${roomnum}`);
 
     this.updateRoomUsers(debugSocket, roomnum);
@@ -102,12 +102,12 @@ class IoUtils {
 
   /** @param {IoRoom} ioRoom @returns {boolean} */
   isHost(ioRoom) {
-    return this.ioContext.socket.id === ioRoom?.host;
+    return this.socketContext.socket.id === ioRoom?.host;
   }
 
   /** @param {String} roomnum @returns {Room} */
   getRoom(roomnum) {
-    return this.ioContext.io.sockets.adapter.rooms.get(`room-${roomnum}`);
+    return this.socketContext.io.sockets.adapter.rooms.get(`room-${roomnum}`);
   }
 
   /** @param {String} roomnum */
@@ -126,7 +126,7 @@ class IoUtils {
   }
 
   get roomnums() {
-    return [...this.ioContext.socket.rooms]
+    return [...this.socketContext.socket.rooms]
       .slice(1)
       .map((room) => room?.replace(regexPrefix, ""));
   }

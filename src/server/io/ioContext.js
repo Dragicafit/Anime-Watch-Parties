@@ -1,19 +1,28 @@
-const { Server: ioServer, Socket } = require("socket.io");
+const { Server, Socket } = require("socket.io");
 
 class IoContext {
-  /** @type {ioServer} */
+  /** @type {Server} */
   io;
-  /** @type {Socket} */
-  socket;
   /** @type {Performance} */
   performance;
 
-  /** @param {ioServer} io @param {Socket} socket @param {Performance} performance */
-  constructor(io, socket, performance) {
+  /** @param {Server} io @param {Performance} performance */
+  constructor(io, performance) {
     this.io = io;
-    this.socket = socket;
     this.performance = performance;
   }
 }
 
+class SocketContext extends IoContext {
+  /** @type {Socket} */
+  socket;
+
+  /** @param {Server} io @param {Socket} socket @param {Performance} performance */
+  constructor(io, socket, performance) {
+    super(io, performance);
+    this.socket = socket;
+  }
+}
+
 exports.IoContext = IoContext;
+exports.SocketContext = SocketContext;

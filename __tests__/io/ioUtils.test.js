@@ -4,7 +4,7 @@
 const { Server, Socket } = require("socket.io");
 const { IoUtils } = require("../../src/server/io/ioUtils");
 const { IoRoom } = require("../../src/server/io/ioRoom");
-const { IoContext } = require("../../src/server/io/ioContext");
+const { IoContext, SocketContext } = require("../../src/server/io/ioContext");
 
 /** @type {Server} */
 let io;
@@ -34,13 +34,13 @@ beforeEach((done) => {
   callback = jest.fn();
 
   io = new Server();
+  IoRoom.ioContext = new IoContext(io, performance);
   socket = io.sockets._add(
     { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
     () => {
-      IoRoom.ioContext = new IoContext(io, null, performance);
-      let ioContext = new IoContext(io, socket, performance);
-      ioUtils = new IoUtils(ioContext);
+      let socketContext = new SocketContext(io, socket, performance);
+      ioUtils = new IoUtils(socketContext);
 
       // join room
       socket.join(`room-${roomnum}`);
