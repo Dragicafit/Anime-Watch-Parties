@@ -6,7 +6,7 @@
     "start": "node src/server/server.js",
     "debug": "DEBUG=*erverAWP:* npm start",
     "test": "jest",
-    "release": "./concat.ps1 && zip -r -FS Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json src/icons/* src/dependencies/* src/background-scripts/background-script2.js src/content-scripts/listener.js src/web-accessible-resources/js/script.js src/web-accessible-resources/css/script.css src/popup/*",
+    "release": "browserify -g [ @frida/uglifyify --ignore '**/src/background-scripts/*' ] --debug src/background-scripts/clientScript.js | exorcist src/background-scripts/background-script.js.map > src/background-scripts/background-script.js && ./concat.ps1 && zip -r -FS Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json src/icons/* src/dependencies/* src/background-scripts/background-script.js src/content-scripts/listener.js src/web-accessible-resources/js/script.js src/web-accessible-resources/css/script.css src/popup/*",
     "cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj \"/C=FR/ST=Ile-de-France/L=Paris/O=Dragicafit/OU=Org/CN=localhost\" -sha256"
   },
   "repository": {
@@ -16,9 +16,12 @@
   "author": "Dragicafit",
   "license": "MIT",
   "dependencies": {
+    "@frida/uglifyify": "^7.0.1",
+    "browserify": "^17.0.0",
     "connect-redis": "^5.1.0",
     "debug": "^4.3.1",
     "dotenv": "^8.2.0",
+    "exorcist": "^2.0.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "handlebars": "^4.7.7",

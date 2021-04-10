@@ -31,17 +31,3 @@ cd web-accessible-resources/
     echo "" >> script.css
     cat "embed.css" >> script.css
     echo "" >> script.css
-    cd ../
-cd ../
-cd background-scripts/
-echo "\"use strict\";" > background-script2.js
-cat "../dependencies/socket.io.min.js" >> background-script2.js
-echo "" >> background-script2.js
-cat "background-script.js" >> background-script2.js
-echo "" >> background-script2.js
-cat "transmission-b.js" >> background-script2.js
-echo "" >> background-script2.js
-cat "sync.js" >> background-script2.js
-echo "" >> background-script2.js
-cat "events.js" >> background-script2.js
-echo "" >> background-script2.js

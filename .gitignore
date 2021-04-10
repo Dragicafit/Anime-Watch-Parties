@@ -1,5 +1,6 @@
 script.js
-background-script2.js
+background-script.js
+background-script.js.map
 script.css
 package-lock.json
 *.pem
