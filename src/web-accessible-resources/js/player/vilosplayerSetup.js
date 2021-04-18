@@ -1,8 +1,17 @@
-class vilosplayerSetup extends awpplayerSetup {
-  previousSeek = 0;
+"use strict";
 
-  constructor() {
-    super("vilosplayer");
+const { TabContext } = require("../tabContext");
+const { TabSync } = require("../tabSync");
+const { awpplayerSetup } = require("./awpplayerSetup");
+
+class vilosplayerSetup extends awpplayerSetup {
+  /** @type {Number} */
+  #previousSeek;
+
+  /** @param {TabContext} tabContext @param {TabSync} tabSync */
+  constructor(tabContext, tabSync) {
+    super("vilosplayer", tabContext, tabSync);
+    this.#previousSeek = 0;
   }
 
   _onPlay(a) {
@@ -15,8 +24,8 @@ class vilosplayerSetup extends awpplayerSetup {
 
   _onSeek(a) {
     VILOS_PLAYERJS.on("timeupdate", (e) => {
-      let previousSeek = this.previousSeek;
-      this.previousSeek = e.seconds;
+      let previousSeek = this.#previousSeek;
+      this.#previousSeek = e.seconds;
       if (Math.abs(e.seconds - previousSeek) < 0.5) return;
       a(e.seconds, e);
     });
@@ -43,7 +52,9 @@ class vilosplayerSetup extends awpplayerSetup {
     else VILOS_PLAYERJS.pause();
   }
 
-  _playerExist() {
+  playerExist() {
     return typeof VILOS_PLAYERJS === "object";
   }
 }
+
+exports.vilosplayerSetup = vilosplayerSetup;

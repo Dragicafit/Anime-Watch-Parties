@@ -1,11 +1,21 @@
+"use strict";
+
+const { TabContext } = require("../tabContext");
+const { TabSync } = require("../tabSync");
+const { awpplayerSetup } = require("./awpplayerSetup");
+
 class jwplayerSetup extends awpplayerSetup {
-  constructor() {
-    super("jwplayer");
+  /** @param {TabContext} tabContext @param {TabSync} tabSync */
+  constructor(tabContext, tabSync) {
+    super("jwplayer", tabContext, tabSync);
   }
 
   _onPlay(a) {
     jwplayer().on("play", (e) => {
-      if (host || (e.playReason === "interaction" && e.reason === "playing"))
+      if (
+        this.tabContext.tabRoom.host ||
+        (e.playReason === "interaction" && e.reason === "playing")
+      )
         a(e);
     });
   }
@@ -35,7 +45,9 @@ class jwplayerSetup extends awpplayerSetup {
     else jwplayer().pause();
   }
 
-  _playerExist() {
+  playerExist() {
     return typeof jwplayer === "function";
   }
 }
+
+exports.jwplayerSetup = jwplayerSetup;

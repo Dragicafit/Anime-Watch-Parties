@@ -6,7 +6,9 @@
     "start": "node src/server/server.js",
     "debug": "DEBUG=*erverAWP:* npm start",
     "test": "jest",
-    "release": "browserify -g [ @frida/uglifyify --ignore '**/src/background-scripts/*' ] --debug src/background-scripts/clientScript.js | exorcist src/background-scripts/background-script.js.map > src/background-scripts/background-script.js && ./concat.ps1 && zip -r -FS Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json src/icons/* src/dependencies/* src/background-scripts/background-script.js src/content-scripts/listener.js src/web-accessible-resources/js/script.js src/web-accessible-resources/css/script.css src/popup/*",
+    "browserify-background-scripts": "cd src/background-scripts && browserify -d -g [ @frida/uglifyify --ignore './**' ] clientScript.js | exorcist background-script.js.map > background-script.js",
+    "browserify-web-accessible-resources": "cd src/web-accessible-resources/js && browserify -d tabScript.js | exorcist script.js.map > script.js",
+    "release": "npm run browserify-background-scripts && npm run browserify-web-accessible-resources && ./concat.ps1 && zip -r -FS Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json src/icons/* src/dependencies/* src/background-scripts/background-script.js src/content-scripts/listener.js src/web-accessible-resources/js/script.js src/web-accessible-resources/css/script.css src/popup/*",
     "cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj \"/C=FR/ST=Ile-de-France/L=Paris/O=Dragicafit/OU=Org/CN=localhost\" -sha256"
   },
   "repository": {
@@ -16,12 +18,9 @@
   "author": "Dragicafit",
   "license": "MIT",
   "dependencies": {
-    "@frida/uglifyify": "^7.0.1",
-    "browserify": "^17.0.0",
     "connect-redis": "^5.1.0",
     "debug": "^4.3.1",
     "dotenv": "^8.2.0",
-    "exorcist": "^2.0.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "handlebars": "^4.7.7",
@@ -30,7 +29,6 @@
     "rate-limiter-flexible": "^2.2.1",
     "redis": "^3.1.0",
     "socket.io": "^4.0.1",
-    "socket.io-client": "^4.0.1",
     "socket.io-redis": "^6.1.0"
   },
   "bugs": {
@@ -38,9 +36,19 @@
   },
   "homepage": "https://github.com/Dragicafit/Anime-Watch-Parties#readme",
   "devDependencies": {
+    "@babel/core": "^7.13.15",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/plugin-proposal-private-methods": "^7.13.0",
+    "@frida/uglifyify": "^7.0.1",
     "@types/jest": "^26.0.22",
+    "babelify": "^10.0.0",
+    "browserify": "^17.0.0",
+    "exorcist": "^2.0.0",
     "jest": "^26.6.3",
-    "jshint": "^2.12.0"
+    "jquery": "^3.6.0",
+    "jquery-ui": "^1.12.1",
+    "jshint": "^2.12.0",
+    "socket.io-client": "^4.0.1"
   },
   "jest": {
     "testEnvironment": "node",
@@ -48,5 +56,18 @@
       "/node_modules/"
     ],
     "collectCoverage": true
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "plugins": [
+            "@babel/plugin-proposal-class-properties",
+            "@babel/plugin-proposal-private-methods"
+          ]
+        }
+      ]
+    ]
   }
 }
