@@ -37,7 +37,7 @@ beforeEach((done) => {
 
       // join room
       socket.join(`room-${roomnum}`);
-      let ioRoom = new IoRoom();
+      let ioRoom = new IoRoom(roomnum);
       ioRoom.host = "socket-1";
       ioUtils.getRoom(roomnum).ioRoom = ioRoom;
 

@@ -5,6 +5,8 @@ class IoRoom {
   /** @type {IoContext} */
   static ioContext;
 
+  /** @type {String} */
+  roomnum;
   /** @type {SocketId} */
   host;
   /** @type {Boolean} */
@@ -20,7 +22,9 @@ class IoRoom {
   /** @type {String} */
   location;
 
-  constructor() {
+  /** @param {String} roomnum */
+  constructor(roomnum) {
+    this.roomnum = roomnum;
     this.updateState(false, 0);
   }
 
@@ -54,6 +58,7 @@ class IoRoom {
       currTime += (IoRoom.ioContext.performance.now() - this.lastChange) / 1000;
     }
     return {
+      roomnum: this.roomnum,
       state: this.state,
       time: currTime,
     };
@@ -61,6 +66,7 @@ class IoRoom {
 
   get videoObject() {
     return {
+      roomnum: this.roomnum,
       videoId: this.currVideo,
       site: this.site,
       location: this.location,

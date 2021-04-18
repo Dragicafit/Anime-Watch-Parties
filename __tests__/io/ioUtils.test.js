@@ -44,7 +44,7 @@ beforeEach((done) => {
 
       // join room
       socket.join(`room-${roomnum}`);
-      let ioRoom = new IoRoom();
+      let ioRoom = new IoRoom(roomnum);
       ioRoom.host = "socket-1";
       ioUtils.getRoom(roomnum).ioRoom = ioRoom;
 
@@ -68,10 +68,12 @@ describe("syncClient", () => {
     ioUtils.syncClient(debugSocket, roomnum, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
+      roomnum: roomnum,
       time: 0.003,
       state: true,
     });
     expect(emit).toHaveBeenNthCalledWith(2, "changeVideoClient", {
+      roomnum: roomnum,
       site: undefined,
       videoId: "videoId",
       location: undefined,
@@ -106,10 +108,12 @@ describe("syncClient", () => {
     ioUtils.syncClient(debugSocket, roomnum, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
+      roomnum: roomnum,
       time: 0,
       state: false,
     });
     expect(emit).toHaveBeenNthCalledWith(2, "changeVideoClient", {
+      roomnum: roomnum,
       site: undefined,
       videoId: "videoId",
       location: undefined,
@@ -144,6 +148,7 @@ describe("syncClient", () => {
     ioUtils.syncClient(debugSocket, roomnum, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
+      roomnum: roomnum,
       time: 0.003,
       state: true,
     });
@@ -178,6 +183,7 @@ describe("syncClient", () => {
     ioUtils.syncClient(debugSocket, roomnum, callback);
 
     expect(emit).toHaveBeenNthCalledWith(1, "changeVideoClient", {
+      roomnum: roomnum,
       site: undefined,
       videoId: "videoId",
       location: undefined,
@@ -256,6 +262,7 @@ describe("updateRoomUsers", () => {
     ioUtils.updateRoomUsers(debugSocket, roomnum);
 
     expect(emit).toHaveBeenNthCalledWith(1, "getUsers", {
+      roomnum: roomnum,
       onlineUsers: 1,
     });
     expect(debugSocket).toHaveBeenNthCalledWith(

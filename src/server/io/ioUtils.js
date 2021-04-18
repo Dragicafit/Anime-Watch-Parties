@@ -38,6 +38,7 @@ class IoUtils {
     debugSocket(`applied to room-${roomnum}`);
 
     this.socketContext.io.sockets.to(`room-${roomnum}`).emit("getUsers", {
+      roomnum: roomnum,
       onlineUsers: room.size,
     });
   }
@@ -69,11 +70,10 @@ class IoUtils {
       debugSocket("room is null (error socket.io)");
       return callback("error server");
     }
-    /** @type {IoRoom} */
     let ioRoom = room.ioRoom;
     let init = ioRoom == null;
     if (init) {
-      ioRoom = room.ioRoom = new IoRoom();
+      ioRoom = room.ioRoom = new IoRoom(roomnum);
     }
     if (ioRoom.host == null) {
       debugSocket("socket is host");

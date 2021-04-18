@@ -1,5 +1,5 @@
 const { ClientContext } = require("./clientContext");
-const { ClientRoom } = require("./clientRoom");
+const { ClientTab } = require("./clientTab");
 const { ClientSync } = require("./clientSync");
 const { ClientUtils } = require("./clientUtils");
 
@@ -18,31 +18,32 @@ class ClientEvent {
     this.clientSync = clientSync;
   }
 
-  askInfo(tabId) {
+  askInfo(tabId, clientTab = this.clientContext.clientTabs.get(tabId)) {
     console.log("ask info");
 
     this.clientContext.browser.runtime
       .sendMessage({
         command: "sendInfo",
-        roomnum: this.clientContext.infoTabs.get(tabId)?.roomnum,
-        onlineUsers: this.clientContext.infoTabs.get(tabId)?.onlineUsers,
+        roomnum: clientTab?.roomnum,
+        onlineUsers: clientTab?.onlineUsers,
       })
       .catch(this.clientUtils.reportError);
 
-    if (this.clientContext.infoTabs.get(tabId) == null) return;
-
     this.clientContext.browser.tabs.sendMessage(tabId, {
       command: "sendInfo",
-      roomnum: this.clientContext.infoTabs.get(tabId).roomnum,
-      host: this.clientContext.infoTabs.get(tabId).host,
+      roomnum: clientTab?.roomnum,
+      host: clientTab?.host,
     });
   }
 
   scriptLoaded(tabId) {
     console.log("script loaded");
 
-    if (this.clientContext.infoTabs.get(tabId) == null)
-      return this.clientContext.infoTabs.set(tabId, new ClientRoom());
+    if (!this.clientContext.clientTabs.has(tabId))
+      this.clientContext.clientTabs.set(
+        tabId,
+        new ClientTab(this.clientContext)
+      );
 
     this.askInfo(tabId);
   }
@@ -50,43 +51,62 @@ class ClientEvent {
   joinRoom(tab, tabId, roomnum) {
     console.log(`join room`);
 
+    for (let [, clientTab2] of this.clientContext.clientTabs.entries()) {
+      if (clientTab2?.roomnum !== roomnum) continue;
+
+      if (clientTab2.host) {
+        this.joinedRoom(null, { roomnum: roomnum, host: false }, tab, tabId);
+        return;
+      }
+    }
+
     this.clientContext.socket.emit(
       "joinRoom",
       { roomnum: roomnum },
-      (err, data) => {
-        if (err) {
-          console.log(err);
-          if (err === "not connected") {
-            this.clientSync.openPopupTwitch(tabId, roomnum);
-          }
-          return;
-        }
-
-        if (this.clientContext.infoTabs.get(tabId) == null)
-          this.clientContext.infoTabs.set(tabId, new ClientRoom());
-        this.clientContext.infoTabs.get(tabId).roomnum = data.roomnum;
-        this.clientContext.infoTabs.get(tabId).host = data.host;
-
-        if (data.host) {
-          console.log("You are the new host!");
-          this.clientSync.changeVideoServer(tab);
-          this.clientSync.askState(tabId);
-        } else {
-          this.clientSync.startEmbed(tabId);
-        }
-        console.log(`send room number after joinRoom ${data.roomnum}`);
-
-        this.askInfo(tabId);
-      }
+      (err, data) => this.joinedRoom(err, data, tab, tabId)
     );
   }
 
-  changeStateClient(time, state) {
+  joinedRoom(err, data, tab, tabId) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+
+    if (!this.clientContext.clientTabs.has(tabId))
+      this.clientContext.clientTabs.set(
+        tabId,
+        new ClientTab(this.clientContext)
+      );
+    let clientTab = this.clientContext.clientTabs.get(tabId);
+    clientTab.roomnum = data.roomnum;
+    clientTab.host = data.host;
+
+    if (clientTab.host) {
+      console.log("You are the new host!");
+      this.clientSync.changeVideoServer(tab, clientTab);
+      this.clientSync.askState(tabId);
+    } else {
+      this.clientSync.startEmbed(tabId);
+    }
+    console.log(`send room number after joinRoom ${clientTab.roomnum}`);
+
+    this.askInfo(tabId, clientTab);
+  }
+
+  changeStateClient(roomnum, time, state) {
     console.log(`change state client`);
-    //
-    if (this.clientContext.infoTabs.size == 0) return;
-    let tabId = this.clientContext.infoTabs.keys().next().value;
-    //
+
+    for (let [tabId, clientTab] of this.clientContext.clientTabs.entries()) {
+      if (clientTab?.roomnum !== roomnum) continue;
+
+      this.changeStateClientTab(tabId, time, state);
+    }
+  }
+
+  changeStateClientTab(tabId, time, state) {
+    console.log(`change state client`);
+
     this.clientContext.browser.tabs.sendMessage(tabId, {
       command: "changeStateClient",
       time: time,
@@ -94,50 +114,48 @@ class ClientEvent {
     });
   }
 
-  sendState(time, state) {
+  sendState(tabId, time, state) {
     console.log(`send state`);
-    this.clientSync.changeStateServer(time, state);
+    this.clientSync.changeStateServer(tabId, time, state);
   }
 
-  getUsers(newOnlineUsers) {
-    console.log(`get users: ${newOnlineUsers}`);
+  getUsers(roomnum, onlineUsers) {
+    console.log(`get users: ${onlineUsers}`);
 
-    //
-    if (this.clientContext.infoTabs.size == 0) return;
-    let tabId = this.clientContext.infoTabs.keys().next().value;
-    //
+    for (let [tabId, clientTab] of this.clientContext.clientTabs.entries()) {
+      if (clientTab?.roomnum !== roomnum) continue;
 
-    if (this.clientContext.infoTabs.get(tabId) == null) return;
+      clientTab.onlineUsers = onlineUsers;
 
-    this.clientContext.infoTabs.get(tabId).onlineUsers = newOnlineUsers;
-
-    this.askInfo(tabId);
+      this.askInfo(tabId, clientTab);
+    }
   }
 
-  unSetHost() {
+  unSetHost(roomnum) {
     console.log("Unsetting host");
 
-    //
-    if (this.clientContext.infoTabs.size == 0) return;
-    let tabId = this.clientContext.infoTabs.keys().next().value;
-    //
-    if (this.clientContext.infoTabs.get(tabId) == null) return;
+    for (let [tabId, clientTab] of this.clientContext.clientTabs.entries()) {
+      if (clientTab?.roomnum !== roomnum) continue;
 
-    this.clientContext.infoTabs.get(tabId).host = false;
+      clientTab.host = false;
 
-    this.askInfo(tabId);
+      this.askInfo(tabId, clientTab);
+    }
   }
 
-  changeVideoClient(site, location, videoId) {
+  changeVideoClient(roomnum, site, location, videoId) {
     console.log("change video client");
     console.log(`video id is: ${videoId}`);
 
-    //
-    if (this.clientContext.infoTabs.size == 0) return;
-    let tabId = this.clientContext.infoTabs.keys().next().value;
-    //
+    for (let [tabId, clientTab] of this.clientContext.clientTabs.entries()) {
+      if (clientTab?.roomnum !== roomnum) continue;
+      this.changeVideoClientTab(tabId, site, location, videoId);
+    }
+  }
 
-    if (this.clientContext.infoTabs.get(tabId) == null) return;
+  changeVideoClientTab(tabId, site, location, videoId) {
+    console.log("change video client");
+    console.log(`video id is: ${videoId}`);
 
     this.clientContext.browser.tabs
       .get(tabId)
@@ -170,11 +188,11 @@ class ClientEvent {
       .catch(this.clientUtils.reportError);
   }
 
-  restartSocket(tabId, roomnum) {
+  restartSocket(tab, tabId, roomnum) {
     this.clientContext.socket.close();
     setTimeout(() => {
       this.clientContext.socket.connect();
-      this.joinRoom(tabId, roomnum);
+      this.joinRoom(tab, tabId, roomnum);
     }, 100);
   }
 }

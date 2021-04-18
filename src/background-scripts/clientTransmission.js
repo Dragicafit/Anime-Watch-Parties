@@ -8,7 +8,7 @@ module.exports = {
   start: function (clientContext, clientUtils, clientEvent, clientSync) {
     clientContext.browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
       if (changeInfo.status !== "complete") return;
-      if (clientContext.infoTabs.get(tabId) == null) return;
+      if (!clientContext.clientTabs.has(tabId)) return;
       console.log("updated");
       clientUtils.insertScript(tabId);
     });
@@ -35,13 +35,13 @@ module.exports = {
             clientEvent.scriptLoaded(tabId);
             break;
           case "sendState":
-            clientEvent.sendState(message.time, message.state);
+            clientEvent.sendState(tabId, message.time, message.state);
             break;
           case "restartSocket":
-            clientEvent.restartSocket(tabId, message.roomnum);
+            clientEvent.restartSocket(tab, tabId, message.roomnum);
             break;
           case "syncClient":
-            clientSync.syncClient();
+            clientSync.syncClient(tabId);
             break;
           default:
             break;
@@ -50,14 +50,21 @@ module.exports = {
     });
 
     clientContext.socket.on("changeStateClient", (data) =>
-      clientEvent.changeStateClient(data?.time, data?.state)
+      clientEvent.changeStateClient(data.roomnum, data.time, data.state)
     );
     clientContext.socket.on("getUsers", (data) =>
-      clientEvent.getUsers(data?.onlineUsers)
+      clientEvent.getUsers(data.roomnum, data.onlineUsers)
     );
-    clientContext.socket.on("unSetHost", () => clientEvent.unSetHost());
+    clientContext.socket.on("unSetHost", () =>
+      clientEvent.unSetHost(data.roomnum)
+    );
     clientContext.socket.on("changeVideoClient", (data) =>
-      clientEvent.changeVideoClient(data?.site, data?.location, data?.videoId)
+      clientEvent.changeVideoClient(
+        data.roomnum,
+        data.site,
+        data.location,
+        data.videoId
+      )
     );
   },
 };

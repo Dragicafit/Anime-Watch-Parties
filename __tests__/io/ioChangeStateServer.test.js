@@ -58,7 +58,7 @@ beforeEach((done) => {
 
       // join room
       socket.join(`room-${roomnum}`);
-      let ioRoom = new IoRoom();
+      let ioRoom = new IoRoom(roomnum);
       ioRoom.host = "socket-1";
       ioUtils.getRoom(roomnum).ioRoom = ioRoom;
 
@@ -80,6 +80,7 @@ it.each([
   changeStateServer(debugSocket, roomnum, state, time, callback);
 
   expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
+    roomnum: roomnum,
     time: time,
     state: state,
   });

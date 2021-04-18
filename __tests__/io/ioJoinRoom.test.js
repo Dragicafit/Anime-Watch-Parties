@@ -162,7 +162,7 @@ it("Join existing room", (done) => {
     null,
     () => {
       socket2.join(`room-${roomnum}`);
-      ioUtils.getRoom(roomnum).ioRoom = new IoRoom();
+      ioUtils.getRoom(roomnum).ioRoom = new IoRoom(roomnum);
 
       joinRoom(debugSocket, roomnum, callback);
 
@@ -213,7 +213,7 @@ it("Join existing room but too many rooms joined", (done) => {
     null,
     () => {
       socket2.join(`room-${roomnum}`);
-      ioUtils.getRoom(roomnum).ioRoom = new IoRoom();
+      ioUtils.getRoom(roomnum).ioRoom = new IoRoom(roomnum);
       joinRoom(debugSocket, roomnum, callback);
 
       expect(debugSocket).toHaveBeenNthCalledWith(1, "too many rooms joined");
@@ -243,7 +243,7 @@ it("Join existing room but too many rooms joined", (done) => {
 
 it("Change room to same room", () => {
   socket.join(`room-${roomnum}`);
-  ioUtils.getRoom(roomnum).ioRoom = new IoRoom();
+  ioUtils.getRoom(roomnum).ioRoom = new IoRoom(roomnum);
   joinRoom(debugSocket, roomnum, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(

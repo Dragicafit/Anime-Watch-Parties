@@ -1,9 +1,12 @@
 const { ClientContext } = require("./clientContext");
 const { parseUrlWakanim, parseUrlCrunchyroll } = require("./clientConst");
+const { ClientEvent } = require("./clientEvents");
 
 class ClientSync {
   /** @type {ClientContext} */
   clientContext;
+  /** @type {ClientEvent} */
+  clientEvent;
 
   /** @param {ClientContext} clientContext */
   constructor(clientContext) {
@@ -48,33 +51,59 @@ class ClientSync {
     });
   }
 
-  changeVideoServer(tab) {
+  changeVideoServer(
+    tab,
+    clientTab = this.clientContext.clientTabs.get(tab.id)
+  ) {
     console.log("change video server");
 
     let url = this.parseUrl(tab.url);
     console.log(`change video to ${url.videoId}`);
 
     this.clientContext.socket.emit("changeVideoServer", {
-      room: this.clientContext.infoTabs.get(tab.id).roomnum,
-      videoId: url.videoId,
+      roomnum: clientTab.roomnum,
       site: url.site,
       location: url.location,
+      videoId: url.videoId,
     });
+    for (let [tabId2, clientRoom2] of this.clientContext.clientTabs.entries()) {
+      if (clientRoom2?.roomnum !== clientTab.roomnum || tabId2 === tab.id)
+        continue;
+      this.clientEvent.changeVideoClientTab(
+        tabId2,
+        url.site,
+        url.location,
+        url.videoId
+      );
+    }
   }
 
-  changeStateServer(currTime, state) {
+  changeStateServer(
+    tabId,
+    currTime,
+    state,
+    clientTab = this.clientContext.clientTabs.get(tabId)
+  ) {
     console.log("change state server");
 
     this.clientContext.socket.emit("changeStateServer", {
+      roomnum: clientTab.roomnum,
       time: currTime,
       state: state,
     });
+    for (let [tabId2, clientRoom2] of this.clientContext.clientTabs.entries()) {
+      if (clientRoom2?.roomnum !== clientTab.roomnum || tabId2 === tabId)
+        continue;
+      this.clientEvent.changeStateClientTab(tabId2, currTime, state);
+    }
   }
 
-  syncClient() {
+  syncClient(tabId, clientTab = this.clientContext.clientTabs.get(tabId)) {
     console.log("sync client");
 
-    this.clientContext.socket.emit("syncClient");
+    this.clientContext.socket.emit("syncClient", {
+      roomnum: clientTab.roomnum,
+    });
   }
 
   openPopupTwitch(tabId, roomnum) {
