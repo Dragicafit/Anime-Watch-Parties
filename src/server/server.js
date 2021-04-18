@@ -17,7 +17,9 @@ const { Server: ioServer } = require("socket.io");
 const io = new ioServer(server, {
   perMessageDeflate: false,
   cors: {
-    origin: `moz-extension://${process.env.EXTENSION_ID}`,
+    origin: process.env.EXTENSION_IDS.split(",").map((extensionId) =>
+      extensionId.trim()
+    ),
     credentials: true,
   },
 });
