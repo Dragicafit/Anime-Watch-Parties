@@ -12,6 +12,11 @@ module.exports = {
       console.log("updated");
       clientUtils.insertScript(tabId);
     });
+    clientContext.browser.tabs.onRemoved.addListener((tabId) => {
+      if (!clientContext.clientTabs.has(tabId)) return;
+      console.log("removed");
+      clientContext.clientTabs.delete(tabId);
+    });
 
     clientContext.browser.runtime.onMessage.addListener((message, sender) => {
       if (sender.tab == null) return clientUtils.getActiveTab().then(func);
