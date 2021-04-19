@@ -10,6 +10,7 @@ const { TabEvents } = require("./tabEvents");
 const { TabUtils } = require("./tabUtils");
 const { TabRoom } = require("./tabRoom");
 const { TwitchEmbed } = require("./embed/twitchEmbed");
+const performance = require("perf_hooks").performance;
 const tabTransmission = require("./tabTransmission");
 const { PlayerAWP } = require("./player/PlayerAWP");
 
@@ -19,10 +20,10 @@ let popupTwitch;
 
 let tabContext = new TabContext(
   "https://localhost:4000",
-
   new TabRoom(),
   $,
-  window
+  window,
+  performance
 );
 
 let tabSync = new TabSync(tabContext);
