@@ -51,11 +51,16 @@ class ClientEvent {
   joinRoom(tab, tabId, roomnum) {
     console.log(`join room`);
 
-    for (let [, clientTab2] of this.clientContext.clientTabs.entries()) {
+    for (let [tabId2, clientTab2] of this.clientContext.clientTabs.entries()) {
       if (clientTab2?.roomnum !== roomnum) continue;
 
       if (clientTab2.host) {
-        this.joinedRoom(null, { roomnum: roomnum, host: false }, tab, tabId);
+        this.joinedRoom(
+          null,
+          { roomnum: roomnum, host: tabId2 == tabId },
+          tab,
+          tabId
+        );
         return;
       }
     }
