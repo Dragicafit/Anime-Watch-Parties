@@ -78,11 +78,12 @@ class ClientEvent {
       return;
     }
 
-    if (!this.clientContext.clientTabs.has(tabId))
+    if (!this.clientContext.clientTabs.has(tabId)) {
       this.clientContext.clientTabs.set(
         tabId,
         new ClientTab(this.clientContext)
       );
+    }
     let clientTab = this.clientContext.clientTabs.get(tabId);
     clientTab.roomnum = data.roomnum;
     clientTab.host = data.host;
