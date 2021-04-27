@@ -8,6 +8,7 @@ const ioDisconnecting = require("./io/ioDisconnecting");
 const ioChangeVideoServer = require("./io/ioChangeVideoServer");
 const ioChangeStateServer = require("./io/ioChangeStateServer");
 const ioJoinRoom = require("./io/ioJoinRoom");
+const ioLeaveRoom = require("./io/ioLeaveRoom");
 const ioSyncClient = require("./io/ioSyncClient");
 const { IoRoom } = require("./io/ioRoom");
 const { IoContext, SocketContext } = require("./io/ioContext");
@@ -37,6 +38,7 @@ module.exports = {
         let ioUtils = new IoUtils(socketContext);
         ioDisconnecting.start(socketContext, ioUtils, debugDisconnecting);
         ioJoinRoom.start(socketContext, ioUtils);
+        ioLeaveRoom.start(socketContext, ioUtils);
         ioChangeStateServer.start(socketContext, ioUtils);
         ioChangeVideoServer.start(socketContext, ioUtils);
         ioSyncClient.start(socketContext, ioUtils);

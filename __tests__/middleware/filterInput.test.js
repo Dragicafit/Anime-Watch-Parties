@@ -5,6 +5,7 @@ const filterInput = require("../../src/server/middleware/filterInput");
 
 const supportedEvents = {
   JOIN_ROOM: "joinRoom",
+  LEAVE_ROOM: "leaveRoom",
   CHANGE_STATE_SERVER: "changeStateServer",
   CHANGE_VIDEO_SERVER: "changeVideoServer",
   SYNC_CLIENT: "syncClient",

@@ -13,6 +13,7 @@ const port = process.env.PORT != portTest ? portTest : portTest + 1;
 
 const supportedEvents = {
   JOIN_ROOM: "joinRoom",
+  LEAVE_ROOM: "leaveRoom",
   CHANGE_STATE_SERVER: "changeStateServer",
   CHANGE_VIDEO_SERVER: "changeVideoServer",
   SYNC_CLIENT: "syncClient",

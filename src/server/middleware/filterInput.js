@@ -4,12 +4,14 @@ const debug = require("debug")("filterInputServerAWP");
 const { Socket } = require("socket.io");
 
 const JOIN_ROOM = "joinRoom";
+const LEAVE_ROOM = "leaveRoom";
 const CHANGE_STATE_SERVER = "changeStateServer";
 const CHANGE_VIDEO_SERVER = "changeVideoServer";
 const SYNC_CLIENT = "syncClient";
 
 const debugArgument = debug.extend("argument");
 const debugJoinRoom = debug.extend(JOIN_ROOM);
+const debugLeaveRoom = debug.extend(LEAVE_ROOM);
 const debugChangeStateServer = debug.extend(CHANGE_STATE_SERVER);
 const debugChangeVideoServer = debug.extend(CHANGE_VIDEO_SERVER);
 const debugSyncClient = debug.extend(SYNC_CLIENT);
@@ -39,6 +41,13 @@ module.exports = {
         case JOIN_ROOM:
           events[1] = (...args) => {
             debugJoinRoom(`${socket.id}:`, ...args);
+          };
+          events[2] = data.roomnum;
+          events[3] = callback;
+          break;
+        case LEAVE_ROOM:
+          events[1] = (...args) => {
+            debugLeaveRoom(`${socket.id}:`, ...args);
           };
           events[2] = data.roomnum;
           events[3] = callback;
@@ -77,6 +86,7 @@ module.exports = {
   },
   supportedEvents: {
     JOIN_ROOM: JOIN_ROOM,
+    LEAVE_ROOM: LEAVE_ROOM,
     CHANGE_STATE_SERVER: CHANGE_STATE_SERVER,
     CHANGE_VIDEO_SERVER: CHANGE_VIDEO_SERVER,
     SYNC_CLIENT: SYNC_CLIENT,

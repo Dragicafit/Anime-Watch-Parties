@@ -15,7 +15,8 @@ module.exports = {
     clientContext.browser.tabs.onRemoved.addListener((tabId) => {
       if (!clientContext.clientTabs.has(tabId)) return;
       console.log("removed");
-      clientContext.clientTabs.delete(tabId);
+
+      clientEvent.leaveRoom(tabId);
     });
 
     clientContext.browser.runtime.onMessage.addListener((message, sender) => {

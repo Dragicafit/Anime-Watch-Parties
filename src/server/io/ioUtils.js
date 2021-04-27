@@ -31,9 +31,9 @@ class IoUtils {
   }
 
   updateRoomUsers(debugSocket, roomnum) {
-    let room = this.getRoomIfIn(roomnum);
+    let room = this.getRoom(roomnum);
     if (room == null) {
-      return debugSocket("socket is not connected to room");
+      return debugSocket(`room-${roomnum} has been deleted`);
     }
     debugSocket(`applied to room-${roomnum}`);
 

@@ -294,7 +294,7 @@ describe("updateRoomUsers", () => {
 
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
-      "socket is not connected to room"
+      "room-roomnum has been deleted"
     );
 
     expect(emit).toHaveBeenCalledTimes(0);
@@ -310,7 +310,7 @@ describe("updateRoomUsers", () => {
 
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
-      "socket is not connected to room"
+      "room-roomnum has been deleted"
     );
 
     expect(emit).toHaveBeenCalledTimes(0);
