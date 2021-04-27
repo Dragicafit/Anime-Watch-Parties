@@ -45,6 +45,9 @@ class vilosplayerSetup extends awpplayerSetup {
 
   _onSeek(a) {
     VILOS_PLAYERJS.on("timeupdate", (e) => {
+      if (this.tabContext.window.document.hidden) {
+        return;
+      }
       if (
         !this.#preventCallIfTriggered.has("seek") ||
         this.tabContext.performance.now() -
