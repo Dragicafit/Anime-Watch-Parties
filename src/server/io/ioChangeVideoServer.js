@@ -24,9 +24,13 @@ module.exports = {
           debugSocket("site is not a valid string");
           return callback("wrong input");
         }
-        if (typeof location !== "string" || !regexLocation.test(location)) {
-          debugSocket("location is not a valid string");
-          return callback("wrong input");
+        if (site === "crunchyroll") {
+          location = null;
+        } else {
+          if (typeof location !== "string" || !regexLocation.test(location)) {
+            debugSocket("location is not a valid string");
+            return callback("wrong input");
+          }
         }
 
         let ioRoom = ioUtils.getIoRoomIfIn(roomnum);

@@ -200,12 +200,7 @@ class ClientEvent {
       .then((tab) => {
         let url = this.clientSync.parseUrl(tab.url);
 
-        if (
-          url.site === site &&
-          url.location === location &&
-          url.videoId === videoId
-        )
-          return;
+        if (url.site === site && url.videoId === videoId) return;
 
         let newUrl;
         switch (site) {
@@ -213,7 +208,11 @@ class ClientEvent {
             newUrl = `https://www.wakanim.tv/${location}/v2/catalogue/episode/${videoId}`;
             break;
           case "crunchyroll":
-            newUrl = `https://www.crunchyroll.com/${location}/${videoId}`;
+            if (url.site === "crunchyroll" && url.location != null) {
+              newUrl = `https://www.crunchyroll.com/${url.location}/${videoId}`;
+            } else {
+              newUrl = `https://www.crunchyroll.com/${videoId}`;
+            }
             break;
           default:
             return;

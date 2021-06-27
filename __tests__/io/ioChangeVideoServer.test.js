@@ -72,14 +72,23 @@ beforeEach((done) => {
 
 it.each([
   ["videoId", "wakanim", "FR"],
-  ["v", "crunchyroll", "US"],
-  ["dr-stone/episode-11-prologue-of-dr-stone-801916", "wakanim", "us"],
-  [Array(301).join("x"), "wakanim", "uS"],
+  ["v", "wakanim", "US"],
+  ["videoId", "wakanim", "us"],
+  ["videoId", "wakanim", "uS"],
+  ["videoId", "crunchyroll", "US"],
+  ["videoId", "crunchyroll", null],
+  ["videoId", "crunchyroll", undefined],
+  [Array(301).join("x"), "wakanim", "US"],
+  ["dr-stone/episode-11-prologue-of-dr-stone-801916", "crunchyroll", null],
+  ["11396", "wakanim", "FR"],
 ])("Valid", (videoId2, site2, location2) => {
   videoId = videoId2;
   site = site2;
   location = location2;
   changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
+  if (site === "crunchyroll") {
+    location = null;
+  }
 
   expect(emit).toHaveBeenNthCalledWith(1, "changeVideoClient", {
     roomnum: roomnum,
@@ -183,7 +192,7 @@ it.each([
   [""],
   () => {},
   function a() {},
-])("With invalid time", (site2) => {
+])("With invalid site", (site2) => {
   site = site2;
   changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
 
