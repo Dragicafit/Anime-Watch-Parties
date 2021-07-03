@@ -1,0 +1,8 @@
+@startuml changeVideoServer
+
+Client -> Server: changeVideoServer
+activate Server
+Server -> "Other Client": changeVideoClient
+deactivate Server
+
+@enduml

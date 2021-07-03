@@ -1,0 +1,9 @@
+@startuml syncClient
+
+Client -> Server: syncClient
+activate Server
+Client <-- Server: changeStateClient
+Client <-- Server: changeVideoClient
+deactivate Server
+
+@enduml

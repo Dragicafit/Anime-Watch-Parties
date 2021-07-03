@@ -1,0 +1,8 @@
+@startuml changeStateServer
+
+Client -> Server: changeStateServer
+activate Server
+Server -> "Other Client": changeStateClient
+deactivate Server
+
+@enduml

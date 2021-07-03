@@ -1,0 +1,8 @@
+@startuml disconnecting
+
+Client -> Server: disconnecting
+activate Server
+Server -> "Other Client": getUsers
+deactivate Server
+
+@enduml
