@@ -2,8 +2,8 @@
 
 Client -> Server: syncClient
 activate Server
-Client <-- Server: changeStateClient
 Client <-- Server: changeVideoClient
+Client <-- Server: changeStateClient
 deactivate Server
 
 @enduml

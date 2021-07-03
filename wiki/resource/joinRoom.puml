@@ -5,8 +5,8 @@ activate Server
 Client <-- Server: callback
 Server -> "Other Client": getUsers
 Client <-- Server: getUsers
-Client <-- Server: changeStateClient
 Client <-- Server: changeVideoClient
+Client <-- Server: changeStateClient
 deactivate Server
 
 @enduml

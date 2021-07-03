@@ -20,13 +20,13 @@ class IoUtils {
     }
     debugSocket(`applied to room-${roomnum}`);
 
-    if (ioRoom.isStateDefined()) {
-      debugSocket("change state client");
-      this.socketContext.socket.emit("changeStateClient", ioRoom.stateObject);
-    }
     if (ioRoom.isVideoDefined()) {
       debugSocket("change video client");
       this.socketContext.socket.emit("changeVideoClient", ioRoom.videoObject);
+    }
+    if (ioRoom.isStateDefined()) {
+      debugSocket("change state client");
+      this.socketContext.socket.emit("changeStateClient", ioRoom.stateObject);
     }
   }
 

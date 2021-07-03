@@ -67,23 +67,23 @@ describe("syncClient", () => {
   it("sync state and video and state is true", () => {
     ioUtils.syncClient(debugSocket, roomnum, callback);
 
-    expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
-      roomnum: roomnum,
-      time: 0.003,
-      state: true,
-    });
-    expect(emit).toHaveBeenNthCalledWith(2, "changeVideoClient", {
+    expect(emit).toHaveBeenNthCalledWith(1, "changeVideoClient", {
       roomnum: roomnum,
       site: undefined,
       videoId: "videoId",
       location: undefined,
     });
+    expect(emit).toHaveBeenNthCalledWith(2, "changeStateClient", {
+      roomnum: roomnum,
+      time: 0.003,
+      state: true,
+    });
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
       `applied to room-${roomnum}`
     );
-    expect(debugSocket).toHaveBeenNthCalledWith(2, "change state client");
-    expect(debugSocket).toHaveBeenNthCalledWith(3, "change video client");
+    expect(debugSocket).toHaveBeenNthCalledWith(2, "change video client");
+    expect(debugSocket).toHaveBeenNthCalledWith(3, "change state client");
 
     expect(emit).toHaveBeenCalledTimes(2);
     expect(debugSocket).toHaveBeenCalledTimes(3);
@@ -107,23 +107,23 @@ describe("syncClient", () => {
     ioUtils.getIoRoom(roomnum).state = false;
     ioUtils.syncClient(debugSocket, roomnum, callback);
 
-    expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
-      roomnum: roomnum,
-      time: 0,
-      state: false,
-    });
-    expect(emit).toHaveBeenNthCalledWith(2, "changeVideoClient", {
+    expect(emit).toHaveBeenNthCalledWith(1, "changeVideoClient", {
       roomnum: roomnum,
       site: undefined,
       videoId: "videoId",
       location: undefined,
     });
+    expect(emit).toHaveBeenNthCalledWith(2, "changeStateClient", {
+      roomnum: roomnum,
+      time: 0,
+      state: false,
+    });
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
       `applied to room-${roomnum}`
     );
-    expect(debugSocket).toHaveBeenNthCalledWith(2, "change state client");
-    expect(debugSocket).toHaveBeenNthCalledWith(3, "change video client");
+    expect(debugSocket).toHaveBeenNthCalledWith(2, "change video client");
+    expect(debugSocket).toHaveBeenNthCalledWith(3, "change state client");
 
     expect(emit).toHaveBeenCalledTimes(2);
     expect(debugSocket).toHaveBeenCalledTimes(3);
