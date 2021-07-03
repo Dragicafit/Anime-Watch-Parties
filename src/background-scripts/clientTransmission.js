@@ -6,12 +6,24 @@ const { ClientSync } = require("./clientSync");
 module.exports = {
   /** @param {ClientContext} clientContext @param {ClientUtils} clientUtils @param {ClientEvent} clientEvent @param {ClientSync} clientSync */
   start: function (clientContext, clientUtils, clientEvent, clientSync) {
-    clientContext.browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
-      if (changeInfo.status !== "complete") return;
-      if (!clientContext.clientTabs.has(tabId)) return;
-      console.log("updated");
-      clientUtils.insertScript(tabId);
-    });
+    clientContext.browser.tabs.onUpdated.addListener(
+      (tabId, changeInfo, tab) => {
+        if (!clientContext.clientTabs.has(tabId)) return;
+        console.log("updated", tabId, changeInfo, tab);
+
+        if (changeInfo.url) {
+          if (clientContext.clientTabs.get(tabId).host) {
+            clientSync.changeVideoServer(tab);
+          } else {
+            clientSync.syncClient(tabId);
+          }
+        }
+
+        if (changeInfo.status === "complete") {
+          clientUtils.insertScript(tabId);
+        }
+      }
+    );
     clientContext.browser.tabs.onRemoved.addListener((tabId) => {
       if (!clientContext.clientTabs.has(tabId)) return;
       console.log("removed");
