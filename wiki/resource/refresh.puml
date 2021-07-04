@@ -1,0 +1,48 @@
+@startuml refresh
+
+actor User
+participant Popup
+participant "Other Tab"
+participant Tab
+participant Client
+participant Server
+participant "Other Client"
+
+
+User -> Popup: refresh
+Popup -> Client: joinRoom
+activate Client
+Client -> Server: joinRoom
+activate Server
+Client <-- Server: callback
+Client -> Server: changeVideoServer
+activate Server
+"Other Tab" <- Client: update
+Server -> "Other Client": changeVideoClient
+deactivate Server
+Tab <- Client: askState
+activate Tab
+Tab -> Client: sendState
+deactivate Tab
+Client -> Server: changeStateServer
+activate Server
+"Other Tab" <- Client: changeStateClient
+Tab <- Client: sendInfo
+Popup <- Client: sendInfo
+deactivate Client
+Server -> "Other Client": changeStateClient
+deactivate Server
+Server -> "Other Client": getUsers
+Client <- Server: getUsers
+activate Client
+Tab <- Client: sendInfo
+Popup <- Client: sendInfo
+"Other Tab" <- Client: sendInfo
+Popup <- Client: sendInfo
+deactivate Client
+...
+Client <- Server: changeVideoClient
+Client <- Server: changeStateClient
+deactivate Server
+
+@enduml

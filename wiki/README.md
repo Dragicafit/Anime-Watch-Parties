@@ -9,3 +9,5 @@
 ![leaveRoom](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Dragicafit/Anime-Watch-Parties/master/wiki/resource/leaveRoom.puml)
 
 ![syncClient](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Dragicafit/Anime-Watch-Parties/master/wiki/resource/syncClient.puml)
+
+![refresh](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Dragicafit/Anime-Watch-Parties/master/wiki/resource/refresh.puml)

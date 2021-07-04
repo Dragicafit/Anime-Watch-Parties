@@ -1,12 +1,15 @@
 @startuml joinRoom
 
+activate Client
 Client -> Server: joinRoom
 activate Server
 Client <-- Server: callback
+deactivate Client
 Server -> "Other Client": getUsers
-Client <-- Server: getUsers
-Client <-- Server: changeVideoClient
-Client <-- Server: changeStateClient
+Client <- Server: getUsers
+...
+Client <- Server: changeVideoClient
+Client <- Server: changeStateClient
 deactivate Server
 
 @enduml
