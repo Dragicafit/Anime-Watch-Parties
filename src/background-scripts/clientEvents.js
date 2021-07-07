@@ -53,14 +53,10 @@ class ClientEvent {
 
     for (let [tabId2, clientTab2] of this.clientContext.clientTabs.entries()) {
       if (clientTab2?.roomnum !== roomnum) continue;
+      if (tabId2 === tabId) continue;
 
       if (clientTab2.host) {
-        this.joinedRoom(
-          null,
-          { roomnum: roomnum, host: tabId2 == tabId },
-          tab,
-          tabId
-        );
+        this.joinedRoom(null, { roomnum: roomnum, host: false }, tab, tabId);
         return;
       }
     }
@@ -95,9 +91,13 @@ class ClientEvent {
         data.location,
         data.videoId
       );
+    } else if (data.host) {
+      this.clientSync.changeVideoServer(tab);
     }
     if (data.time != null && data.state != null) {
       this.changeStateClient(data.roomnum, data.time, data.state);
+    } else if (data.host) {
+      this.clientSync.askState(tabId);
     }
     if (data.onlineUsers != null) {
       this.getUsers(data.roomnum, data.onlineUsers);

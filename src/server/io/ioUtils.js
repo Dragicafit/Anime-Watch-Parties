@@ -57,7 +57,6 @@ class IoUtils {
     this.socketContext.socket.join(`room-${roomnum}`);
     this._configure(debugSocket, roomnum, callback, toCallback);
 
-    this.syncClient(debugSocket, roomnum, callback, toCallback);
     this.updateRoomUsers(debugSocket, roomnum, toCallback);
   }
 
@@ -81,6 +80,7 @@ class IoUtils {
 
     toCallback.roomnum = roomnum;
     toCallback.host = this.isHost(ioRoom);
+    this.syncClient(debugSocket, roomnum, callback, toCallback);
   }
 
   leaveRoom(debugSocket, roomnum) {

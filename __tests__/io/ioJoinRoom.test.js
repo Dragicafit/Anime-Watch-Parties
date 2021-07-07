@@ -293,10 +293,20 @@ it("Change room to same room", () => {
     roomnum: roomnum,
     host: true,
   });
+  expect(ioUtils.syncClient).toHaveBeenNthCalledWith(
+    1,
+    debugSocket,
+    roomnum,
+    callback,
+    {
+      roomnum: roomnum,
+      host: true,
+    }
+  );
 
   expect(debugSocket).toHaveBeenCalledTimes(2);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(ioUtils.syncClient).toHaveBeenCalledTimes(0);
+  expect(ioUtils.syncClient).toHaveBeenCalledTimes(1);
   expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(0);
   expect(performance.now).toHaveBeenCalledTimes(1);
 
