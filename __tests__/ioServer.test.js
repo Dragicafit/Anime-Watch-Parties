@@ -243,86 +243,138 @@ describe("test arguments", function () {
 
   describe("emit changeStateServer", () => {
     it("without data", (done) => {
-      socket.emit("changeStateServer");
-
-      done();
+      socket.emit("changeStateServer", (err, data) => {
+        expect(err).toBe("wrong input");
+        expect(data).toBeUndefined();
+        done();
+      });
     });
 
     it("state is null", (done) => {
-      socket.emit("changeStateServer", { state: null, time: 20 });
-
-      done();
+      socket.emit(
+        "changeStateServer",
+        { state: null, time: 20 },
+        (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          done();
+        }
+      );
     });
 
     it("time is null", (done) => {
-      socket.emit("changeStateServer", { state: true, time: null });
-
-      done();
+      socket.emit(
+        "changeStateServer",
+        { state: true, time: null },
+        (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          done();
+        }
+      );
     });
 
     it("time is null", (done) => {
-      socket.emit("changeStateServer", {
-        state: true,
-        time: 2000000000000000000000000000000000000000000000000,
-      });
-
-      done();
+      socket.emit(
+        "changeStateServer",
+        {
+          state: true,
+          time: 2000000000000000000000000000000000000000000000000,
+        },
+        (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          done();
+        }
+      );
     });
 
     it("time is null", (done) => {
-      socket.emit("changeStateServer", { state: true, time: 20 });
-
-      done();
+      socket.emit(
+        "changeStateServer",
+        { state: true, time: 20 },
+        (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          done();
+        }
+      );
     });
   });
 
   describe("emit changeVideoServer", () => {
     it("emit changeVideoServer", (done) => {
-      socket.emit("changeVideoServer", {
-        videoId: "videoId",
-        site: "wakanim",
-        location: "fr",
-      });
-
-      done();
+      socket.emit(
+        "changeVideoServer",
+        {
+          videoId: "videoId",
+          site: "wakanim",
+          location: "fr",
+        },
+        (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          done();
+        }
+      );
     });
 
     it("emit changeVideoServer", (done) => {
-      socket.emit("changeVideoServer", {
-        videoId: "videoId",
-        site: "wakanim",
-        location: "fr",
-      });
-
-      done();
+      socket.emit(
+        "changeVideoServer",
+        {
+          videoId: "videoId",
+          site: "wakanim",
+          location: "fr",
+        },
+        (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          done();
+        }
+      );
     });
 
     it("emit changeVideoServer", (done) => {
-      socket.emit("changeVideoServer", {
-        videoId: "videoId",
-        site: "wakanim",
-        location: "fr",
-      });
-
-      done();
+      socket.emit(
+        "changeVideoServer",
+        {
+          videoId: "videoId",
+          site: "wakanim",
+          location: "fr",
+        },
+        (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          done();
+        }
+      );
     });
 
     it("emit changeVideoServer", (done) => {
-      socket.emit("changeVideoServer", {
-        videoId: "videoId",
-        site: "wakanim",
-        location: "fr",
-      });
-
-      done();
+      socket.emit(
+        "changeVideoServer",
+        {
+          videoId: "videoId",
+          site: "wakanim",
+          location: "fr",
+        },
+        (err, data) => {
+          expect(err).toBe("wrong input");
+          expect(data).toBeUndefined();
+          done();
+        }
+      );
     });
   });
 
   describe("emit syncClient", () => {
     it("emit syncClient", (done) => {
-      socket.emit("syncClient");
-
-      done();
+      socket.emit("syncClient", (err, data) => {
+        expect(err).toBe("wrong input");
+        expect(data).toBeUndefined();
+        done();
+      });
     });
   });
 });
@@ -365,6 +417,9 @@ describe("test connection", function () {
           expect(data).toEqual({
             host: true,
             roomnum: "roomnum",
+            onlineUsers: 1,
+            state: false,
+            time: 0,
           });
           resolve();
         })
@@ -375,10 +430,16 @@ describe("test connection", function () {
     });
 
     it("get online users", () => {
-      socket.emit("joinRoom", { roomnum: "roomnum" });
       return new Promise((resolve) => {
-        socket.on("getUsers", function (data) {
-          expect(data.onlineUsers).toBe(1);
+        socket.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
+          expect(err).toBeNull();
+          expect(data).toEqual({
+            host: true,
+            roomnum: "roomnum",
+            onlineUsers: 1,
+            state: false,
+            time: 0,
+          });
           resolve();
         });
       });
@@ -442,6 +503,9 @@ describe("test connection", function () {
             expect(data).toEqual({
               host: true,
               roomnum: "roomnum",
+              onlineUsers: 1,
+              state: false,
+              time: 0,
             });
             resolve();
           })
@@ -452,6 +516,9 @@ describe("test connection", function () {
             expect(data).toEqual({
               host: false,
               roomnum: "roomnum",
+              onlineUsers: 2,
+              state: false,
+              time: 0,
             });
             resolve();
           })
@@ -463,17 +530,36 @@ describe("test connection", function () {
     });
 
     it("get online users", () => {
-      socket1.emit("joinRoom", { roomnum: "roomnum" });
-      socket2.emit("joinRoom", { roomnum: "roomnum" });
       return Promise.all([
+        new Promise((resolve) =>
+          socket1.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
+            expect(err).toBeNull();
+            expect(data).toEqual({
+              host: true,
+              roomnum: "roomnum",
+              onlineUsers: 1,
+              state: false,
+              time: 0,
+            });
+            resolve();
+          })
+        ),
+
+        new Promise((resolve) =>
+          socket2.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
+            expect(err).toBeNull();
+            expect(data).toEqual({
+              host: false,
+              roomnum: "roomnum",
+              onlineUsers: 2,
+              state: false,
+              time: 0,
+            });
+            resolve();
+          })
+        ),
         new Promise((resolve) => {
           socket1.on("getUsers", function (data) {
-            expect(data.onlineUsers).toBe(1);
-            resolve();
-          });
-        }),
-        new Promise((resolve) => {
-          socket2.on("getUsers", function (data) {
             expect(data.onlineUsers).toBe(2);
             resolve();
           });

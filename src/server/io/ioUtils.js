@@ -12,7 +12,7 @@ class IoUtils {
     this.socketContext = socketContext;
   }
 
-  syncClient(debugSocket, roomnum, callback) {
+  syncClient(debugSocket, roomnum, callback, toCallback = {}) {
     let ioRoom = this.getIoRoomIfIn(roomnum);
     if (ioRoom == null) {
       debugSocket("socket is not connected to room");
@@ -22,31 +22,32 @@ class IoUtils {
 
     if (ioRoom.isVideoDefined()) {
       debugSocket("change video client");
-      this.socketContext.socket.emit("changeVideoClient", ioRoom.videoObject);
+      Object.assign(toCallback, ioRoom.videoObject);
     }
     if (ioRoom.isStateDefined()) {
       debugSocket("change state client");
-      this.socketContext.socket.emit("changeStateClient", ioRoom.stateObject);
+      Object.assign(toCallback, ioRoom.stateObject);
     }
   }
 
-  updateRoomUsers(debugSocket, roomnum) {
+  updateRoomUsers(debugSocket, roomnum, toCallback = {}) {
     let room = this.getRoom(roomnum);
     if (room == null) {
       return debugSocket(`room-${roomnum} has been deleted`);
     }
     debugSocket(`applied to room-${roomnum}`);
 
-    this.socketContext.io.sockets.to(`room-${roomnum}`).emit("getUsers", {
+    this.socketContext.socket.to(`room-${roomnum}`).emit("getUsers", {
       roomnum: roomnum,
       onlineUsers: room.size,
     });
+    toCallback.onlineUsers = room.size;
   }
 
-  joinRoom(debugSocket, roomnum, callback) {
+  joinRoom(debugSocket, roomnum, callback, toCallback = {}) {
     let oldRoomnums = this.roomnums;
     if (oldRoomnums.includes(roomnum)) {
-      return this._configure(debugSocket, roomnum, callback);
+      return this._configure(debugSocket, roomnum, callback, toCallback);
     }
     if (oldRoomnums.length >= 10) {
       debugSocket("too many rooms joined");
@@ -54,15 +55,13 @@ class IoUtils {
     }
 
     this.socketContext.socket.join(`room-${roomnum}`);
-    this._configure(debugSocket, roomnum, callback);
+    this._configure(debugSocket, roomnum, callback, toCallback);
 
-    setTimeout(() => {
-      this.syncClient(debugSocket, roomnum, () => {});
-    }, 1000);
-    this.updateRoomUsers(debugSocket, roomnum);
+    this.syncClient(debugSocket, roomnum, callback, toCallback);
+    this.updateRoomUsers(debugSocket, roomnum, toCallback);
   }
 
-  _configure(debugSocket, roomnum, callback) {
+  _configure(debugSocket, roomnum, callback, toCallback = {}) {
     debugSocket(`connected to room-${roomnum}`);
 
     let room = this.getRoom(roomnum);
@@ -80,10 +79,8 @@ class IoUtils {
       ioRoom.host = this.socketContext.socket.id;
     }
 
-    callback(null, {
-      roomnum: roomnum,
-      host: this.isHost(ioRoom),
-    });
+    toCallback.roomnum = roomnum;
+    toCallback.host = this.isHost(ioRoom);
   }
 
   leaveRoom(debugSocket, roomnum) {

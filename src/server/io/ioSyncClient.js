@@ -12,7 +12,9 @@ module.exports = {
         return callback("wrong input");
       }
 
-      ioUtils.syncClient(debugSocket, roomnum, callback);
+      let toCallback = {};
+      ioUtils.syncClient(debugSocket, roomnum, callback, toCallback);
+      callback(null, toCallback);
     });
   },
 };

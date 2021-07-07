@@ -45,10 +45,11 @@ beforeEach((done) => {
 it("Valid", () => {
   leaveRoom(debugSocket, roomnum, callback);
 
+  expect(callback).toHaveBeenNthCalledWith(1, null, {});
   expect(ioUtils.leaveRoom).toHaveBeenNthCalledWith(1, debugSocket, roomnum);
 
   expect(debugSocket).toHaveBeenCalledTimes(0);
-  expect(callback).toHaveBeenCalledTimes(0);
+  expect(callback).toHaveBeenCalledTimes(1);
   expect(ioUtils.leaveRoom).toHaveBeenCalledTimes(1);
 });
 

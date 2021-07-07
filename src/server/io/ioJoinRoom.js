@@ -12,7 +12,9 @@ module.exports = {
         return callback("wrong input");
       }
 
-      ioUtils.joinRoom(debugSocket, roomnum, callback);
+      let toCallback = {};
+      ioUtils.joinRoom(debugSocket, roomnum, callback, toCallback);
+      callback(null, toCallback);
     });
   },
 };

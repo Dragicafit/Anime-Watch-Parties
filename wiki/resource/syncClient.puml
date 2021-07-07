@@ -1,9 +1,9 @@
 @startuml syncClient
 
+activate Client
 Client -> Server: syncClient
 activate Server
-Client <- Server: changeVideoClient
-Client <- Server: changeStateClient
+Client <-- Server: callback
 deactivate Server
 
 @enduml

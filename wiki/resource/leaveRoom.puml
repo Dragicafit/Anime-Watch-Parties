@@ -1,8 +1,10 @@
 @startuml leaveRoom
 
+activate Client
 Client -> Server: leaveRoom
 activate Server
 Server -> "Other Client": getUsers
+Client <-- Server: callback
 deactivate Server
 
 @enduml

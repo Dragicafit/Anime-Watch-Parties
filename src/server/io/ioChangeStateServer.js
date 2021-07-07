@@ -37,6 +37,8 @@ module.exports = {
         socketContext.socket
           .to(`room-${roomnum}`)
           .emit("changeStateClient", ioRoom.stateObject);
+
+        callback(null, {});
       }
     );
   },

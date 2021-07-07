@@ -85,10 +85,11 @@ it.each([
     state: state,
   });
   expect(debugSocket).toHaveBeenNthCalledWith(1, `applied to room-${roomnum}`);
+  expect(callback).toHaveBeenNthCalledWith(1, null, {});
 
   expect(emit).toHaveBeenCalledTimes(1);
   expect(debugSocket).toHaveBeenCalledTimes(1);
-  expect(callback).toHaveBeenCalledTimes(0);
+  expect(callback).toHaveBeenCalledTimes(1);
   expect(performance.now).toHaveBeenCalledTimes(2 + state);
 
   expect(ioUtils.getRoom(roomnum)).toMatchObject({

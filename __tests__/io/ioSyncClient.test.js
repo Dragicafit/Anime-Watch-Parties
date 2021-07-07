@@ -45,15 +45,17 @@ beforeEach((done) => {
 it("Valid", () => {
   syncClient(debugSocket, roomnum, callback);
 
+  expect(callback).toHaveBeenNthCalledWith(1, null, {});
   expect(ioUtils.syncClient).toHaveBeenNthCalledWith(
     1,
     debugSocket,
     roomnum,
-    callback
+    callback,
+    {}
   );
 
   expect(debugSocket).toHaveBeenCalledTimes(0);
-  expect(callback).toHaveBeenCalledTimes(0);
+  expect(callback).toHaveBeenCalledTimes(1);
   expect(ioUtils.syncClient).toHaveBeenCalledTimes(1);
 });
 

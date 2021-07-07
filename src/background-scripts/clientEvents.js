@@ -88,10 +88,23 @@ class ClientEvent {
     clientTab.roomnum = data.roomnum;
     clientTab.host = data.host;
 
+    if (data.videoId != null) {
+      this.changeVideoClient(
+        data.roomnum,
+        data.site,
+        data.location,
+        data.videoId
+      );
+    }
+    if (data.time != null && data.state != null) {
+      this.changeStateClient(data.roomnum, data.time, data.state);
+    }
+    if (data.onlineUsers != null) {
+      this.getUsers(data.roomnum, data.onlineUsers);
+    }
+
     if (clientTab.host) {
       console.log("You are the new host!");
-      this.clientSync.changeVideoServer(tab, clientTab);
-      this.clientSync.askState(tabId);
     } else {
       this.clientSync.startEmbed(tabId);
     }

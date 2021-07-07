@@ -101,9 +101,32 @@ class ClientSync {
   syncClient(tabId, clientTab = this.clientContext.clientTabs.get(tabId)) {
     console.log("sync client");
 
-    this.clientContext.socket.emit("syncClient", {
-      roomnum: clientTab.roomnum,
-    });
+    this.clientContext.socket.emit(
+      "syncClient",
+      {
+        roomnum: clientTab.roomnum,
+      },
+      (err, data) => {
+        if (err) {
+          return console.log(err);
+        }
+        if (data.videoId != null) {
+          this.clientEvent.changeVideoClient(
+            data.roomnum,
+            data.site,
+            data.location,
+            data.videoId
+          );
+        }
+        if (data.time != null && data.state != null) {
+          this.clientEvent.changeStateClient(
+            data.roomnum,
+            data.time,
+            data.state
+          );
+        }
+      }
+    );
   }
 
   openPopupTwitch(tabId, roomnum) {

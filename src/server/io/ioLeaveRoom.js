@@ -13,6 +13,7 @@ module.exports = {
       }
 
       ioUtils.leaveRoom(debugSocket, roomnum);
+      callback(null, {});
     });
   },
 };

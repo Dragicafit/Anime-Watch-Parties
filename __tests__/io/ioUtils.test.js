@@ -65,16 +65,14 @@ describe("syncClient", () => {
   });
 
   it("sync state and video and state is true", () => {
-    ioUtils.syncClient(debugSocket, roomnum, callback);
+    let toCallback = {};
+    ioUtils.syncClient(debugSocket, roomnum, callback, toCallback);
 
-    expect(emit).toHaveBeenNthCalledWith(1, "changeVideoClient", {
+    expect(toCallback).toEqual({
       roomnum: roomnum,
       site: undefined,
       videoId: "videoId",
       location: undefined,
-    });
-    expect(emit).toHaveBeenNthCalledWith(2, "changeStateClient", {
-      roomnum: roomnum,
       time: 0.003,
       state: true,
     });
@@ -85,7 +83,7 @@ describe("syncClient", () => {
     expect(debugSocket).toHaveBeenNthCalledWith(2, "change video client");
     expect(debugSocket).toHaveBeenNthCalledWith(3, "change state client");
 
-    expect(emit).toHaveBeenCalledTimes(2);
+    expect(emit).toHaveBeenCalledTimes(0);
     expect(debugSocket).toHaveBeenCalledTimes(3);
     expect(performance.now).toHaveBeenCalledTimes(2);
     expect(callback).toHaveBeenCalledTimes(0);
@@ -105,16 +103,14 @@ describe("syncClient", () => {
 
   it("sync state and video and state is false", () => {
     ioUtils.getIoRoom(roomnum).state = false;
-    ioUtils.syncClient(debugSocket, roomnum, callback);
+    let toCallback = {};
+    ioUtils.syncClient(debugSocket, roomnum, callback, toCallback);
 
-    expect(emit).toHaveBeenNthCalledWith(1, "changeVideoClient", {
+    expect(toCallback).toStrictEqual({
       roomnum: roomnum,
       site: undefined,
       videoId: "videoId",
       location: undefined,
-    });
-    expect(emit).toHaveBeenNthCalledWith(2, "changeStateClient", {
-      roomnum: roomnum,
       time: 0,
       state: false,
     });
@@ -125,7 +121,7 @@ describe("syncClient", () => {
     expect(debugSocket).toHaveBeenNthCalledWith(2, "change video client");
     expect(debugSocket).toHaveBeenNthCalledWith(3, "change state client");
 
-    expect(emit).toHaveBeenCalledTimes(2);
+    expect(emit).toHaveBeenCalledTimes(0);
     expect(debugSocket).toHaveBeenCalledTimes(3);
     expect(performance.now).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledTimes(0);
@@ -145,9 +141,10 @@ describe("syncClient", () => {
 
   it("sync state", () => {
     ioUtils.getIoRoom(roomnum).currVideo = undefined;
-    ioUtils.syncClient(debugSocket, roomnum, callback);
+    let toCallback = {};
+    ioUtils.syncClient(debugSocket, roomnum, callback, toCallback);
 
-    expect(emit).toHaveBeenNthCalledWith(1, "changeStateClient", {
+    expect(toCallback).toStrictEqual({
       roomnum: roomnum,
       time: 0.003,
       state: true,
@@ -158,7 +155,7 @@ describe("syncClient", () => {
     );
     expect(debugSocket).toHaveBeenNthCalledWith(2, "change state client");
 
-    expect(emit).toHaveBeenCalledTimes(1);
+    expect(emit).toHaveBeenCalledTimes(0);
     expect(debugSocket).toHaveBeenCalledTimes(2);
     expect(callback).toHaveBeenCalledTimes(0);
     expect(performance.now).toHaveBeenCalledTimes(2);
@@ -180,9 +177,10 @@ describe("syncClient", () => {
     ioUtils.getIoRoom(roomnum).currTime = undefined;
     ioUtils.getIoRoom(roomnum).state = undefined;
     ioUtils.getIoRoom(roomnum).lastChange = undefined;
-    ioUtils.syncClient(debugSocket, roomnum, callback);
+    let toCallback = {};
+    ioUtils.syncClient(debugSocket, roomnum, callback, toCallback);
 
-    expect(emit).toHaveBeenNthCalledWith(1, "changeVideoClient", {
+    expect(toCallback).toStrictEqual({
       roomnum: roomnum,
       site: undefined,
       videoId: "videoId",
@@ -194,7 +192,7 @@ describe("syncClient", () => {
     );
     expect(debugSocket).toHaveBeenNthCalledWith(2, "change video client");
 
-    expect(emit).toHaveBeenCalledTimes(1);
+    expect(emit).toHaveBeenCalledTimes(0);
     expect(debugSocket).toHaveBeenCalledTimes(2);
     expect(performance.now).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledTimes(0);
@@ -251,7 +249,7 @@ describe("syncClient", () => {
 
 describe("updateRoomUsers", () => {
   beforeEach(() => {
-    io.sockets.to = (roomKey) => {
+    socket.to = (roomKey) => {
       if (roomKey === `room-${roomnum}`) {
         return { emit: emit };
       }

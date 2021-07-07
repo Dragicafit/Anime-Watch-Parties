@@ -1,8 +1,10 @@
 @startuml changeVideoServer
 
+activate Client
 Client -> Server: changeVideoServer
 activate Server
 Server -> "Other Client": changeVideoClient
+Client <-- Server : callback
 deactivate Server
 
 @enduml

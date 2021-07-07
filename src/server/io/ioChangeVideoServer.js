@@ -48,6 +48,8 @@ module.exports = {
         socketContext.socket
           .to(`room-${roomnum}`)
           .emit("changeVideoClient", ioRoom.videoObject);
+
+        callback(null, {});
       }
     );
   },

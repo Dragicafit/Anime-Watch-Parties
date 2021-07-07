@@ -65,22 +65,30 @@ it.each(["r", "roomnum_", Array(31).join("x")])(
     expect(callback).toHaveBeenNthCalledWith(1, null, {
       roomnum: roomnum,
       host: true,
-    }); /*
+    });
     expect(ioUtils.syncClient).toHaveBeenNthCalledWith(
       1,
       debugSocket,
       roomnum,
-      callback
-    );*/
+      callback,
+      {
+        roomnum: roomnum,
+        host: true,
+      }
+    );
     expect(ioUtils.updateRoomUsers).toHaveBeenNthCalledWith(
       1,
       expect.any(Function),
-      roomnum
+      roomnum,
+      {
+        roomnum: roomnum,
+        host: true,
+      }
     );
 
     expect(debugSocket).toHaveBeenCalledTimes(3);
     expect(callback).toHaveBeenCalledTimes(1);
-    expect(ioUtils.syncClient).toHaveBeenCalledTimes(0);
+    expect(ioUtils.syncClient).toHaveBeenCalledTimes(1);
     expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(1);
     expect(performance.now).toHaveBeenCalledTimes(1);
 
@@ -114,15 +122,29 @@ it("Join new room but almost too many rooms joined", () => {
     roomnum: roomnum,
     host: true,
   });
+  expect(ioUtils.syncClient).toHaveBeenNthCalledWith(
+    1,
+    debugSocket,
+    roomnum,
+    callback,
+    {
+      roomnum: roomnum,
+      host: true,
+    }
+  );
   expect(ioUtils.updateRoomUsers).toHaveBeenNthCalledWith(
     1,
     expect.any(Function),
-    roomnum
+    roomnum,
+    {
+      roomnum: roomnum,
+      host: true,
+    }
   );
 
   expect(debugSocket).toHaveBeenCalledTimes(3);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(ioUtils.syncClient).toHaveBeenCalledTimes(0);
+  expect(ioUtils.syncClient).toHaveBeenCalledTimes(1);
   expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(1);
   expect(performance.now).toHaveBeenCalledTimes(1);
 
@@ -146,9 +168,10 @@ it("Join new room but too many rooms joined", () => {
 
   expect(debugSocket).toHaveBeenNthCalledWith(1, "too many rooms joined");
   expect(callback).toHaveBeenNthCalledWith(1, "access denied");
+  expect(callback).toHaveBeenNthCalledWith(2, null, {});
 
   expect(debugSocket).toHaveBeenCalledTimes(1);
-  expect(callback).toHaveBeenCalledTimes(1);
+  expect(callback).toHaveBeenCalledTimes(2);
   expect(ioUtils.syncClient).toHaveBeenCalledTimes(0);
   expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(0);
   expect(performance.now).toHaveBeenCalledTimes(0);
@@ -176,15 +199,29 @@ it("Join existing room", (done) => {
         roomnum: roomnum,
         host: true,
       });
+      expect(ioUtils.syncClient).toHaveBeenNthCalledWith(
+        1,
+        debugSocket,
+        roomnum,
+        callback,
+        {
+          roomnum: roomnum,
+          host: true,
+        }
+      );
       expect(ioUtils.updateRoomUsers).toHaveBeenNthCalledWith(
         1,
         expect.any(Function),
-        roomnum
+        roomnum,
+        {
+          roomnum: roomnum,
+          host: true,
+        }
       );
 
       expect(debugSocket).toHaveBeenCalledTimes(3);
       expect(callback).toHaveBeenCalledTimes(1);
-      expect(ioUtils.syncClient).toHaveBeenCalledTimes(0);
+      expect(ioUtils.syncClient).toHaveBeenCalledTimes(1);
       expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(1);
       expect(performance.now).toHaveBeenCalledTimes(1);
 
@@ -218,9 +255,10 @@ it("Join existing room but too many rooms joined", (done) => {
 
       expect(debugSocket).toHaveBeenNthCalledWith(1, "too many rooms joined");
       expect(callback).toHaveBeenNthCalledWith(1, "access denied");
+      expect(callback).toHaveBeenNthCalledWith(2, null, {});
 
       expect(debugSocket).toHaveBeenCalledTimes(1);
-      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledTimes(2);
       expect(ioUtils.syncClient).toHaveBeenCalledTimes(0);
       expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(0);
       expect(performance.now).toHaveBeenCalledTimes(1);
@@ -319,15 +357,26 @@ it("With error", () => {
     host: true,
     roomnum: roomnum,
   });
+  expect(ioUtils.syncClient).toHaveBeenNthCalledWith(
+    1,
+    debugSocket,
+    roomnum,
+    callback,
+    {
+      roomnum: roomnum,
+      host: true,
+    }
+  );
   expect(ioUtils.updateRoomUsers).toHaveBeenNthCalledWith(
     1,
     expect.any(Function),
-    roomnum
+    roomnum,
+    { host: true, roomnum: "roomnum" }
   );
 
   expect(debugSocket).toHaveBeenCalledTimes(3);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(ioUtils.syncClient).toHaveBeenCalledTimes(0);
+  expect(ioUtils.syncClient).toHaveBeenCalledTimes(1);
   expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(1);
   expect(performance.now).toHaveBeenCalledTimes(1);
 
@@ -361,9 +410,10 @@ it("With error, same room", () => {
     "room is null (error socket.io)"
   );
   expect(callback).toHaveBeenNthCalledWith(1, "error server");
+  expect(callback).toHaveBeenNthCalledWith(2, null, {});
 
   expect(debugSocket).toHaveBeenCalledTimes(2);
-  expect(callback).toHaveBeenCalledTimes(1);
+  expect(callback).toHaveBeenCalledTimes(2);
   expect(ioUtils.syncClient).toHaveBeenCalledTimes(0);
   expect(ioUtils.updateRoomUsers).toHaveBeenCalledTimes(0);
   expect(performance.now).toHaveBeenCalledTimes(0);
