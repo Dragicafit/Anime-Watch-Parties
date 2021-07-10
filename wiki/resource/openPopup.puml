@@ -1,0 +1,31 @@
+@startuml openPopup
+
+actor User
+participant Popup
+participant Tab
+participant Client
+
+User -> Popup: open
+activate Popup
+Popup -> Client: insertScript
+deactivate Popup
+activate Client
+Client -> Tab: executeScript
+deactivate Client
+activate Tab
+Tab -> Client: scriptLoaded
+activate Client
+Tab -> Popup: scriptLoaded
+deactivate Tab
+activate Popup
+Tab <- Client: sendInfo
+Popup <- Client: sendInfo
+deactivate Client
+Popup -> Client: askInfo
+deactivate Popup
+activate Client
+Tab <- Client: sendInfo
+Popup <- Client: sendInfo
+deactivate Client
+
+@enduml

@@ -39,11 +39,12 @@ class ClientEvent {
   scriptLoaded(tabId) {
     console.log("script loaded");
 
-    if (!this.clientContext.clientTabs.has(tabId))
+    if (!this.clientContext.clientTabs.has(tabId)) {
       this.clientContext.clientTabs.set(
         tabId,
         new ClientTab(this.clientContext)
       );
+  }
 
     this.askInfo(tabId);
   }
