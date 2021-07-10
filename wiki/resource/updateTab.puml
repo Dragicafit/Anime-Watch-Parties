@@ -1,0 +1,66 @@
+@startuml updateTab
+
+actor User
+participant Popup
+participant "Other Tab"
+participant Tab
+participant Client
+participant Server
+participant "Other Client"
+
+User -> Tab: update
+activate Tab
+Tab -> Client: onUpdated
+deactivate Tab
+activate Client
+Client -> Server: changeVideoServer
+activate Server
+"Other Tab" <- Client: update
+activate "Other Tab"
+Client -> Tab: executeScript
+activate Tab
+Server -> "Other Client": changeVideoClient
+Client <-- Server : callback
+deactivate Server
+deactivate Client
+Tab -> Client: scriptLoaded
+activate Client
+Tab -> Popup: scriptLoaded
+deactivate Tab
+activate Popup
+Tab <- Client: sendInfo
+Popup <- Client: sendInfo
+deactivate Client
+Popup -> Client: askInfo
+deactivate Popup
+activate Client
+Tab <- Client: sendInfo
+Popup <- Client: sendInfo
+deactivate Client
+"Other Tab" -> Client: onUpdated
+deactivate "Other Tab"
+activate Client
+Client -> Server: syncClient
+activate Server
+Client -> "Other Tab": executeScript
+activate "Other Tab"
+Client <-- Server: callback
+deactivate Server
+"Other Tab" <- Client: changeStateClient
+deactivate Client
+"Other Tab" -> Client: scriptLoaded
+activate Client
+"Other Tab" -> Popup: scriptLoaded
+deactivate "Other Tab"
+activate Popup
+"Other Tab" <- Client: sendInfo
+Popup <- Client: sendInfo
+deactivate Client
+Popup -> Client: askInfo
+deactivate Popup
+activate Client
+"Other Tab" <- Client: sendInfo
+Popup <- Client: sendInfo
+deactivate Client
+
+@enduml
