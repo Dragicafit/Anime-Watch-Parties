@@ -1,21 +1,37 @@
 "use strict";
 
-class awpPlayerInterface {
-  onPlay() {}
+class AwpPlayerInterface {
+  onPlay() {
+    // interface
+  }
 
-  onPause() {}
+  onPause() {
+    // interface
+  }
 
-  onSeek() {}
+  onSeek() {
+    // interface
+  }
 
-  getTime() {}
+  getTime() {
+    // interface
+  }
 
-  isPlay() {}
+  isPlay() {
+    // interface
+  }
 
-  seekTo(time) {}
+  seekTo(time) {
+    // interface
+  }
 
-  setState(state) {}
+  setState(state) {
+    // interface
+  }
 
-  playerExist() {}
+  playerExist() {
+    // interface
+  }
 }
 
-exports.awpPlayerInterface = awpPlayerInterface;
+exports.AwpPlayerInterface = AwpPlayerInterface;

@@ -497,7 +497,7 @@ describe("test connection", function () {
 
     it("simple connection", () => {
       return Promise.all([
-        new Promise((resolve) =>
+        new Promise((resolve) => {
           socket1.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
             expect(err).toBeNull();
             expect(data).toEqual({
@@ -508,9 +508,9 @@ describe("test connection", function () {
               time: 0,
             });
             resolve();
-          })
-        ),
-        new Promise((resolve) =>
+          });
+        }),
+        new Promise((resolve) => {
           socket2.emit("joinRoom", { roomnum: "roomnum" }, (err, data) => {
             expect(err).toBeNull();
             expect(data).toEqual({
@@ -521,8 +521,8 @@ describe("test connection", function () {
               time: 0,
             });
             resolve();
-          })
-        ),
+          });
+        }),
       ]).then(() => {
         expect(io.sockets.adapter.rooms.get(`room-roomnum`)).toBeDefined();
         expect(io.sockets.adapter.rooms.get(`room-roomnum`).size).toBe(2);

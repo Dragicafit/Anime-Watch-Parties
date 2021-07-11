@@ -35,7 +35,9 @@ module.exports = {
         return callback("data is not valid");
       }
       if (typeof callback !== "function") {
-        callback = () => {};
+        callback = () => {
+          // create empty callback
+        };
       }
       switch (event) {
         case JOIN_ROOM:

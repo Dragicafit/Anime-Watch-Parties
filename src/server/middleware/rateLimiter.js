@@ -2,7 +2,7 @@
 
 const debug = require("debug")("rateLimiterServerAWP");
 const { Express } = require("express");
-const { Server: ioServer } = require("socket.io");
+const { Server: IoServer } = require("socket.io");
 const { RedisClient } = require("redis");
 const {
   RateLimiterRedis,
@@ -10,7 +10,7 @@ const {
 } = require("rate-limiter-flexible");
 
 module.exports = {
-  /** @param {Express} app @param {ioServer} io @param {RedisClient} redisClient */
+  /** @param {Express} app @param {IoServer} io @param {RedisClient} redisClient */
   start: function (app, io, redisClient) {
     const rateLimiter = new BurstyRateLimiter(
       new RateLimiterRedis({

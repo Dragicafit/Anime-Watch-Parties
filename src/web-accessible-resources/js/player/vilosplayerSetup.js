@@ -2,9 +2,9 @@
 
 const { TabContext } = require("../tabContext");
 const { TabSync } = require("../tabSync");
-const { awpplayerSetup } = require("./awpplayerSetup");
+const { AwpplayerSetup } = require("./awpplayerSetup");
 
-class vilosplayerSetup extends awpplayerSetup {
+class VilosplayerSetup extends AwpplayerSetup {
   /** @type {Number} */
   #previousSeek;
   /** @type {Map<String,Number>} */
@@ -100,4 +100,4 @@ class vilosplayerSetup extends awpplayerSetup {
   }
 }
 
-exports.vilosplayerSetup = vilosplayerSetup;
+exports.VilosplayerSetup = VilosplayerSetup;

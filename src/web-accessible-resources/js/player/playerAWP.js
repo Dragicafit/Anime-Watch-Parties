@@ -1,24 +1,24 @@
 "use strict";
 
-const { awpPlayerInterface } = require("./awpPlayerInterface");
-const { awpplayerSetup } = require("./awpplayerSetup");
-const { jwplayerSetup } = require("./jwplayerSetup");
-const { vilosplayerSetup } = require("./vilosplayerSetup");
+const { AwpPlayerInterface } = require("./awpPlayerInterface");
+const { AwpplayerSetup } = require("./awpplayerSetup");
+const { JwplayerSetup } = require("./jwplayerSetup");
+const { VilosplayerSetup } = require("./vilosplayerSetup");
 
-class PlayerAWP extends awpPlayerInterface {
-  /** @type {jwplayerSetup} */
+class PlayerAWP extends AwpPlayerInterface {
+  /** @type {JwplayerSetup} */
   #jwplayer;
-  /**  @type {vilosplayerSetup} */
+  /**  @type {VilosplayerSetup} */
   #vilosplayer;
 
-  /** @param {jwplayerSetup} jwplayer @param {vilosplayerSetup} vilosplayer */
+  /** @param {JwplayerSetup} jwplayer @param {VilosplayerSetup} vilosplayer */
   constructor(jwplayer, vilosplayer) {
     super();
     this.#jwplayer = jwplayer;
     this.#vilosplayer = vilosplayer;
   }
 
-  /** @type {awpplayerSetup} */
+  /** @type {AwpplayerSetup} */
   get awpplayer() {
     if (this.#jwplayer?.playerExist()) {
       return this.#jwplayer;

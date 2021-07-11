@@ -1,7 +1,7 @@
 "use strict";
 
 const debug = require("debug")("ioServerAWP");
-const { Server: ioServer, Socket } = require("socket.io");
+const { Server: IoServer, Socket } = require("socket.io");
 const performance = require("perf_hooks").performance;
 const filterInput = require("./middleware/filterInput");
 const ioDisconnecting = require("./io/ioDisconnecting");
@@ -20,7 +20,7 @@ const debugDisconnecting = debug.extend("disconnecting");
 const supportedEvents = filterInput.supportedEvents;
 
 module.exports = {
-  /** @param {ioServer} io */
+  /** @param {IoServer} io */
   start: function (io) {
     IoRoom.ioContext = new IoContext(io, performance);
 
@@ -45,7 +45,7 @@ module.exports = {
       }
     );
   },
-  /** @param {ioServer} io */
+  /** @param {IoServer} io */
   close: function (io) {
     return new Promise((resolve) => io.close(resolve));
   },

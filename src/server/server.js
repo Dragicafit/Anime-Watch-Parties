@@ -13,8 +13,8 @@ const server = require("https").createServer(
   },
   app
 );
-const { Server: ioServer } = require("socket.io");
-const io = new ioServer(server, {
+const { Server: IoServer } = require("socket.io");
+const io = new IoServer(server, {
   perMessageDeflate: false,
   cors: {
     origin: process.env.EXTENSION_IDS.split(",").map((extensionId) =>

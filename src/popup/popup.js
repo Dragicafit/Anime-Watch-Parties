@@ -24,7 +24,6 @@ function chat() {
       }
       if (!nosymbols.test(value)) {
         this.setCustomValidity("0-9, a-Z and _ only");
-        return;
       }
     }
 

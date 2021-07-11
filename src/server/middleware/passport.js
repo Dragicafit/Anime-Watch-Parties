@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const debug = require("debug")("passportServerAWP");
 const { Express } = require("express");
-const { Server: ioServer } = require("socket.io");
+const { Server: IoServer } = require("socket.io");
 const { RedisClient } = require("redis");
 const session = require("express-session");
 const RedisStore = require("connect-redis")(session);
@@ -18,7 +18,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET;
 const CALLBACK_URL = process.env.CALLBACK_URL;
 
 module.exports = {
-  /** @param {Express} app @param {ioServer} io @param {RedisClient} redisClient */
+  /** @param {Express} app @param {IoServer} io @param {RedisClient} redisClient */
   start: function (app, io, redisClient) {
     const passport = require("passport");
 

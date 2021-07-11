@@ -2,9 +2,9 @@
 
 const { TabContext } = require("../tabContext");
 const { TabSync } = require("../tabSync");
-const { awpplayerSetup } = require("./awpplayerSetup");
+const { AwpplayerSetup } = require("./awpplayerSetup");
 
-class jwplayerSetup extends awpplayerSetup {
+class JwplayerSetup extends AwpplayerSetup {
   /** @param {TabContext} tabContext @param {TabSync} tabSync */
   constructor(tabContext, tabSync) {
     super("jwplayer", tabContext, tabSync);
@@ -50,4 +50,4 @@ class jwplayerSetup extends awpplayerSetup {
   }
 }
 
-exports.jwplayerSetup = jwplayerSetup;
+exports.JwplayerSetup = JwplayerSetup;

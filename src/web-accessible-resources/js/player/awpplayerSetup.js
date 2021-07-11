@@ -2,9 +2,9 @@
 
 const { TabContext } = require("../tabContext");
 const { TabSync } = require("../tabSync");
-const { awpPlayerInterface } = require("./awpPlayerInterface");
+const { AwpPlayerInterface } = require("./awpPlayerInterface");
 
-class awpplayerSetup extends awpPlayerInterface {
+class AwpplayerSetup extends AwpPlayerInterface {
   /** @type {String} */
   name;
   /** @type {TabContext} */
@@ -21,9 +21,15 @@ class awpplayerSetup extends awpPlayerInterface {
     this._waitForExist();
   }
 
-  _onPlay(a) {}
-  _onPause(a) {}
-  _onSeek(a) {}
+  _onPlay(a) {
+    // abstract
+  }
+  _onPause(a) {
+    // abstract
+  }
+  _onSeek(a) {
+    // abstract
+  }
 
   onPlay() {
     this._onPlay((e) => {
@@ -69,13 +75,17 @@ class awpplayerSetup extends awpPlayerInterface {
     if (!this.playerExist()) return;
     this._seekTo(time);
   }
-  _seekTo(time) {}
+  _seekTo(time) {
+    // abstract
+  }
 
   setState(state) {
     if (!this.playerExist()) return;
     this._setState(state);
   }
-  _setState(state) {}
+  _setState(state) {
+    // abstract
+  }
 
   playerExist() {
     return false;
@@ -91,4 +101,4 @@ class awpplayerSetup extends awpPlayerInterface {
   }
 }
 
-exports.awpplayerSetup = awpplayerSetup;
+exports.AwpplayerSetup = AwpplayerSetup;

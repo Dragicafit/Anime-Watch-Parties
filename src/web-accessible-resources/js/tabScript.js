@@ -1,7 +1,7 @@
 "use strict";
 
-const { jwplayerSetup } = require("./player/jwplayerSetup");
-const { vilosplayerSetup } = require("./player/vilosplayerSetup");
+const { JwplayerSetup } = require("./player/jwplayerSetup");
+const { VilosplayerSetup } = require("./player/vilosplayerSetup");
 const $ = require("jquery");
 require("./jquery-ui-browserify")($);
 const { TabContext } = require("./tabContext");
@@ -12,7 +12,7 @@ const { TabRoom } = require("./tabRoom");
 const { TwitchEmbed } = require("./embed/twitchEmbed");
 const performance = require("perf_hooks").performance;
 const tabTransmission = require("./tabTransmission");
-const { PlayerAWP } = require("./player/PlayerAWP");
+const { PlayerAWP } = require("./player/playerAWP");
 
 let server = "https://localhost:4000";
 let streamerDelay = 0;
@@ -28,8 +28,8 @@ let tabContext = new TabContext(
 
 let tabSync = new TabSync(tabContext);
 tabContext.playerAWP = new PlayerAWP(
-  new jwplayerSetup(tabContext, tabSync),
-  new vilosplayerSetup(tabContext, tabSync)
+  new JwplayerSetup(tabContext, tabSync),
+  new VilosplayerSetup(tabContext, tabSync)
 );
 let tabUtils = new TabUtils(tabContext);
 let tabEvents = new TabEvents(tabContext, tabSync);

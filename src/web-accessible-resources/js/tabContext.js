@@ -1,6 +1,6 @@
 "use strict";
 
-const { PlayerAWP } = require("./player/PlayerAWP");
+const { PlayerAWP } = require("./player/playerAWP");
 const { TabRoom } = require("./tabRoom");
 
 class TabContext {
