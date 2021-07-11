@@ -8,7 +8,6 @@ participant Client
 participant Server
 participant "Other Client"
 
-
 User -> Popup: refresh
 Popup -> Client: joinRoom
 activate Client

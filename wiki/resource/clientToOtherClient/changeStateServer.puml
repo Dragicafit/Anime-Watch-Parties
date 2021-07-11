@@ -1,5 +1,9 @@
 @startuml changeStateServer
 
+participant Client
+participant Server
+participant "Other Client"
+
 activate Client
 Client -> Server: changeStateServer
 activate Server

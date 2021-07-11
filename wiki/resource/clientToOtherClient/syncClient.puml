@@ -1,5 +1,8 @@
 @startuml syncClient
 
+participant Client
+participant Server
+
 activate Client
 Client -> Server: syncClient
 activate Server

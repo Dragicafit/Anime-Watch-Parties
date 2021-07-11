@@ -1,5 +1,9 @@
 @startuml joinRoom
 
+participant Client
+participant Server
+participant "Other Client"
+
 activate Client
 Client -> Server: joinRoom
 activate Server
