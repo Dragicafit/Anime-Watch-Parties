@@ -15,14 +15,13 @@ deactivate Tab
 activate Client
 Client -> Server: changeVideoServer
 activate Server
+Server -> "Other Client": changeVideoClient
+deactivate Server
 "Other Tab" <- Client: update
 activate "Other Tab"
 Client -> Tab: executeScript
-activate Tab
-Server -> "Other Client": changeVideoClient
-Client <-- Server : callback
-deactivate Server
 deactivate Client
+activate Tab
 Tab -> Client: scriptLoaded
 activate Client
 Tab -> Popup: scriptLoaded
