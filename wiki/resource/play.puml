@@ -1,0 +1,22 @@
+@startuml play
+
+actor User
+participant "Other Tab"
+participant Tab
+participant Client
+participant Server
+
+User -> Tab: play
+activate Tab
+Tab -> Client: syncClient
+deactivate Tab
+activate Client
+Client -> Server: syncClient
+activate Server
+Client <-- Server : callback
+deactivate Server
+Tab <- Client: changeStateClient
+"Other Tab" <- Client: changeStateClient
+deactivate Client
+
+@enduml
