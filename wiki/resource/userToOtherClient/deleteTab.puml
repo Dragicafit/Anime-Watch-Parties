@@ -1,0 +1,20 @@
+@startuml updateTab
+
+actor User
+participant Tab
+participant Client
+participant Server
+participant "Other Client"
+
+User -> Tab: delete
+activate Tab
+Tab -> Client: onRemove
+deactivate Tab
+activate Client
+Client -> Server: leaveRoom
+deactivate Client
+activate Server
+Server -> "Other Client": getUsers
+deactivate Server
+
+@enduml

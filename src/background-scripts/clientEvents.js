@@ -44,7 +44,7 @@ class ClientEvent {
         tabId,
         new ClientTab(this.clientContext)
       );
-  }
+    }
 
     this.askInfo(tabId);
   }
@@ -52,15 +52,15 @@ class ClientEvent {
   joinRoom(tab, tabId, roomnum) {
     console.log(`join room`);
 
-    for (let [tabId2, clientTab2] of this.clientContext.clientTabs.entries()) {
-      if (clientTab2?.roomnum !== roomnum) continue;
-      if (tabId2 === tabId) continue;
+    // for (let [tabId2, clientTab2] of this.clientContext.clientTabs.entries()) {
+    //   if (clientTab2?.roomnum !== roomnum) continue;
+    //   if (tabId2 === tabId) continue;
 
-      if (clientTab2.host) {
-        this.joinedRoom(null, { roomnum: roomnum, host: false }, tab, tabId);
-        return;
-      }
-    }
+    //   if (clientTab2.host) {
+    //     this.joinedRoom(null, { roomnum: roomnum, host: false }, tab, tabId);
+    //     return;
+    //   }
+    // }
 
     this.clientContext.socket.emit(
       "joinRoom",
@@ -117,29 +117,8 @@ class ClientEvent {
   leaveRoom(tabId) {
     console.log(`leave room`);
 
-    let { roomnum, host: wasHost } = this.clientContext.clientTabs.get(tabId);
+    let { roomnum } = this.clientContext.clientTabs.get(tabId);
     this.clientContext.clientTabs.delete(tabId);
-
-    if (wasHost) {
-      for (let [
-        tabId2,
-        clientTab2,
-      ] of this.clientContext.clientTabs.entries()) {
-        if (clientTab2?.roomnum !== roomnum) continue;
-
-        this.clientContext.browser.tabs
-          .get(tabId2)
-          .then((tab2) =>
-            this.joinedRoom(
-              null,
-              { roomnum: roomnum, host: true },
-              tab2,
-              tabId2
-            )
-          );
-        return;
-      }
-    }
 
     if (this.clientContext.clientTabs.size == 0) {
       this.clientContext.socket.emit("leaveRoom", { roomnum: roomnum });
