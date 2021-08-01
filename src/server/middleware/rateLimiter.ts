@@ -1,17 +1,13 @@
-"use strict";
+import debugModule from "debug";
+import { Express } from "express";
+import { Server as IoServer } from "socket.io";
+import { RedisClient } from "redis";
+import { RateLimiterRedis, BurstyRateLimiter } from "rate-limiter-flexible";
 
-const debug = require("debug")("rateLimiterServerAWP");
-const { Express } = require("express");
-const { Server: IoServer } = require("socket.io");
-const { RedisClient } = require("redis");
-const {
-  RateLimiterRedis,
-  BurstyRateLimiter,
-} = require("rate-limiter-flexible");
+const debug = debugModule("rateLimiterServerAWP");
 
-module.exports = {
-  /** @param {Express} app @param {IoServer} io @param {RedisClient} redisClient */
-  start: function (app, io, redisClient) {
+export default {
+  start: function (app: Express, io: IoServer, redisClient: RedisClient) {
     const rateLimiter = new BurstyRateLimiter(
       new RateLimiterRedis({
         storeClient: redisClient,

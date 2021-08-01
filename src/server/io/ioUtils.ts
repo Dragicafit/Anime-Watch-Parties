@@ -1,18 +1,22 @@
-const { IoRoom, Room } = require("./ioRoom");
-const { SocketContext } = require("./ioContext");
+import { IoRoom, Room } from "./ioRoom";
+import { SocketContext } from "./ioContext";
+import { IoCallback, IoDebugSocket } from "./ioConst";
 
 const regexPrefix = /^room-/g;
 
-class IoUtils {
-  /** @type {SocketContext} */
-  socketContext;
+export class IoUtils {
+  socketContext: SocketContext;
 
-  /** @param {SocketContext} socketContext */
-  constructor(socketContext) {
+  constructor(socketContext: SocketContext) {
     this.socketContext = socketContext;
   }
 
-  syncClient(debugSocket, roomnum, callback, toCallback = {}) {
+  syncClient(
+    debugSocket: IoDebugSocket,
+    roomnum: string,
+    callback: IoCallback,
+    toCallback: any = {}
+  ) {
     let ioRoom = this.getIoRoomIfIn(roomnum);
     if (ioRoom == null) {
       debugSocket("socket is not connected to room");
@@ -30,7 +34,11 @@ class IoUtils {
     }
   }
 
-  updateRoomUsers(debugSocket, roomnum, toCallback = {}) {
+  updateRoomUsers(
+    debugSocket: IoDebugSocket,
+    roomnum: string,
+    toCallback: any = {}
+  ) {
     let room = this.getRoom(roomnum);
     if (room == null) {
       return debugSocket(`room-${roomnum} has been deleted`);
@@ -44,7 +52,12 @@ class IoUtils {
     toCallback.onlineUsers = room.size;
   }
 
-  joinRoom(debugSocket, roomnum, callback, toCallback = {}) {
+  joinRoom(
+    debugSocket: IoDebugSocket,
+    roomnum: string,
+    callback: IoCallback,
+    toCallback: any = {}
+  ) {
     let oldRoomnums = this.roomnums;
     if (oldRoomnums.includes(roomnum)) {
       return this._configure(debugSocket, roomnum, callback, toCallback);
@@ -60,7 +73,12 @@ class IoUtils {
     this.updateRoomUsers(debugSocket, roomnum, toCallback);
   }
 
-  _configure(debugSocket, roomnum, callback, toCallback = {}) {
+  _configure(
+    debugSocket: IoDebugSocket,
+    roomnum: string,
+    callback: IoCallback,
+    toCallback: any = {}
+  ) {
     debugSocket(`connected to room-${roomnum}`);
 
     let room = this.getRoom(roomnum);
@@ -69,8 +87,7 @@ class IoUtils {
       return callback("error server");
     }
     let ioRoom = room.ioRoom;
-    let init = ioRoom == null;
-    if (init) {
+    if (ioRoom == null) {
       ioRoom = room.ioRoom = new IoRoom(roomnum);
     }
     if (ioRoom.host == null) {
@@ -83,7 +100,7 @@ class IoUtils {
     this.syncClient(debugSocket, roomnum, callback, toCallback);
   }
 
-  leaveRoom(debugSocket, roomnum) {
+  leaveRoom(debugSocket: IoDebugSocket, roomnum: string) {
     let ioRoom = this.getIoRoom(roomnum);
     if (ioRoom == null) {
       return;
@@ -97,28 +114,25 @@ class IoUtils {
     this.updateRoomUsers(debugSocket, roomnum);
   }
 
-  /** @param {IoRoom} ioRoom @returns {boolean} */
-  isHost(ioRoom) {
+  isHost(ioRoom: IoRoom): boolean {
     return this.socketContext.socket.id === ioRoom?.host;
   }
 
-  /** @param {String} roomnum @returns {Room} */
-  getRoom(roomnum) {
-    return this.socketContext.io.sockets.adapter.rooms.get(`room-${roomnum}`);
+  getRoom(roomnum: string): Room | undefined {
+    return <Room | undefined>(
+      this.socketContext.io.sockets.adapter.rooms.get(`room-${roomnum}`)
+    );
   }
 
-  /** @param {String} roomnum */
-  getIoRoom(roomnum) {
+  getIoRoom(roomnum: string) {
     return this.getRoom(roomnum)?.ioRoom;
   }
 
-  /** @param {String} roomnum */
-  getRoomIfIn(roomnum) {
+  getRoomIfIn(roomnum: string) {
     return this.roomnums.includes(roomnum) ? this.getRoom(roomnum) : null;
   }
 
-  /** @param {String} roomnum */
-  getIoRoomIfIn(roomnum) {
+  getIoRoomIfIn(roomnum: string) {
     return this.roomnums.includes(roomnum) ? this.getIoRoom(roomnum) : null;
   }
 
@@ -128,5 +142,3 @@ class IoUtils {
       .map((room) => room?.replace(regexPrefix, ""));
   }
 }
-
-exports.IoUtils = IoUtils;

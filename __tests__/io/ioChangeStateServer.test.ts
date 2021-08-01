@@ -1,39 +1,34 @@
-#!/usr/bin/env node
-"use strict";
+import { Server, Socket } from "socket.io";
+import ioChangeStateServer from "../../src/server/io/ioChangeStateServer";
+import { IoContext, SocketContext } from "../../src/server/io/ioContext";
+import { IoRoom } from "../../src/server/io/ioRoom";
+import { IoUtils } from "../../src/server/io/ioUtils";
+import { Performance } from "perf_hooks";
+import { IoCallback, IoDebugSocket } from "../../src/server/io/ioConst";
 
-const { Server, Socket } = require("socket.io");
-const ioChangeStateServer = require("../../src/server/io/ioChangeStateServer");
-const { IoContext, SocketContext } = require("../../src/server/io/ioContext");
-const { IoRoom } = require("../../src/server/io/ioRoom");
-const { IoUtils } = require("../../src/server/io/ioUtils");
+let io: Server;
+let socket: Socket;
+let ioUtils: IoUtils;
+let changeStateServer: (
+  debugSocket: IoDebugSocket,
+  roomnum: any,
+  state: any,
+  time: any,
+  callback: IoCallback
+) => void;
 
-/** @type {Server} */
-let io;
-/** @type {Socket} */
-let socket;
-/** @type {IoUtils} */
-let ioUtils;
-let changeStateServer;
+let debugSocket: jest.Mock;
+let roomnum: any;
+let state: any;
+let time: any;
+let callback: jest.Mock;
 
-/** @type {jest.Mock} */
-let debugSocket;
-/** @type {String} */
-let roomnum;
-/** @type {Boolean} */
-let state;
-/** @type {Number} */
-let time;
-/** @type {jest.Mock} */
-let callback;
-
-/** @type {jest.Mock} */
-let emit;
-/** @type {Performance} */
-let performance;
+let emit: jest.Mock;
+let performance: Performance;
 
 beforeEach((done) => {
   emit = jest.fn();
-  performance = { now: jest.fn(() => 5) };
+  performance = <any>{ now: jest.fn(() => 5) };
 
   debugSocket = jest.fn();
   roomnum = "roomnum";
@@ -42,16 +37,16 @@ beforeEach((done) => {
   callback = jest.fn();
 
   io = new Server();
-  IoRoom.ioContext = new IoContext(io, performance);
+  IoRoom.ioContext = new IoContext(<Server>io, <Performance>performance);
   socket = io.sockets._add(
-    { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
+    <any>{ conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
     () => {
-      socket.to = (roomKey) => {
+      socket.to = <any>((roomKey: string) => {
         if (roomKey === `room-${roomnum}`) {
           return { emit: emit };
         }
-      };
+      });
 
       let socketContext = new SocketContext(io, socket, performance);
       ioUtils = new IoUtils(socketContext);
@@ -60,10 +55,10 @@ beforeEach((done) => {
       socket.join(`room-${roomnum}`);
       let ioRoom = new IoRoom(roomnum);
       ioRoom.host = "socket-1";
-      ioUtils.getRoom(roomnum).ioRoom = ioRoom;
+      ioUtils.getRoom(roomnum)!.ioRoom = ioRoom;
 
       ioChangeStateServer.start(socketContext, ioUtils);
-      changeStateServer = socket.events.changeStateServer;
+      changeStateServer = (<any>socket).events.changeStateServer;
       done();
     }
   );
@@ -90,7 +85,7 @@ it.each([
   expect(emit).toHaveBeenCalledTimes(1);
   expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
-  expect(performance.now).toHaveBeenCalledTimes(2 + state);
+  expect(performance.now).toHaveBeenCalledTimes(2 + Number(state));
 
   expect(ioUtils.getRoom(roomnum)).toMatchObject({
     ioRoom: {
@@ -98,9 +93,6 @@ it.each([
       state: state,
       currTime: time,
       lastChange: 5,
-      currVideo: undefined,
-      site: undefined,
-      location: undefined,
     },
   });
 });
@@ -159,9 +151,6 @@ it.each([
       state: false,
       currTime: 0,
       lastChange: 5,
-      currVideo: undefined,
-      site: undefined,
-      location: undefined,
     },
   });
 });
@@ -194,9 +183,6 @@ it.each([
       state: false,
       currTime: 0,
       lastChange: 5,
-      currVideo: undefined,
-      site: undefined,
-      location: undefined,
     },
   });
 });
@@ -223,7 +209,7 @@ it("is in an non-existent room", () => {
   let ioRoom = ioUtils.getIoRoom(roomnum);
   socket.leave(`room-${roomnum}`);
   socket.join(roomnum);
-  io.sockets.adapter.rooms.get(roomnum).ioRoom = ioRoom;
+  (<any>io.sockets.adapter.rooms.get(roomnum)!).ioRoom = ioRoom;
   changeStateServer(debugSocket, roomnum, state, time, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(
@@ -247,15 +233,12 @@ it("is in an non-existent room", () => {
       state: false,
       currTime: 0,
       lastChange: 5,
-      currVideo: undefined,
-      site: undefined,
-      location: undefined,
     },
   });
 });
 
 it("Not host", () => {
-  ioUtils.getIoRoom(roomnum).host = "socket-2";
+  ioUtils.getIoRoom(roomnum)!.host = "socket-2";
   changeStateServer(debugSocket, roomnum, state, time, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(1, "socket is not host");
@@ -272,9 +255,6 @@ it("Not host", () => {
       state: false,
       currTime: 0,
       lastChange: 5,
-      currVideo: undefined,
-      site: undefined,
-      location: undefined,
     },
   });
 });

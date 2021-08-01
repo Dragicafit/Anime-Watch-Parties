@@ -1,12 +1,18 @@
-#!/usr/bin/env node
-"use strict";
+import "dotenv/config";
+import fs from "fs";
+import express from "express";
+import debugModule from "debug";
+import https from "https";
+import { createAdapter } from "socket.io-redis";
+import { RedisClient } from "redis";
+import rateLimiter from "./middleware/rateLimiter";
+import passport from "./middleware/passport";
+import ioServerSetup from "./ioServerSetup";
+import httpServerSetup from "./httpServerSetup";
 
-require("dotenv").config();
-const fs = require("fs");
-
-const app = require("express")();
-const debug = require("debug")("serverAWP");
-const server = require("https").createServer(
+const app = express();
+const debug = debugModule("serverAWP");
+const server = https.createServer(
   {
     key: fs.readFileSync("key.pem"),
     cert: fs.readFileSync("cert.pem"),
@@ -17,18 +23,13 @@ const { Server: IoServer } = require("socket.io");
 const io = new IoServer(server, {
   perMessageDeflate: false,
   cors: {
-    origin: process.env.EXTENSION_IDS.split(",").map((extensionId) =>
-      extensionId.trim()
-    ),
+    origin: process.env
+      .EXTENSION_IDS!.split(",")
+      .map((extensionId) => extensionId.trim()),
     credentials: true,
   },
 });
-const redisAdapter = require("socket.io-redis");
-const redisClient = require("redis").createClient();
-const rateLimiter = require("./middleware/rateLimiter");
-const passport = require("./middleware/passport");
-const ioServerSetup = require("./ioServerSetup");
-const httpServerSetup = require("./httpServerSetup");
+const redisClient = new RedisClient({});
 
 rateLimiter.start(app, io, redisClient);
 passport.start(app, io, redisClient);
@@ -41,7 +42,9 @@ const debugMain = debug.extend("main");
 
 process.title = "AnimeWatchParties";
 
-io.adapter(redisAdapter());
+const pubClient = redisClient;
+const subClient = pubClient.duplicate();
+io.adapter(createAdapter({ pubClient, subClient }));
 
 server.listen(port, () => {
   debugMain(`Server listening at port ${port}`);

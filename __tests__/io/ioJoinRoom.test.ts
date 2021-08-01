@@ -1,32 +1,28 @@
-#!/usr/bin/env node
-"use strict";
+import { Server, Socket } from "socket.io";
+import ioJoinRoom from "../../src/server/io/ioJoinRoom";
+import { IoUtils } from "../../src/server/io/ioUtils";
+import { IoRoom } from "../../src/server/io/ioRoom";
+import { IoContext, SocketContext } from "../../src/server/io/ioContext";
+import { IoCallback, IoDebugSocket } from "../../src/server/io/ioConst";
+import { Performance } from "perf_hooks";
 
-const { Server, Socket } = require("socket.io");
-const ioJoinRoom = require("../../src/server/io/ioJoinRoom");
-const { IoUtils } = require("../../src/server/io/ioUtils");
-const { IoRoom } = require("../../src/server/io/ioRoom");
-const { IoContext, SocketContext } = require("../../src/server/io/ioContext");
+let io: Server;
+let socket: Socket;
+let ioUtils: IoUtils;
+let joinRoom: (
+  debugSocket: IoDebugSocket,
+  roomnum: any,
+  callback: IoCallback
+) => void;
 
-/** @type {Server} */
-let io;
-/** @type {Socket} */
-let socket;
-/** @type {IoUtils} */
-let ioUtils;
-let joinRoom;
+let debugSocket: jest.Mock;
+let roomnum: any;
+let callback: jest.Mock;
 
-/** @type {jest.Mock} */
-let debugSocket;
-/** @type {String} */
-let roomnum;
-/** @type {jest.Mock} */
-let callback;
-
-/** @type {Performance} */
-let performance;
+let performance: Performance;
 
 beforeEach((done) => {
-  performance = { now: jest.fn(() => 5) };
+  performance = <any>{ now: jest.fn(() => 5) };
 
   debugSocket = jest.fn();
   roomnum = "roomnum";
@@ -35,7 +31,7 @@ beforeEach((done) => {
   io = new Server();
   IoRoom.ioContext = new IoContext(io, performance);
   socket = io.sockets._add(
-    { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
+    <any>{ conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
     () => {
       let socketContext = new SocketContext(io, socket, performance);
@@ -44,7 +40,7 @@ beforeEach((done) => {
       ioUtils.updateRoomUsers = jest.fn((cb) => cb("updateRoomUsers"));
 
       ioJoinRoom.start(socketContext, ioUtils);
-      joinRoom = socket.events.joinRoom;
+      joinRoom = (<any>socket).events.joinRoom;
       done();
     }
   );
@@ -95,12 +91,9 @@ it.each(["r", "roomnum_", Array(31).join("x")])(
     expect(ioUtils.getRoom(roomnum)).toMatchObject({
       ioRoom: {
         currTime: 0,
-        currVideo: undefined,
         host: "socket-1",
         lastChange: 5,
         state: false,
-        location: undefined,
-        site: undefined,
       },
     });
   }
@@ -151,12 +144,9 @@ it("Join new room but almost too many rooms joined", () => {
   expect(ioUtils.getRoom(roomnum)).toMatchObject({
     ioRoom: {
       currTime: 0,
-      currVideo: undefined,
       host: "socket-1",
       lastChange: 5,
       state: false,
-      location: undefined,
-      site: undefined,
     },
   });
 });
@@ -181,11 +171,11 @@ it("Join new room but too many rooms joined", () => {
 
 it("Join existing room", (done) => {
   let socket2 = io.sockets._add(
-    { conn: { protocol: 3, readyState: "open" }, id: "socket-2" },
+    <any>{ conn: { protocol: 3, readyState: "open" }, id: "socket-2" },
     null,
     () => {
       socket2.join(`room-${roomnum}`);
-      ioUtils.getRoom(roomnum).ioRoom = new IoRoom(roomnum);
+      ioUtils.getRoom(roomnum)!.ioRoom = new IoRoom(roomnum);
 
       joinRoom(debugSocket, roomnum, callback);
 
@@ -228,12 +218,9 @@ it("Join existing room", (done) => {
       expect(ioUtils.getRoom(roomnum)).toMatchObject({
         ioRoom: {
           currTime: 0,
-          currVideo: undefined,
           host: "socket-1",
           lastChange: 5,
           state: false,
-          location: undefined,
-          site: undefined,
         },
       });
       done();
@@ -246,11 +233,11 @@ it("Join existing room but too many rooms joined", (done) => {
     socket.join(`room-${roomnum}${i}`);
   }
   let socket2 = io.sockets._add(
-    { conn: { protocol: 3, readyState: "open" }, id: "socket-2" },
+    <any>{ conn: { protocol: 3, readyState: "open" }, id: "socket-2" },
     null,
     () => {
       socket2.join(`room-${roomnum}`);
-      ioUtils.getRoom(roomnum).ioRoom = new IoRoom(roomnum);
+      ioUtils.getRoom(roomnum)!.ioRoom = new IoRoom(roomnum);
       joinRoom(debugSocket, roomnum, callback);
 
       expect(debugSocket).toHaveBeenNthCalledWith(1, "too many rooms joined");
@@ -266,12 +253,8 @@ it("Join existing room but too many rooms joined", (done) => {
       expect(ioUtils.getRoom(roomnum)).toMatchObject({
         ioRoom: {
           currTime: 0,
-          currVideo: undefined,
-          host: undefined,
           lastChange: 5,
           state: false,
-          location: undefined,
-          site: undefined,
         },
       });
       done();
@@ -281,7 +264,7 @@ it("Join existing room but too many rooms joined", (done) => {
 
 it("Change room to same room", () => {
   socket.join(`room-${roomnum}`);
-  ioUtils.getRoom(roomnum).ioRoom = new IoRoom(roomnum);
+  ioUtils.getRoom(roomnum)!.ioRoom = new IoRoom(roomnum);
   joinRoom(debugSocket, roomnum, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(
@@ -313,11 +296,8 @@ it("Change room to same room", () => {
   expect(ioUtils.getRoom(roomnum)).toMatchObject({
     ioRoom: {
       currTime: 0,
-      currVideo: undefined,
       host: "socket-1",
       lastChange: 5,
-      location: undefined,
-      site: undefined,
       state: false,
     },
   });
@@ -394,11 +374,8 @@ it("With error", () => {
   expect(ioUtils.getRoom(roomnum)).toMatchObject({
     ioRoom: {
       currTime: 0,
-      currVideo: undefined,
       host: "socket-1",
       lastChange: 5,
-      location: undefined,
-      site: undefined,
       state: false,
     },
   });
@@ -432,5 +409,5 @@ it("With error, same room", () => {
   expect(io.sockets.adapter.rooms.get(roomnum)).toStrictEqual(
     new Set(["socket-1"])
   );
-  expect(io.sockets.adapter.rooms.get(roomnum).ioRoom).toBeUndefined();
+  expect((<any>io.sockets.adapter.rooms.get(roomnum)).ioRoom).toBeUndefined();
 });

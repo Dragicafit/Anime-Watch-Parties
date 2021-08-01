@@ -1,8 +1,8 @@
-"use strict";
+import debugModule from "debug";
+import { Express } from "express";
+import handlebars from "handlebars";
 
-const debug = require("debug")("httpServerAWP");
-const { Express } = require("express");
-const handlebars = require("handlebars");
+const debug = debugModule("httpServerAWP");
 
 var template = handlebars.compile(`
 <html><head><title>Twitch Auth Sample</title><script>
@@ -32,12 +32,11 @@ var template = handlebars.compile(`
   {{/each}}
 </html>`);
 
-module.exports = {
-  /** @param {Express} app */
-  start: function (app) {
+export default {
+  start: function (app: Express) {
     app.get("/", function (req, res) {
       let reqSession = req.session;
-      let user = reqSession?.passport?.user;
+      let user = (<any>reqSession)?.passport?.user;
       if (user) {
         let auths = Object.keys(user).map((key) => ({
           provider: key,

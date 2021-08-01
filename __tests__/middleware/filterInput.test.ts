@@ -1,9 +1,8 @@
-#!/usr/bin/env node
-"use strict";
+import { Socket } from "socket.io";
+import { IoCallback, supportedEvents } from "../../src/server/io/ioConst";
+import filterInput from "../../src/server/middleware/filterInput";
 
-const filterInput = require("../../src/server/middleware/filterInput");
-
-const supportedEvents = {
+const supportedEventsTest = {
   JOIN_ROOM: "joinRoom",
   LEAVE_ROOM: "leaveRoom",
   CHANGE_STATE_SERVER: "changeStateServer",
@@ -11,17 +10,26 @@ const supportedEvents = {
   SYNC_CLIENT: "syncClient",
 };
 
-function emit([event, data, callback], next) {
-  let socket = {};
-  socket.use = (fn) => {
+function emit([event, data, callback]: any[], next: any) {
+  let socket: Socket = <Socket>{};
+  socket.use = (
+    fn: (event: any[], next: (err?: Error) => void) => void
+  ): Socket => {
     fn([event, data, callback], next);
+    return socket;
   };
   filterInput.start(socket);
 }
 
-function testSupportedEvents(executor) {
+function testSupportedEvents(
+  executor: (
+    supportedEvent: string,
+    resolve: (value: unknown) => void,
+    reject: (value: unknown) => void
+  ) => void
+) {
   return Promise.all(
-    Object.values(supportedEvents).map((supportedEvent) => {
+    Object.values(supportedEventsTest).map((supportedEvent) => {
       new Promise((resolve, reject) =>
         executor(supportedEvent, resolve, reject)
       );
@@ -31,23 +39,19 @@ function testSupportedEvents(executor) {
 
 describe("test argument middleware", function () {
   it("verify supported events", () => {
-    expect(filterInput.supportedEvents).toStrictEqual(supportedEvents);
+    expect(supportedEvents).toStrictEqual(supportedEventsTest);
     return Promise.resolve();
   });
 
   it("callbacks error with non existent event", () => {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       emit(
-        [
-          "nonExistent",
-          null,
-          (err, data) => {
+        ["nonExistent", null, <IoCallback>((err, data) => {
             expect(err).toBe("event is not valid");
             expect(data).toBeUndefined();
             resolve();
-          },
-        ],
-        reject
+          })],
+        () => reject()
       );
     });
   });

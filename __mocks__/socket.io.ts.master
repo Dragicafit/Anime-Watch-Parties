@@ -1,7 +1,14 @@
 import http = require("http");
+import { createReadStream } from "fs";
+import { createDeflate, createGzip, createBrotliCompress } from "zlib";
+import accepts = require("accepts");
+import { pipeline } from "stream";
+import path = require("path");
+import engine = require("engine.io");
+import { Client } from "./client";
 import { EventEmitter } from "events";
 import { ExtendedError, Namespace, ServerReservedEventsMap } from "./namespace";
-import { ParentNamespace } from "socket.io/dist/parent-namespace";
+import { ParentNamespace } from "./parent-namespace";
 import { Adapter, Room, SocketId } from "socket.io-adapter";
 import * as parser from "socket.io-parser";
 import type { Encoder } from "socket.io-parser";
@@ -9,17 +16,14 @@ import debugModule from "debug";
 import { Socket } from "./socket";
 import type { CookieSerializeOptions } from "cookie";
 import type { CorsOptions } from "cors";
-import type {
-  BroadcastOperator,
-  RemoteSocket,
-} from "socket.io/dist/broadcast-operator";
+import type { BroadcastOperator, RemoteSocket } from "./broadcast-operator";
 import {
   EventsMap,
   DefaultEventsMap,
   EventParams,
   StrictEventEmitter,
   EventNames,
-} from "socket.io/dist/typed-events";
+} from "./typed-events";
 
 const debug = debugModule("socket.io:server");
 
@@ -206,7 +210,7 @@ export class Server<
   private _adapter?: AdapterConstructor;
   private _serveClient: boolean;
   private opts: Partial<EngineOptions>;
-  private eio: any;
+  private eio;
   private _path: string;
   private clientPathRegex: RegExp;
 
@@ -234,11 +238,6 @@ export class Server<
     opts: Partial<ServerOptions> = {}
   ) {
     super();
-    this._serveClient = <any>null;
-    this._path = <any>null;
-    this.clientPathRegex = <any>null;
-    this._connectTimeout = <any>null;
-    this.httpServer = <any>null;
     if (
       "object" === typeof srv &&
       srv instanceof Object &&
@@ -308,7 +307,7 @@ export class Server<
             .createChild(name);
           // @ts-ignore
           this.sockets.emitReserved("new_namespace", namespace);
-          fn(<any>namespace);
+          fn(namespace);
         }
       });
     };
@@ -401,7 +400,36 @@ export class Server<
     srv: http.Server | number,
     opts: Partial<ServerOptions> = {}
   ): this {
-    return <any>jest.fn(() => this);
+    if ("function" == typeof srv) {
+      const msg =
+        "You are trying to attach socket.io to an express " +
+        "request handler function. Please pass a http.Server instance.";
+      throw new Error(msg);
+    }
+
+    // handle a port as a string
+    if (Number(srv) == srv) {
+      srv = Number(srv);
+    }
+
+    if ("number" == typeof srv) {
+      debug("creating http server and binding to %d", srv);
+      const port = srv;
+      srv = http.createServer((req, res) => {
+        res.writeHead(404);
+        res.end();
+      });
+      srv.listen(port);
+    }
+
+    // merge the options passed to the Socket.IO server
+    Object.assign(opts, this.opts);
+    // set engine.io path to `/socket.io`
+    opts.path = opts.path || this._path;
+
+    this.initEngine(srv, opts);
+
+    return this;
   }
 
   /**
@@ -415,7 +443,18 @@ export class Server<
     srv: http.Server,
     opts: Partial<EngineAttachOptions>
   ): void {
-    return <any>jest.fn();
+    // initialize engine
+    debug("creating engine.io instance with opts %j", opts);
+    this.eio = engine.attach(srv, opts);
+
+    // attach static file serving
+    if (this._serveClient) this.attachServe(srv);
+
+    // Export http server
+    this.httpServer = srv;
+
+    // bind to engine events
+    this.bind(this.eio);
   }
 
   /**
@@ -425,7 +464,19 @@ export class Server<
    * @private
    */
   private attachServe(srv: http.Server): void {
-    return <any>jest.fn();
+    debug("attaching client serving req handler");
+
+    const evs = srv.listeners("request").slice(0);
+    srv.removeAllListeners("request");
+    srv.on("request", (req, res) => {
+      if (this.clientPathRegex.test(req.url)) {
+        this.serve(req, res);
+      } else {
+        for (let i = 0; i < evs.length; i++) {
+          evs[i].call(srv, req, res);
+        }
+      }
+    });
   }
 
   /**
@@ -436,7 +487,35 @@ export class Server<
    * @private
    */
   private serve(req: http.IncomingMessage, res: http.ServerResponse): void {
-    return <any>jest.fn();
+    const filename = req.url!.replace(this._path, "");
+    const isMap = dotMapRegex.test(filename);
+    const type = isMap ? "map" : "source";
+
+    // Per the standard, ETags must be quoted:
+    // https://tools.ietf.org/html/rfc7232#section-2.3
+    const expectedEtag = '"' + clientVersion + '"';
+    const weakEtag = "W/" + expectedEtag;
+
+    const etag = req.headers["if-none-match"];
+    if (etag) {
+      if (expectedEtag === etag || weakEtag === etag) {
+        debug("serve client %s 304", type);
+        res.writeHead(304);
+        res.end();
+        return;
+      }
+    }
+
+    debug("serve client %s", type);
+
+    res.setHeader("Cache-Control", "public, max-age=0");
+    res.setHeader(
+      "Content-Type",
+      "application/" + (isMap ? "json" : "javascript")
+    );
+    res.setHeader("ETag", expectedEtag);
+
+    Server.sendFile(filename, req, res);
   }
 
   /**
@@ -450,7 +529,35 @@ export class Server<
     req: http.IncomingMessage,
     res: http.ServerResponse
   ): void {
-    return <any>jest.fn();
+    const readStream = createReadStream(
+      path.join(__dirname, "../client-dist/", filename)
+    );
+    const encoding = accepts(req).encodings(["br", "gzip", "deflate"]);
+
+    const onError = (err: NodeJS.ErrnoException | null) => {
+      if (err) {
+        res.end();
+      }
+    };
+
+    switch (encoding) {
+      case "br":
+        res.writeHead(200, { "content-encoding": "br" });
+        readStream.pipe(createBrotliCompress()).pipe(res);
+        pipeline(readStream, createBrotliCompress(), res, onError);
+        break;
+      case "gzip":
+        res.writeHead(200, { "content-encoding": "gzip" });
+        pipeline(readStream, createGzip(), res, onError);
+        break;
+      case "deflate":
+        res.writeHead(200, { "content-encoding": "deflate" });
+        pipeline(readStream, createDeflate(), res, onError);
+        break;
+      default:
+        res.writeHead(200);
+        pipeline(readStream, res, onError);
+    }
   }
 
   /**
@@ -460,8 +567,10 @@ export class Server<
    * @return self
    * @public
    */
-  public bind(engine: any): this {
-    return <any>jest.fn(() => this);
+  public bind(engine): this {
+    this.engine = engine;
+    this.engine.on("connection", this.onconnection.bind(this));
+    return this;
   }
 
   /**
@@ -471,8 +580,14 @@ export class Server<
    * @return self
    * @private
    */
-  private onconnection(conn: any): this {
-    return <any>jest.fn(() => this);
+  private onconnection(conn): this {
+    debug("incoming connection with id %s", conn.id);
+    const client = new Client(this, conn);
+    if (conn.protocol === 3) {
+      // @ts-ignore
+      client.connect("/");
+    }
+    return this;
   }
 
   /**
@@ -487,7 +602,7 @@ export class Server<
     fn?: (socket: Socket<ListenEvents, EmitEvents, ServerSideEvents>) => void
   ): Namespace<ListenEvents, EmitEvents, ServerSideEvents> {
     if (typeof name === "function" || name instanceof RegExp) {
-      const parentNsp = new ParentNamespace(<any>this);
+      const parentNsp = new ParentNamespace(this);
       debug("initializing parent namespace %s", parentNsp.name);
       if (typeof name === "function") {
         this.parentNsps.set(name, parentNsp);
@@ -501,7 +616,7 @@ export class Server<
         // @ts-ignore
         parentNsp.on("connect", fn);
       }
-      return <any>parentNsp;
+      return parentNsp;
     }
 
     if (String(name)[0] !== "/") name = "/" + name;
@@ -531,7 +646,7 @@ export class Server<
       socket._onclose("server shutting down");
     }
 
-    //this.engine.close();
+    this.engine.close();
 
     if (this.httpServer) {
       this.httpServer.close(fn);
@@ -609,6 +724,20 @@ export class Server<
   public write(...args: EventParams<EmitEvents, "message">): this {
     this.sockets.emit("message", ...args);
     return this;
+  }
+
+  /**
+   * Emit a packet to other Socket.IO servers
+   *
+   * @param ev - the event name
+   * @param args - an array of arguments, which may include an acknowledgement callback at the end
+   * @public
+   */
+  public serverSideEmit<Ev extends EventNames<ServerSideEvents>>(
+    ev: Ev,
+    ...args: EventParams<ServerSideEvents, Ev>
+  ): boolean {
+    return this.sockets.serverSideEmit(ev, ...args);
   }
 
   /**
@@ -700,16 +829,18 @@ export class Server<
 const emitterMethods = Object.keys(EventEmitter.prototype).filter(function (
   key
 ) {
-  return typeof (<any>EventEmitter.prototype)[key] === "function";
+  return typeof EventEmitter.prototype[key] === "function";
 });
 
 emitterMethods.forEach(function (fn) {
-  (<any>Server.prototype)[fn] = function () {
-    return (<any>this.sockets)[fn].apply(this.sockets, arguments);
+  Server.prototype[fn] = function () {
+    return this.sockets[fn].apply(this.sockets, arguments);
   };
 });
 
-module.exports = (srv?: any, opts?: any) => new Server(srv, opts);
+module.exports = (srv?, opts?) => new Server(srv, opts);
 module.exports.Server = Server;
+module.exports.Namespace = Namespace;
+module.exports.Socket = Socket;
 
-export { ServerOptions, BroadcastOperator, RemoteSocket };
+export { Socket, ServerOptions, Namespace, BroadcastOperator, RemoteSocket };

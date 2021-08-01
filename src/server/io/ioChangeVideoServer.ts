@@ -1,17 +1,24 @@
-const { SocketContext } = require("./ioContext");
-const { IoUtils } = require("./ioUtils");
+import { IoCallback, IoDebugSocket } from "./ioConst";
+import { SocketContext } from "./ioContext";
+import { IoUtils } from "./ioUtils";
 
 const regexRoom = /^\w{1,30}$/;
 const regexVideoId = /^[\w\/-]{1,300}$/;
 const regexSite = /^(wakanim|crunchyroll)$/;
 const regexLocation = /^[a-zA-Z]{2}$/;
 
-module.exports = {
-  /** @param {SocketContext} socketContext @param {IoUtils} ioUtils */
-  start: function (socketContext, ioUtils) {
+export default {
+  start: function (socketContext: SocketContext, ioUtils: IoUtils) {
     socketContext.socket.on(
       "changeVideoServer",
-      (debugSocket, roomnum, videoId, site, location, callback) => {
+      (
+        debugSocket: IoDebugSocket,
+        roomnum: any,
+        videoId: any,
+        site: any,
+        location: any,
+        callback: IoCallback
+      ) => {
         if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
           debugSocket("roomnum is not a valid string");
           return callback("wrong input");

@@ -1,42 +1,34 @@
-const { SocketId } = require("socket.io-adapter");
-const { IoContext } = require("./ioContext");
+import { SocketId } from "socket.io-adapter";
+import { IoContext } from "./ioContext";
 
-class IoRoom {
-  /** @type {IoContext} */
-  static ioContext;
+export class IoRoom {
+  static ioContext: IoContext;
 
-  /** @type {String} */
-  roomnum;
-  /** @type {SocketId} */
-  host;
-  /** @type {Boolean} */
-  state;
-  /** @type {Number} */
-  currTime;
-  /** @type {Number} */
-  lastChange;
-  /** @type {String} */
-  currVideo;
-  /** @type {String} */
-  site;
-  /** @type {String} */
-  location;
+  roomnum: string;
+  host: SocketId | undefined;
+  state: boolean;
+  currTime: number;
+  lastChange: number;
+  currVideo: string | undefined;
+  site: string | undefined;
+  location: string | undefined;
 
-  /** @param {String} roomnum */
-  constructor(roomnum) {
+  constructor(roomnum: string) {
     this.roomnum = roomnum;
+    this.state = false;
+    this.currTime = 0;
+    this.lastChange = 0;
+
     this.updateState(false, 0);
   }
 
-  /** @param {Boolean} state @param {Number} currTime */
-  updateState(state, currTime) {
+  updateState(state: boolean, currTime: number) {
     this.state = state;
     this.currTime = currTime;
     this.lastChange = IoRoom.ioContext.performance.now();
   }
 
-  /** @param {String} currVideo @param {String} site @param {String} location */
-  updateVideo(currVideo, site, location) {
+  updateVideo(currVideo: string, site: string, location: string) {
     this.currVideo = currVideo;
     this.site = site;
     this.location = location;
@@ -74,10 +66,6 @@ class IoRoom {
   }
 }
 
-class Room extends Set {
-  /** @type {IoRoom} */
-  ioRoom;
+export class Room extends Set {
+  ioRoom: IoRoom | undefined;
 }
-
-exports.IoRoom = IoRoom;
-exports.Room = Room;

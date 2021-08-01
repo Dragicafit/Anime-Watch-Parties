@@ -1,28 +1,21 @@
-const { Server, Socket } = require("socket.io");
+import { Server, Socket } from "socket.io";
+import { Performance } from "perf_hooks";
 
-class IoContext {
-  /** @type {Server} */
-  io;
-  /** @type {Performance} */
-  performance;
+export class IoContext {
+  io: Server;
+  performance: Performance;
 
-  /** @param {Server} io @param {Performance} performance */
-  constructor(io, performance) {
+  constructor(io: Server, performance: Performance) {
     this.io = io;
     this.performance = performance;
   }
 }
 
-class SocketContext extends IoContext {
-  /** @type {Socket} */
-  socket;
+export class SocketContext extends IoContext {
+  socket: Socket;
 
-  /** @param {Server} io @param {Socket} socket @param {Performance} performance */
-  constructor(io, socket, performance) {
+  constructor(io: Server, socket: Socket, performance: Performance) {
     super(io, performance);
     this.socket = socket;
   }
 }
-
-exports.IoContext = IoContext;
-exports.SocketContext = SocketContext;

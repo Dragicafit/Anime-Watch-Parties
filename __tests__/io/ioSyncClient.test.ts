@@ -1,25 +1,21 @@
-#!/usr/bin/env node
-"use strict";
+import { Server, Socket } from "socket.io";
+import { IoCallback, IoDebugSocket } from "../../src/server/io/ioConst";
+import { SocketContext } from "../../src/server/io/ioContext";
+import ioSyncClient from "../../src/server/io/ioSyncClient";
+import { IoUtils } from "../../src/server/io/ioUtils";
 
-const { Server, Socket } = require("socket.io");
-const { SocketContext } = require("../../src/server/io/ioContext");
-const ioSyncClient = require("../../src/server/io/ioSyncClient");
-const { IoUtils } = require("../../src/server/io/ioUtils");
+let io: Server;
+let socket: Socket;
+let ioUtils: IoUtils;
+let syncClient: (
+  debugSocket: IoDebugSocket,
+  roomnum: any,
+  callback: IoCallback
+) => void;
 
-/** @type {Server} */
-let io;
-/** @type {Socket} */
-let socket;
-/** @type {IoUtils} */
-let ioUtils;
-let syncClient;
-
-/** @type {jest.Mock} */
-let debugSocket;
-/** @type {String} */
-let roomnum;
-/** @type {jest.Mock} */
-let callback;
+let debugSocket: jest.Mock;
+let roomnum: any;
+let callback: jest.Mock;
 
 beforeEach((done) => {
   debugSocket = jest.fn();
@@ -28,15 +24,15 @@ beforeEach((done) => {
 
   io = new Server();
   socket = io.sockets._add(
-    { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
+    <any>{ conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
     () => {
-      let socketContext = new SocketContext(io, socket);
+      let socketContext = new SocketContext(io, socket, <any>null);
       ioUtils = new IoUtils(socketContext);
       ioUtils.syncClient = jest.fn();
 
       ioSyncClient.start(socketContext, ioUtils);
-      syncClient = socket.events.syncClient;
+      syncClient = (<any>socket).events.syncClient;
       done();
     }
   );

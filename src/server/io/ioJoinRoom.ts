@@ -1,20 +1,23 @@
-const { SocketContext } = require("./ioContext");
-const { IoUtils } = require("./ioUtils");
+import { IoCallback, IoDebugSocket } from "./ioConst";
+import { SocketContext } from "./ioContext";
+import { IoUtils } from "./ioUtils";
 
 const regexRoom = /^\w{1,30}$/;
 
-module.exports = {
-  /** @param {SocketContext} socketContext @param {IoUtils} ioUtils */
-  start: function (socketContext, ioUtils) {
-    socketContext.socket.on("joinRoom", (debugSocket, roomnum, callback) => {
-      if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
-        debugSocket("roomnum is not a valid string");
-        return callback("wrong input");
-      }
+export default {
+  start: function (socketContext: SocketContext, ioUtils: IoUtils) {
+    socketContext.socket.on(
+      "joinRoom",
+      (debugSocket: IoDebugSocket, roomnum: any, callback: IoCallback) => {
+        if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
+          debugSocket("roomnum is not a valid string");
+          return callback("wrong input");
+        }
 
-      let toCallback = {};
-      ioUtils.joinRoom(debugSocket, roomnum, callback, toCallback);
-      callback(null, toCallback);
-    });
+        let toCallback: any = {};
+        ioUtils.joinRoom(debugSocket, roomnum, callback, toCallback);
+        callback(null, toCallback);
+      }
+    );
   },
 };

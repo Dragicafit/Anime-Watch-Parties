@@ -1,41 +1,48 @@
-"use strict";
+import "dotenv/config";
 
-require("dotenv").config();
+import debugModule from "debug";
+import { Express, RequestHandler } from "express";
+import { Server as IoServer, Socket } from "socket.io";
+import { RedisClient } from "redis";
+import session from "express-session";
+import RedisStore from "connect-redis";
+import { Strategy as twitchStrategy } from "passport-twitch-strategy";
+import { ExtendedError } from "socket.io/dist/namespace";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import passport from "passport";
 
-const debug = require("debug")("passportServerAWP");
-const { Express } = require("express");
-const { Server: IoServer } = require("socket.io");
-const { RedisClient } = require("redis");
-const session = require("express-session");
-const RedisStore = require("connect-redis")(session);
-const twitchStrategy = require("passport-twitch-new").Strategy;
-const wrap = (middleware) => (socket, next) =>
-  middleware(socket.request, {}, next);
+const debug = debugModule("passportServerAWP");
+const RedisStoreSession = RedisStore(session);
 
-const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
-const TWITCH_SECRET = process.env.TWITCH_SECRET;
-const SESSION_SECRET = process.env.SESSION_SECRET;
-const CALLBACK_URL = process.env.CALLBACK_URL;
+const wrap =
+  (middleware: RequestHandler) =>
+  (
+    socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap>,
+    next: (err?: ExtendedError) => void
+  ) =>
+    middleware(<any>socket.request, <any>{}, <any>next);
 
-module.exports = {
-  /** @param {Express} app @param {IoServer} io @param {RedisClient} redisClient */
-  start: function (app, io, redisClient) {
-    const passport = require("passport");
+const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID!;
+const TWITCH_SECRET = process.env.TWITCH_SECRET!;
+const SESSION_SECRET = process.env.SESSION_SECRET!;
+const CALLBACK_URL = process.env.CALLBACK_URL!;
 
+export default {
+  start: function (app: Express, io: IoServer, redisClient: RedisClient) {
     app.use(passport.initialize());
     app.use(passport.session());
     var customsession = session({
       resave: false,
       saveUninitialized: false,
       secret: SESSION_SECRET,
-      store: new RedisStore({ client: redisClient }),
+      store: new RedisStoreSession({ client: redisClient }),
       cookie: { secure: true, sameSite: "none" },
     });
     app.use(customsession);
     io.use(wrap(customsession));
 
     io.use((socket, next) => {
-      socket.auths = socket.request.session?.passport?.user;
+      (<any>socket).auths = (<any>socket.request).session?.passport?.user;
       next();
     });
 
@@ -43,7 +50,7 @@ module.exports = {
       done(null, user);
     });
     passport.deserializeUser((user, done) => {
-      done(null, user);
+      done(null, <any>user);
     });
     passport.use(
       "twitch",
@@ -52,9 +59,9 @@ module.exports = {
           clientID: TWITCH_CLIENT_ID,
           clientSecret: TWITCH_SECRET,
           callbackURL: CALLBACK_URL,
-          state: true,
+          scope: "user_read",
         },
-        (accessToken, refreshToken, profile, done) => {
+        (accessToken: any, refreshToken: any, profile: any, done: any) => {
           done(null, profile);
         }
       )
@@ -64,13 +71,13 @@ module.exports = {
       passport.authenticate("twitch", (err, user) => {
         if (err || user === false) return res.redirect("/");
 
-        let userNew = req.session.passport?.user || {};
+        let userNew = (<any>req.session).passport?.user || {};
         userNew[user.provider] = {
           display_name: user.display_name,
           id: user.id,
         };
 
-        req.logIn(userNew, () => {
+        (<any>req).logIn(userNew, () => {
           res.redirect("/");
         });
       })(req, res, next);

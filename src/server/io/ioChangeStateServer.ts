@@ -1,14 +1,20 @@
-const { SocketContext } = require("./ioContext");
-const { IoUtils } = require("./ioUtils");
+import { IoCallback, IoDebugSocket } from "./ioConst";
+import { SocketContext } from "./ioContext";
+import { IoUtils } from "./ioUtils";
 
 const regexRoom = /^\w{1,30}$/;
 
-module.exports = {
-  /** @param {SocketContext} socketContext @param {IoUtils} ioUtils */
-  start: function (socketContext, ioUtils) {
+export default {
+  start: function (socketContext: SocketContext, ioUtils: IoUtils) {
     socketContext.socket.on(
       "changeStateServer",
-      (debugSocket, roomnum, state, time, callback) => {
+      (
+        debugSocket: IoDebugSocket,
+        roomnum: any,
+        state: any,
+        time: any,
+        callback: IoCallback
+      ) => {
         if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
           debugSocket("roomnum is not a valid string");
           return callback("wrong input");

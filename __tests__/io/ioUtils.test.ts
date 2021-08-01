@@ -1,33 +1,23 @@
-#!/usr/bin/env node
-"use strict";
+import { Server, Socket } from "socket.io";
+import { IoUtils } from "../../src/server/io/ioUtils";
+import { IoRoom } from "../../src/server/io/ioRoom";
+import { IoContext, SocketContext } from "../../src/server/io/ioContext";
+import { Performance } from "perf_hooks";
 
-const { Server, Socket } = require("socket.io");
-const { IoUtils } = require("../../src/server/io/ioUtils");
-const { IoRoom } = require("../../src/server/io/ioRoom");
-const { IoContext, SocketContext } = require("../../src/server/io/ioContext");
+let io: Server;
+let socket: Socket;
+let ioUtils: IoUtils;
 
-/** @type {Server} */
-let io;
-/** @type {Socket} */
-let socket;
-/** @type {IoUtils} */
-let ioUtils;
+let debugSocket: jest.Mock;
+let roomnum: string;
+let callback: jest.Mock;
 
-/** @type {jest.Mock} */
-let debugSocket;
-/** @type {String} */
-let roomnum;
-/** @type {jest.Mock} */
-let callback;
-
-/** @type {Performance} */
-let performance;
-/** @type {jest.Mock} */
-let emit;
+let performance: Performance;
+let emit: jest.Mock;
 
 beforeEach((done) => {
   emit = jest.fn();
-  performance = { now: jest.fn(() => 5) };
+  performance = <any>{ now: jest.fn(() => 5) };
 
   debugSocket = jest.fn();
   roomnum = "roomnum";
@@ -36,7 +26,7 @@ beforeEach((done) => {
   io = new Server();
   IoRoom.ioContext = new IoContext(io, performance);
   socket = io.sockets._add(
-    { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
+    <any>{ conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
     () => {
       let socketContext = new SocketContext(io, socket, performance);
@@ -46,7 +36,7 @@ beforeEach((done) => {
       socket.join(`room-${roomnum}`);
       let ioRoom = new IoRoom(roomnum);
       ioRoom.host = "socket-1";
-      ioUtils.getRoom(roomnum).ioRoom = ioRoom;
+      ioUtils.getRoom(roomnum)!.ioRoom = ioRoom;
 
       done();
     }
@@ -57,7 +47,7 @@ describe("syncClient", () => {
   beforeEach(() => {
     socket.emit = emit;
 
-    let ioRoom = ioUtils.getIoRoom(roomnum);
+    let ioRoom = ioUtils.getIoRoom(roomnum)!;
     ioRoom.state = true;
     ioRoom.currTime = 0;
     ioRoom.lastChange = 2;
@@ -70,9 +60,7 @@ describe("syncClient", () => {
 
     expect(toCallback).toEqual({
       roomnum: roomnum,
-      site: undefined,
       videoId: "videoId",
-      location: undefined,
       time: 0.003,
       state: true,
     });
@@ -95,22 +83,20 @@ describe("syncClient", () => {
         currTime: 0,
         lastChange: 2,
         currVideo: "videoId",
-        site: undefined,
-        location: undefined,
       },
     });
   });
 
   it("sync state and video and state is false", () => {
-    ioUtils.getIoRoom(roomnum).state = false;
+    ioUtils.getIoRoom(roomnum)!.state = false;
     let toCallback = {};
     ioUtils.syncClient(debugSocket, roomnum, callback, toCallback);
 
     expect(toCallback).toStrictEqual({
+      location: undefined,
       roomnum: roomnum,
       site: undefined,
       videoId: "videoId",
-      location: undefined,
       time: 0,
       state: false,
     });
@@ -133,14 +119,12 @@ describe("syncClient", () => {
         currTime: 0,
         lastChange: 2,
         currVideo: "videoId",
-        site: undefined,
-        location: undefined,
       },
     });
   });
 
   it("sync state", () => {
-    ioUtils.getIoRoom(roomnum).currVideo = undefined;
+    ioUtils.getIoRoom(roomnum)!.currVideo = undefined;
     let toCallback = {};
     ioUtils.syncClient(debugSocket, roomnum, callback, toCallback);
 
@@ -166,17 +150,14 @@ describe("syncClient", () => {
         state: true,
         currTime: 0,
         lastChange: 2,
-        currVideo: undefined,
-        site: undefined,
-        location: undefined,
       },
     });
   });
 
   it("sync video", () => {
-    ioUtils.getIoRoom(roomnum).currTime = undefined;
-    ioUtils.getIoRoom(roomnum).state = undefined;
-    ioUtils.getIoRoom(roomnum).lastChange = undefined;
+    ioUtils.getIoRoom(roomnum)!.currTime = <any>undefined;
+    ioUtils.getIoRoom(roomnum)!.state = <any>undefined;
+    ioUtils.getIoRoom(roomnum)!.lastChange = <any>undefined;
     let toCallback = {};
     ioUtils.syncClient(debugSocket, roomnum, callback, toCallback);
 
@@ -200,12 +181,7 @@ describe("syncClient", () => {
     expect(ioUtils.getRoom(roomnum)).toMatchObject({
       ioRoom: {
         host: "socket-1",
-        state: undefined,
-        currTime: undefined,
-        lastChange: undefined,
         currVideo: "videoId",
-        site: undefined,
-        location: undefined,
       },
     });
   });
@@ -249,11 +225,11 @@ describe("syncClient", () => {
 
 describe("updateRoomUsers", () => {
   beforeEach(() => {
-    socket.to = (roomKey) => {
+    socket.to = <any>((roomKey: string) => {
       if (roomKey === `room-${roomnum}`) {
         return { emit: emit };
       }
-    };
+    });
   });
 
   it("Valid", () => {
@@ -279,9 +255,6 @@ describe("updateRoomUsers", () => {
         state: false,
         currTime: 0,
         lastChange: 5,
-        currVideo: undefined,
-        site: undefined,
-        location: undefined,
       },
     });
   });

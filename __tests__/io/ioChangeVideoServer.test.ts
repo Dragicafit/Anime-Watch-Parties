@@ -1,39 +1,35 @@
-#!/usr/bin/env node
-"use strict";
+import { Performance } from "perf_hooks";
+import { Server, Socket } from "socket.io";
+import ioChangeVideoServer from "../../src/server/io/ioChangeVideoServer";
+import { IoCallback, IoDebugSocket } from "../../src/server/io/ioConst";
+import { IoContext, SocketContext } from "../../src/server/io/ioContext";
+import { IoRoom } from "../../src/server/io/ioRoom";
+import { IoUtils } from "../../src/server/io/ioUtils";
 
-const { Server, Socket } = require("socket.io");
-const ioChangeVideoServer = require("../../src/server/io/ioChangeVideoServer");
-const { IoContext, SocketContext } = require("../../src/server/io/ioContext");
-const { IoRoom } = require("../../src/server/io/ioRoom");
-const { IoUtils } = require("../../src/server/io/ioUtils");
+let io: Server;
+let socket: Socket;
+let ioUtils: IoUtils;
+let changeVideoServer: (
+  debugSocket: IoDebugSocket,
+  roomnum: any,
+  videoId: any,
+  site: any,
+  location: any,
+  callback: IoCallback
+) => void;
 
-/** @type {Server} */
-let io;
-/** @type {Socket} */
-let socket;
-/** @type {IoUtils} */
-let ioUtils;
-let changeVideoServer;
+let debugSocket: jest.Mock;
+let roomnum: any;
+let videoId: any;
+let site: any;
+let location: any;
+let callback: jest.Mock;
 
-/** @type {jest.Mock} */
-let debugSocket;
-/** @type {String} */
-let roomnum;
-/** @type {String} */
-let videoId;
-/** @type {String} */
-let site;
-/** @type {String} */
-let location;
-/** @type {jest.Mock} */
-let callback;
-
-/** @type {jest.Mock} */
-let emit;
+let emit: jest.Mock;
 
 beforeEach((done) => {
   emit = jest.fn();
-  let performance = { now: () => 5 };
+  let performance: Performance = <any>{ now: () => 5 };
 
   debugSocket = jest.fn();
   roomnum = "roomnum";
@@ -45,26 +41,26 @@ beforeEach((done) => {
   io = new Server();
   IoRoom.ioContext = new IoContext(io, performance);
   socket = io.sockets._add(
-    { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
+    <any>{ conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
     () => {
-      socket.to = (roomKey) => {
+      socket.to = <any>((roomKey: string) => {
         if (roomKey === `room-${roomnum}`) {
           return { emit: emit };
         }
-      };
+      });
 
-      let socketContext = new SocketContext(io, socket);
+      let socketContext = new SocketContext(io, socket, performance);
       ioUtils = new IoUtils(socketContext);
 
       // join room
       socket.join(`room-${roomnum}`);
       let ioRoom = new IoRoom(roomnum);
       ioRoom.host = "socket-1";
-      ioUtils.getRoom(roomnum).ioRoom = ioRoom;
+      ioUtils.getRoom(roomnum)!.ioRoom = ioRoom;
 
       ioChangeVideoServer.start(socketContext, ioUtils);
-      changeVideoServer = socket.events.changeVideoServer;
+      changeVideoServer = (<any>socket).events.changeVideoServer;
       done();
     }
   );
@@ -173,9 +169,6 @@ it.each([
       state: false,
       currTime: 0,
       lastChange: 5,
-      currVideo: undefined,
-      site: undefined,
-      location: undefined,
     },
   });
 });
@@ -210,9 +203,6 @@ it.each([
       state: false,
       currTime: 0,
       lastChange: 5,
-      currVideo: undefined,
-      site: undefined,
-      location: undefined,
     },
   });
 });
@@ -253,9 +243,6 @@ it.each([
       state: false,
       currTime: 0,
       lastChange: 5,
-      currVideo: undefined,
-      site: undefined,
-      location: undefined,
     },
   });
 });
@@ -299,7 +286,7 @@ it("With error", () => {
 });
 
 it("Not host", () => {
-  ioUtils.getIoRoom(roomnum).host = "2";
+  ioUtils.getIoRoom(roomnum)!.host = "2";
   changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
 
   expect(debugSocket).toHaveBeenNthCalledWith(1, "socket is not host");
@@ -315,9 +302,6 @@ it("Not host", () => {
       state: false,
       currTime: 0,
       lastChange: 5,
-      currVideo: undefined,
-      site: undefined,
-      location: undefined,
     },
   });
 });

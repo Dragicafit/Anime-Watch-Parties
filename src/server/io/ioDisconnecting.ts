@@ -1,11 +1,16 @@
-const { SocketContext } = require("./ioContext");
-const { IoUtils } = require("./ioUtils");
+import debugModule from "debug";
+import { IoDebugSocket } from "./ioConst";
+import { SocketContext } from "./ioContext";
+import { IoUtils } from "./ioUtils";
 
-module.exports = {
-  /** @param {SocketContext} socketContext @param {IoUtils} ioUtils @param {debug.Debugger} debugDisconnecting */
-  start: function (socketContext, ioUtils, debugDisconnecting) {
+export default {
+  start: function (
+    socketContext: SocketContext,
+    ioUtils: IoUtils,
+    debugDisconnecting: debugModule.Debugger
+  ) {
     socketContext.socket.on("disconnecting", () => {
-      let debugSocket = (...args) => {
+      let debugSocket: IoDebugSocket = (...args) => {
         debugDisconnecting(`${socketContext.socket.id}:`, ...args);
       };
       debugSocket(`${socketContext.io.sockets.sockets.size} sockets connected`);

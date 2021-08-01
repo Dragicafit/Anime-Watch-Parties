@@ -1,19 +1,16 @@
 import { Socket } from "./socket";
-import type { Server } from "./socket.io";
+import type { Server } from "./index";
 import {
   EventParams,
   EventNames,
   EventsMap,
   StrictEventEmitter,
   DefaultEventsMap,
-} from "socket.io/dist/typed-events";
-import type { Client } from "socket.io/dist/client";
+} from "./typed-events";
+import type { Client } from "./client";
 import debugModule from "debug";
 import type { Adapter, Room, SocketId } from "socket.io-adapter";
-import {
-  BroadcastOperator,
-  RemoteSocket,
-} from "socket.io/dist/broadcast-operator";
+import { BroadcastOperator, RemoteSocket } from "./broadcast-operator";
 
 const debug = debugModule("socket.io:namespace");
 
@@ -94,7 +91,6 @@ export class Namespace<
     super();
     this.server = server;
     this.name = name;
-    this.adapter = <any>null;
     this._initAdapter();
   }
 
@@ -164,7 +160,7 @@ export class Namespace<
    * @public
    */
   public to(room: Room | Room[]): BroadcastOperator<EmitEvents> {
-    return <any>jest.fn();
+    return new BroadcastOperator(this.adapter).to(room);
   }
 
   /**
@@ -175,7 +171,7 @@ export class Namespace<
    * @public
    */
   public in(room: Room | Room[]): BroadcastOperator<EmitEvents> {
-    return <any>jest.fn();
+    return new BroadcastOperator(this.adapter).in(room);
   }
 
   /**
@@ -186,7 +182,7 @@ export class Namespace<
    * @public
    */
   public except(room: Room | Room[]): BroadcastOperator<EmitEvents> {
-    return <any>jest.fn();
+    return new BroadcastOperator(this.adapter).except(room);
   }
 
   /**
@@ -197,7 +193,7 @@ export class Namespace<
    */
   _add(
     client: Client<ListenEvents, EmitEvents, ServerSideEvents>,
-    query: any,
+    query,
     fn?: () => void
   ): Socket<ListenEvents, EmitEvents, ServerSideEvents> {
     debug("adding socket to nsp %s", this.name);
@@ -209,7 +205,7 @@ export class Namespace<
             if (client.conn.protocol === 3) {
               return socket._error(err.data || err.message);
             } else {
-              return socket._error(<any>{
+              return socket._error({
                 message: err.message,
                 data: err.data,
               });
@@ -260,7 +256,7 @@ export class Namespace<
     ev: Ev,
     ...args: EventParams<EmitEvents, Ev>
   ): boolean {
-    return <any>jest.fn();
+    return new BroadcastOperator<EmitEvents>(this.adapter).emit(ev, ...args);
   }
 
   /**
@@ -286,13 +282,43 @@ export class Namespace<
   }
 
   /**
+   * Emit a packet to other Socket.IO servers
+   *
+   * @param ev - the event name
+   * @param args - an array of arguments, which may include an acknowledgement callback at the end
+   * @public
+   */
+  public serverSideEmit<Ev extends EventNames<ServerSideEvents>>(
+    ev: Ev,
+    ...args: EventParams<ServerSideEvents, Ev>
+  ): boolean {
+    if (RESERVED_EVENTS.has(ev)) {
+      throw new Error(`"${ev}" is a reserved event name`);
+    }
+    args.unshift(ev);
+    this.adapter.serverSideEmit(args);
+    return true;
+  }
+
+  /**
+   * Called when a packet is received from another Socket.IO server
+   *
+   * @param args - an array of arguments, which may include an acknowledgement callback at the end
+   *
+   * @private
+   */
+  _onServerSideEmit(args: [string, ...any[]]) {
+    super.emitUntyped.apply(this, args);
+  }
+
+  /**
    * Gets a list of clients.
    *
    * @return self
    * @public
    */
   public allSockets(): Promise<Set<SocketId>> {
-    return <any>jest.fn();
+    return new BroadcastOperator(this.adapter).allSockets();
   }
 
   /**
@@ -303,7 +329,7 @@ export class Namespace<
    * @public
    */
   public compress(compress: boolean): BroadcastOperator<EmitEvents> {
-    return <any>jest.fn();
+    return new BroadcastOperator(this.adapter).compress(compress);
   }
 
   /**
@@ -315,7 +341,7 @@ export class Namespace<
    * @public
    */
   public get volatile(): BroadcastOperator<EmitEvents> {
-    return <any>jest.fn();
+    return new BroadcastOperator(this.adapter).volatile;
   }
 
   /**
@@ -325,7 +351,7 @@ export class Namespace<
    * @public
    */
   public get local(): BroadcastOperator<EmitEvents> {
-    return <any>jest.fn();
+    return new BroadcastOperator(this.adapter).local;
   }
 
   /**
@@ -334,7 +360,7 @@ export class Namespace<
    * @public
    */
   public fetchSockets(): Promise<RemoteSocket<EmitEvents>[]> {
-    return <any>jest.fn();
+    return new BroadcastOperator(this.adapter).fetchSockets();
   }
 
   /**
@@ -344,7 +370,7 @@ export class Namespace<
    * @public
    */
   public socketsJoin(room: Room | Room[]): void {
-    return <any>jest.fn();
+    return new BroadcastOperator(this.adapter).socketsJoin(room);
   }
 
   /**
@@ -354,7 +380,7 @@ export class Namespace<
    * @public
    */
   public socketsLeave(room: Room | Room[]): void {
-    return <any>jest.fn();
+    return new BroadcastOperator(this.adapter).socketsLeave(room);
   }
 
   /**
@@ -364,6 +390,6 @@ export class Namespace<
    * @public
    */
   public disconnectSockets(close: boolean = false): void {
-    return <any>jest.fn();
+    return new BroadcastOperator(this.adapter).disconnectSockets(close);
   }
 }

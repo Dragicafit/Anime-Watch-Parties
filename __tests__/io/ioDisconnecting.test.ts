@@ -1,37 +1,29 @@
-#!/usr/bin/env node
-"use strict";
+import { Server as Server, Socket as Socket } from "socket.io";
+import { IoContext, SocketContext } from "../../src/server/io/ioContext";
+import ioDisconnecting from "../../src/server/io/ioDisconnecting";
+import { IoRoom } from "../../src/server/io/ioRoom";
+import { IoUtils } from "../../src/server/io/ioUtils";
 
-const { Server: Server, Socket: Socket } = require("socket.io");
-const { IoContext, SocketContext } = require("../../src/server/io/ioContext");
-const ioDisconnecting = require("../../src/server/io/ioDisconnecting");
-const { IoRoom } = require("../../src/server/io/ioRoom");
-const { IoUtils } = require("../../src/server/io/ioUtils");
+let io: Server;
+let socket: Socket;
+let disconnecting: () => void;
 
-/** @type {Server} */
-let io;
-/** @type {Socket} */
-let socket;
-let disconnecting;
+let ioUtils: IoUtils;
+let roomnum: string;
 
-/** @type {IoUtils} */
-let ioUtils;
-/** @type {String} */
-let roomnum;
-
-/** @type {jest.Mock} */
-let debugDisconnecting;
+let debugDisconnecting: jest.Mock;
 
 beforeEach((done) => {
   roomnum = "roomnum";
   debugDisconnecting = jest.fn();
 
   io = new Server();
-  IoRoom.ioContext = new IoContext(io, { now: () => 5 });
+  IoRoom.ioContext = new IoContext(io, <any>{ now: () => 5 });
   socket = io.sockets._add(
-    { conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
+    <any>{ conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
     () => {
-      let socketContext = new SocketContext(io, socket);
+      let socketContext = new SocketContext(io, socket, <any>null);
       ioUtils = new IoUtils(socketContext);
       ioUtils.updateRoomUsers = jest.fn((cb) => cb("updateRoomUsers"));
 
@@ -39,10 +31,10 @@ beforeEach((done) => {
       socket.join(`room-${roomnum}`);
       let ioRoom = new IoRoom(roomnum);
       ioRoom.host = "socket-1";
-      ioUtils.getRoom(roomnum).ioRoom = ioRoom;
+      ioUtils.getRoom(roomnum)!.ioRoom = ioRoom;
 
-      ioDisconnecting.start(socketContext, ioUtils, debugDisconnecting);
-      disconnecting = socket.events.disconnecting;
+      ioDisconnecting.start(socketContext, ioUtils, <any>debugDisconnecting);
+      disconnecting = (<any>socket).events.disconnecting;
       done();
     }
   );
@@ -79,7 +71,7 @@ it("With Roomnum and is host", () => {
 });
 
 it("With Roomnum and is not host", () => {
-  ioUtils.getIoRoom(roomnum).host = "2";
+  ioUtils.getIoRoom(roomnum)!.host = "2";
   disconnecting();
 
   expect(debugDisconnecting).toHaveBeenNthCalledWith(
@@ -143,6 +135,6 @@ it("With error", () => {
   expect(io.sockets.adapter.rooms.get(roomnum)).toStrictEqual(
     new Set(["socket-1"])
   );
-  expect(io.sockets.adapter.rooms.get(roomnum).ioRoom).toBeUndefined();
+  expect((<any>io.sockets.adapter.rooms.get(roomnum)).ioRoom).toBeUndefined();
   // the room will be destroyed on disconnect
 });

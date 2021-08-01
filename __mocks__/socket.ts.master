@@ -1,14 +1,15 @@
 import { Packet, PacketType } from "socket.io-parser";
+import url = require("url");
 import debugModule from "debug";
-import type { Server } from "./socket.io";
+import type { Server } from "./index";
 import {
   EventParams,
   EventNames,
   EventsMap,
   StrictEventEmitter,
   DefaultEventsMap,
-} from "socket.io/dist/typed-events";
-import type { Client } from "socket.io/dist/client";
+} from "./typed-events";
+import type { Client } from "./client";
 import type { Namespace, NamespaceReservedEventsMap } from "./namespace";
 import type { IncomingMessage, IncomingHttpHeaders } from "http";
 import type {
@@ -19,7 +20,7 @@ import type {
 } from "socket.io-adapter";
 import base64id from "base64id";
 import type { ParsedUrlQuery } from "querystring";
-import { BroadcastOperator } from "socket.io/dist/broadcast-operator";
+import { BroadcastOperator } from "./broadcast-operator";
 
 const debug = debugModule("socket.io:socket");
 
@@ -134,8 +135,6 @@ export class Socket<
   private flags: BroadcastFlags = {};
   private _anyListeners?: Array<(...args: any[]) => void>;
 
-  public events: any;
-
   /**
    * Interface to a `Client` for a given `Namespace`.
    *
@@ -152,7 +151,6 @@ export class Socket<
     super();
     this.server = nsp.server;
     this.adapter = this.nsp.adapter;
-    this.events = {};
     if (client.conn.protocol === 3) {
       // @ts-ignore
       this.id = nsp.name !== "/" ? nsp.name + "#" + client.id : client.id;
@@ -170,12 +168,18 @@ export class Socket<
    * @private
    */
   private buildHandshake(auth: object): Handshake {
-    return <any>jest.fn();
-  }
-
-  public on(event: any, cb: any) {
-    this.events[event] = cb;
-    return this;
+    return {
+      headers: this.request.headers,
+      time: new Date() + "",
+      address: this.conn.remoteAddress,
+      xdomain: !!this.request.headers.origin,
+      // @ts-ignore
+      secure: !!this.request.connection.encrypted,
+      issued: +new Date(),
+      url: this.request.url!,
+      query: url.parse(this.request.url!, true).query,
+      auth,
+    };
   }
 
   /**
@@ -188,7 +192,28 @@ export class Socket<
     ev: Ev,
     ...args: EventParams<EmitEvents, Ev>
   ): boolean {
-    return <any>jest.fn();
+    if (RESERVED_EVENTS.has(ev)) {
+      throw new Error(`"${ev}" is a reserved event name`);
+    }
+    const data: any[] = [ev, ...args];
+    const packet: any = {
+      type: PacketType.EVENT,
+      data: data,
+    };
+
+    // access last argument to see if it's an ACK callback
+    if (typeof data[data.length - 1] === "function") {
+      debug("emitting packet with ack id %d", this.nsp._ids);
+      this.acks.set(this.nsp._ids, data.pop());
+      packet.id = this.nsp._ids++;
+    }
+
+    const flags = Object.assign({}, this.flags);
+    this.flags = {};
+
+    this.packet(packet, flags);
+
+    return true;
   }
 
   /**
@@ -199,7 +224,7 @@ export class Socket<
    * @public
    */
   public to(room: Room | Room[]): BroadcastOperator<EmitEvents> {
-    return <any>jest.fn();
+    return this.newBroadcastOperator().to(room);
   }
 
   /**
@@ -210,7 +235,7 @@ export class Socket<
    * @public
    */
   public in(room: Room | Room[]): BroadcastOperator<EmitEvents> {
-    return <any>jest.fn();
+    return this.newBroadcastOperator().in(room);
   }
 
   /**
@@ -221,7 +246,7 @@ export class Socket<
    * @public
    */
   public except(room: Room | Room[]): BroadcastOperator<EmitEvents> {
-    return <any>jest.fn();
+    return this.newBroadcastOperator().except(room);
   }
 
   /**
@@ -257,7 +282,9 @@ export class Socket<
     packet: Omit<Packet, "nsp"> & Partial<Pick<Packet, "nsp">>,
     opts: any = {}
   ): void {
-    return <any>jest.fn();
+    packet.nsp = this.nsp.name;
+    opts.compress = false !== opts.compress;
+    this.client._packet(packet as Packet, opts);
   }
 
   /**
@@ -453,7 +480,7 @@ export class Socket<
     this.emitReserved("disconnecting", reason);
     this.leaveAll();
     this.nsp._remove(this);
-    this.client._remove(<any>this);
+    this.client._remove(this);
     this.connected = false;
     this.disconnected = true;
     this.emitReserved("disconnect", reason);
@@ -467,7 +494,7 @@ export class Socket<
    *
    * @private
    */
-  _error(err: null): void {
+  _error(err): void {
     this.packet({ type: PacketType.CONNECT_ERROR, data: err });
   }
 
@@ -523,7 +550,7 @@ export class Socket<
    * @public
    */
   public get broadcast(): BroadcastOperator<EmitEvents> {
-    return <any>jest.fn();
+    return this.newBroadcastOperator();
   }
 
   /**
@@ -533,7 +560,7 @@ export class Socket<
    * @public
    */
   public get local(): BroadcastOperator<EmitEvents> {
-    return <any>jest.fn();
+    return this.newBroadcastOperator().local;
   }
 
   /**
@@ -688,6 +715,13 @@ export class Socket<
   }
 
   private newBroadcastOperator(): BroadcastOperator<EmitEvents> {
-    return <any>jest.fn();
+    const flags = Object.assign({}, this.flags);
+    this.flags = {};
+    return new BroadcastOperator(
+      this.adapter,
+      new Set<Room>(),
+      new Set<Room>([this.id]),
+      flags
+    );
   }
 }
