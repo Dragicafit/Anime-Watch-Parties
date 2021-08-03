@@ -6,8 +6,8 @@
     "start": "ts-node --project src/server/tsconfig.json src/server/server.ts",
     "debug": "DEBUG=*erverAWP:* npm start",
     "test": "jest",
-    "browserify-background-scripts": "cd src/background-scripts && browserify -d clientScript.js | exorcist background-script.js.map > background-script.js",
-    "browserify-web-accessible-resources": "cd src/web-accessible-resources/js && browserify -d tabScript.js | exorcist script.js.map > script.js",
+    "browserify-background-scripts": "cd src/background-scripts && browserify -d clientScript.ts | exorcist background-script.js.map > background-script.js",
+    "browserify-web-accessible-resources": "cd src/web-accessible-resources/js && browserify -d tabScript.ts | exorcist script.js.map > script.js",
     "release": "npm run browserify-background-scripts && npm run browserify-web-accessible-resources && ./concat.ps1 && zip -r -FS Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json src/icons/* src/dependencies/* src/background-scripts/background-script.js src/content-scripts/listener.js src/web-accessible-resources/js/script.js src/web-accessible-resources/css/script.css src/popup/*",
     "cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj \"/C=FR/ST=Ile-de-France/L=Paris/O=Dragicafit/OU=Org/CN=localhost\" -sha256"
   },
@@ -42,6 +42,7 @@
     "@babel/preset-env": "^7.14.8",
     "@frida/uglifyify": "^7.0.1",
     "@tsconfig/node16": "^1.0.2",
+    "@tsconfig/recommended": "^1.0.1",
     "@types/base64id": "^2.0.0",
     "@types/connect-redis": "^0.0.17",
     "@types/debug": "^4.1.7",
@@ -61,6 +62,7 @@
     "socket.io-client": "^4.1.3",
     "ts-jest": "^27.0.4",
     "ts-node": "^10.1.0",
+    "tsify": "^5.0.4",
     "tslib": "^2.3.0",
     "typescript": "^4.3.5"
   },
@@ -84,6 +86,12 @@
             ]
           ]
         }
+      ]
+    ],
+    "plugins": [
+      [
+        "tsify",
+        "noImplicitAny"
       ]
     ]
   }
