@@ -1,12 +1,9 @@
-const { TabContext } = require("./tabContext");
+import { TabContext } from "./tabContext";
 
-class TabUtils {
-  /** @type {TabContext} */
-  tabContext;
+export class TabUtils {
+  tabContext: TabContext;
 
-  /** @param {TabContext} tabContext */
-  constructor(tabContext) {
+  constructor(tabContext: TabContext) {
     this.tabContext = tabContext;
   }
 }
-exports.TabUtils = TabUtils;

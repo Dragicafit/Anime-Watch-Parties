@@ -1,11 +1,9 @@
-const { TabContext } = require("./tabContext");
+import { TabContext } from "./tabContext";
 
-class TabSync {
-  /** @type {TabContext} */
-  tabContext;
+export class TabSync {
+  tabContext: TabContext;
 
-  /** @param {TabContext} tabContext */
-  constructor(tabContext) {
+  constructor(tabContext: TabContext) {
     this.tabContext = tabContext;
   }
 
@@ -21,7 +19,7 @@ class TabSync {
     );
   }
 
-  sendState(time, state) {
+  sendState(time: number, state: boolean) {
     console.log("send state");
 
     this.tabContext.window.postMessage(
@@ -35,5 +33,3 @@ class TabSync {
     );
   }
 }
-
-exports.TabSync = TabSync;

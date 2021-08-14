@@ -1,14 +1,9 @@
-class TabRoom {
-  /** @type {String} */
-  roomnum;
-  /** @type {Boolean} */
-  host;
-  /** @type {Number} */
-  delay;
+export class TabRoom {
+  roomnum: string | undefined;
+  host: boolean | undefined;
+  delay: number;
 
   constructor() {
     this.delay = 0;
   }
 }
-
-exports.TabRoom = TabRoom;

@@ -1,6 +1,6 @@
 // jquery-ui only works on Browser globals (see jquery-ui/ui/widget.js)
-module.exports = ($) => {
-  window.$ = window.jQuery = $;
+export default ($: JQueryStatic) => {
+  (<any>window).$ = (<any>window).jQuery = $;
   require("jquery-ui/ui/version");
   require("jquery-ui/ui/widget");
   require("jquery-ui/ui/data");

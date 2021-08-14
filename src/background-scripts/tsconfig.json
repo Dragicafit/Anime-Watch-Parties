@@ -3,5 +3,6 @@
 
   "compilerOptions": {
     "outDir": "../../built/background-scripts"
-  }
+  },
+  "typeRoots": ["../../node_modules/@types"]
 }

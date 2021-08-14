@@ -18,14 +18,14 @@
     "tabs"
   ],
   "background": {
-    "scripts": ["src/background-scripts/background-script.js"]
+    "scripts": ["built/src/background-scripts/background-script.js"]
   },
   "browser_action": {
     "default_title": "Anime Watch Parties",
     "default_popup": "src/popup/popup.html"
   },
   "web_accessible_resources": [
-    "src/web-accessible-resources/js/script.js",
-    "src/web-accessible-resources/css/script.css"
+    "built/src/web-accessible-resources/js/script.js",
+    "built/src/web-accessible-resources/css/script.css"
   ]
 }

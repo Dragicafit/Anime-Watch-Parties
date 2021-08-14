@@ -1,64 +1,54 @@
-"use strict";
+import { AwpPlayerInterface } from "./awpPlayerInterface";
+import { JwplayerSetup } from "./jwplayerSetup";
+import { VilosplayerSetup } from "./vilosplayerSetup";
 
-const { AwpPlayerInterface } = require("./awpPlayerInterface");
-const { AwpplayerSetup } = require("./awpplayerSetup");
-const { JwplayerSetup } = require("./jwplayerSetup");
-const { VilosplayerSetup } = require("./vilosplayerSetup");
+export class PlayerAWP implements AwpPlayerInterface {
+  private jwplayer: JwplayerSetup;
+  private vilosplayer: VilosplayerSetup;
 
-class PlayerAWP extends AwpPlayerInterface {
-  /** @type {JwplayerSetup} */
-  #jwplayer;
-  /**  @type {VilosplayerSetup} */
-  #vilosplayer;
-
-  /** @param {JwplayerSetup} jwplayer @param {VilosplayerSetup} vilosplayer */
-  constructor(jwplayer, vilosplayer) {
-    super();
-    this.#jwplayer = jwplayer;
-    this.#vilosplayer = vilosplayer;
+  constructor(jwplayer: JwplayerSetup, vilosplayer: VilosplayerSetup) {
+    this.jwplayer = jwplayer;
+    this.vilosplayer = vilosplayer;
   }
 
-  /** @type {AwpplayerSetup} */
-  get awpplayer() {
-    if (this.#jwplayer?.playerExist()) {
-      return this.#jwplayer;
+  get awpplayer(): JwplayerSetup | VilosplayerSetup | void {
+    if (this.jwplayer?.playerExist()) {
+      return this.jwplayer;
     }
-    if (this.#vilosplayer?.playerExist()) {
-      return this.#vilosplayer;
+    if (this.vilosplayer?.playerExist()) {
+      return this.vilosplayer;
     }
   }
 
   onPlay() {
-    return this.awpplayer.onPlay();
+    return this.awpplayer!.onPlay();
   }
 
   onPause() {
-    return this.awpplayer.onPause();
+    return this.awpplayer!.onPause();
   }
 
   onSeek() {
-    return this.awpplayer.onSeek();
+    return this.awpplayer!.onSeek();
   }
 
   getTime() {
-    return this.awpplayer.getTime();
+    return this.awpplayer!.getTime();
   }
 
   isPlay() {
-    return this.awpplayer.isPlay();
+    return this.awpplayer!.isPlay();
   }
 
-  seekTo(time) {
-    return this.awpplayer.seekTo(time);
+  seekTo(time: number) {
+    return this.awpplayer!.seekTo(time);
   }
 
-  setState(state) {
-    return this.awpplayer.setState(state);
+  setState(state: boolean) {
+    return this.awpplayer!.setState(state);
   }
 
   playerExist() {
-    return this.awpplayer.playerExist();
+    return this.awpplayer!.playerExist();
   }
 }
-
-exports.PlayerAWP = PlayerAWP;

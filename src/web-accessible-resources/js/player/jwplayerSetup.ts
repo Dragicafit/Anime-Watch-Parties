@@ -1,94 +1,89 @@
-"use strict";
+import { TabContext } from "../tabContext";
+import { TabSync } from "../tabSync";
+import { AwpplayerSetup } from "./awpplayerSetup";
 
-const { TabContext } = require("../tabContext");
-const { TabSync } = require("../tabSync");
-const { AwpplayerSetup } = require("./awpplayerSetup");
+export class JwplayerSetup extends AwpplayerSetup {
+  private previousSeek: number;
+  private preventCallIfTriggered: Map<string, number>;
 
-class JwplayerSetup extends AwpplayerSetup {
-  /** @type {Number} */
-  #previousSeek;
-  /** @type {Map<String,Number>} */
-  #preventCallIfTriggered;
-
-  /** @param {TabContext} tabContext @param {TabSync} tabSync */
-  constructor(tabContext, tabSync) {
+  constructor(tabContext: TabContext, tabSync: TabSync) {
     super("jwplayer", tabContext, tabSync);
-    this.#previousSeek = 0;
-    this.#preventCallIfTriggered = new Map();
+    this.previousSeek = 0;
+    this.preventCallIfTriggered = new Map();
   }
 
-  _onPlay(a) {
+  _onPlay(callback: (...events: any[]) => void): void {
     jwplayer().on("play", (e) => {
       if (
         this.tabContext.tabRoom.host ||
-        (e.playReason === "interaction" && e.reason === "playing")
+        (e.playReason === "interaction" && (<any>e).reason === "playing")
       ) {
         if (
-          !this.#preventCallIfTriggered.has("play") ||
+          !this.preventCallIfTriggered.has("play") ||
           this.tabContext.performance.now() -
-            this.#preventCallIfTriggered.get("play") >
+            this.preventCallIfTriggered.get("play")! >
             200
         ) {
-          a(e);
+          callback(e);
         }
       }
     });
   }
 
-  _onPause(a) {
+  _onPause(callback: (...events: any[]) => void): void {
     jwplayer().on("pause", (e) => {
       if (
-        !this.#preventCallIfTriggered.has("pause") ||
+        !this.preventCallIfTriggered.has("pause") ||
         this.tabContext.performance.now() -
-          this.#preventCallIfTriggered.get("pause") >
+          this.preventCallIfTriggered.get("pause")! >
           200
       ) {
-        a(e);
+        callback(e);
       }
     });
   }
 
-  _onSeek(a) {
+  _onSeek(callback: (...events: any[]) => void): void {
     jwplayer().on("seek", (e) => {
       if (this.tabContext.window.document.hidden) {
         return;
       }
       if (
-        !this.#preventCallIfTriggered.has("seek") ||
+        !this.preventCallIfTriggered.has("seek") ||
         this.tabContext.performance.now() -
-          this.#preventCallIfTriggered.get("seek") >
+          this.preventCallIfTriggered.get("seek")! >
           200
       ) {
-        let previousSeek = this.#previousSeek;
-        this.#previousSeek = e.offset;
+        let previousSeek = this.previousSeek;
+        this.previousSeek = e.offset;
         if (Math.abs(e.offset - previousSeek) < 0.5) return;
-        a(e.offset, e);
+        callback(e.offset, e);
       }
     });
   }
 
-  _getTime() {
+  override _getTime() {
     return Promise.resolve(jwplayer().getPosition());
   }
 
-  _isPlay() {
+  override _isPlay(): Promise<boolean> {
     return Promise.resolve(jwplayer().getState() === "playing");
   }
 
-  _seekTo(time) {
-    this.#preventCallIfTriggered.set("seek", this.tabContext.performance.now());
+  _seekTo(time: number): void {
+    this.preventCallIfTriggered.set("seek", this.tabContext.performance.now());
     jwplayer().seek(time);
   }
 
-  _setState(state) {
+  _setState(state: boolean): void {
     if (state) {
-      this.#preventCallIfTriggered.set(
+      this.preventCallIfTriggered.set(
         "play",
         this.tabContext.performance.now()
       );
       jwplayer().play();
     } else {
-      this.#preventCallIfTriggered.set(
+      this.preventCallIfTriggered.set(
         "pause",
         this.tabContext.performance.now()
       );
@@ -96,9 +91,7 @@ class JwplayerSetup extends AwpplayerSetup {
     }
   }
 
-  playerExist() {
+  override playerExist(): boolean {
     return typeof jwplayer === "function";
   }
 }
-
-exports.JwplayerSetup = JwplayerSetup;

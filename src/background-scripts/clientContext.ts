@@ -1,24 +1,19 @@
-const { Socket } = require("socket.io-client");
-const { ClientTab } = require("./clientTab");
-const { ClientRoom } = require("./clientRoom");
+import { Socket } from "socket.io-client";
+import { ClientTab } from "./clientTab";
+import { ClientRoom } from "./clientRoom";
 
-class ClientContext {
-  /** @type {Socket} */
-  socket;
-  /** @type {Object} */
-  browser;
-  /** @type {Map<Number,ClientTab>} */
-  clientTabs;
-  /** @type {Map<String,ClientRoom>} */
-  clientRooms;
+export class ClientContext {
+  socket: Socket;
+  clientTabs: Map<number, ClientTab>;
+  clientRooms: Map<string, ClientRoom>;
 
-  /** @param {Socket} socket @param {Object} browser @param {Map<Number,ClientTab>} clientTabs @param {Map<String,ClientRoom>} clientRooms */
-  constructor(socket, browser, clientTabs, clientRooms) {
+  constructor(
+    socket: Socket,
+    clientTabs: Map<number, ClientTab>,
+    clientRooms: Map<string, ClientRoom>
+  ) {
     this.socket = socket;
-    this.browser = browser;
     this.clientTabs = clientTabs;
     this.clientRooms = clientRooms;
   }
 }
-
-exports.ClientContext = ClientContext;

@@ -1,35 +1,22 @@
-"use strict";
+import { TabContext } from "../tabContext";
+import { TabSync } from "../tabSync";
+import { AwpPlayerInterface } from "./awpPlayerInterface";
 
-const { TabContext } = require("../tabContext");
-const { TabSync } = require("../tabSync");
-const { AwpPlayerInterface } = require("./awpPlayerInterface");
+export abstract class AwpplayerSetup implements AwpPlayerInterface {
+  name: string;
+  tabContext: TabContext;
+  tabSync: TabSync;
 
-class AwpplayerSetup extends AwpPlayerInterface {
-  /** @type {String} */
-  name;
-  /** @type {TabContext} */
-  tabContext;
-  /** @type {TabSync} */
-  tabSync;
-
-  /** @param {String} name @param {TabContext} tabContext @param {TabSync} tabSync */
-  constructor(name, tabContext, tabSync) {
-    super();
+  constructor(name: string, tabContext: TabContext, tabSync: TabSync) {
     this.name = name;
     this.tabContext = tabContext;
     this.tabSync = tabSync;
     this._waitForExist();
   }
 
-  _onPlay(a) {
-    // abstract
-  }
-  _onPause(a) {
-    // abstract
-  }
-  _onSeek(a) {
-    // abstract
-  }
+  abstract _onPlay(callback?: (...events: any[]) => void): void;
+  abstract _onPause(callback?: (...events: any[]) => void): void;
+  abstract _onSeek(callback?: (...events: any[]) => void): void;
 
   onPlay() {
     this._onPlay((e) => {
@@ -59,7 +46,7 @@ class AwpplayerSetup extends AwpPlayerInterface {
     if (!this.playerExist()) return Promise.resolve(0);
     return this._getTime();
   }
-  _getTime() {
+  _getTime(): Promise<any> {
     return Promise.reject(new Error("not initialized"));
   }
 
@@ -67,34 +54,31 @@ class AwpplayerSetup extends AwpPlayerInterface {
     if (!this.playerExist()) return Promise.resolve(false);
     return this._isPlay();
   }
-  _isPlay() {
+  _isPlay(): Promise<any> {
     return Promise.reject(new Error("not initialized"));
   }
 
-  seekTo(time) {
+  seekTo(time: number) {
     if (!this.playerExist()) return;
     this._seekTo(time);
   }
-  _seekTo(time) {
-    // abstract
-  }
+  abstract _seekTo(time: number): void;
 
-  setState(state) {
+  setState(state: boolean) {
     if (!this.playerExist()) return;
     this._setState(state);
   }
-  _setState(state) {
-    // abstract
-  }
+  abstract _setState(state: boolean): void;
 
   playerExist() {
     return false;
   }
 
-  _waitForExist() {
-    if (!this.playerExist())
-      return setTimeout(this._waitForExist.bind(this), 500);
-
+  _waitForExist(): void {
+    if (!this.playerExist()) {
+      setTimeout(this._waitForExist.bind(this), 500);
+      return;
+    }
     this.onPlay();
     this.onPause();
     this.onSeek();

@@ -1,24 +1,21 @@
-"use strict";
+import { PlayerAWP } from "./player/playerAWP";
+import { TabRoom } from "./tabRoom";
 
-const { PlayerAWP } = require("./player/playerAWP");
-const { TabRoom } = require("./tabRoom");
+export class TabContext {
+  server: string;
+  tabRoom: TabRoom;
+  $: JQueryStatic;
+  window: Window;
+  performance: Performance;
+  playerAWP: PlayerAWP | undefined;
 
-class TabContext {
-  /** @type {String} */
-  server;
-  /** @type {TabRoom} */
-  tabRoom;
-  /** @type {JQueryStatic} */
-  $;
-  /** @type {Window} */
-  window;
-  /** @type {Performance} */
-  performance;
-  /** @type {PlayerAWP} */
-  playerAWP;
-
-  /** @param {String} server @param {TabRoom} tabRoom @param {JQueryStatic} $ @param {Window} window @param {Performance} performance */
-  constructor(server, tabRoom, $, window) {
+  constructor(
+    server: string,
+    tabRoom: TabRoom,
+    $: JQueryStatic,
+    window: Window,
+    performance: Performance
+  ) {
     this.server = server;
     this.tabRoom = tabRoom;
     this.$ = $;
@@ -26,5 +23,3 @@ class TabContext {
     this.performance = performance;
   }
 }
-
-exports.TabContext = TabContext;

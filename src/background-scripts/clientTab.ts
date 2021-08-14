@@ -1,16 +1,12 @@
-const { ClientContext } = require("./clientContext");
-const { ClientRoom } = require("./clientRoom");
+import { ClientContext } from "./clientContext";
+import { ClientRoom } from "./clientRoom";
 
-class ClientTab {
-  /** @type {ClientContext} */
-  clientContext;
-  /** @type {String} */
-  roomnum;
-  /** @type {Boolean} */
-  host;
+export class ClientTab {
+  clientContext: ClientContext;
+  roomnum: string | undefined;
+  host: boolean | undefined;
 
-  /** @param {ClientContext} clientContext */
-  constructor(clientContext) {
+  constructor(clientContext: ClientContext) {
     this.clientContext = clientContext;
   }
 
@@ -35,8 +31,6 @@ class ClientTab {
     }
     let clientRoom2 = new ClientRoom();
     clientRoom2.onlineUsers = val;
-    this.clientContext.clientRooms.set(this.roomnum, clientRoom2);
+    this.clientContext.clientRooms.set(this.roomnum!, clientRoom2);
   }
 }
-
-exports.ClientTab = ClientTab;

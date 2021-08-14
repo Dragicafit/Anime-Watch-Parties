@@ -1,11 +1,8 @@
-const { TwitchEmbed } = require("./embed/twitchEmbed");
-const { TabContext } = require("./tabContext");
-const { TabEvents } = require("./tabEvents");
-const { TabSync } = require("./tabSync");
+import { TabContext } from "./tabContext";
+import { TabEvents } from "./tabEvents";
 
-module.exports = {
-  /** @param {TabContext} tabContext @param {TabEvents} tabEvent @param {TwitchEmbed} twitchEmbed */
-  start: function (tabContext, tabEvent, twitchEmbed) {
+export default {
+  start: function (tabContext: TabContext, tabEvent: TabEvents) {
     tabContext.window.addEventListener("message", (event) => {
       if (
         event.source !== tabContext.window ||
@@ -19,9 +16,6 @@ module.exports = {
           break;
         case "openPopupTwitch":
           tabEvent.openPopupTwitch(event.data.roomnum);
-          break;
-        case "startEmbed":
-          twitchEmbed.startEmbed();
           break;
         case "changeStateClient":
           tabEvent.changeStateClient(event.data.time, event.data.state);

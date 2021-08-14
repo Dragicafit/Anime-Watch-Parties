@@ -1,6 +1,3 @@
-class ClientRoom {
-  /** @type {Number} */
-  onlineUsers;
+export class ClientRoom {
+  onlineUsers: number | undefined;
 }
-
-exports.ClientRoom = ClientRoom;

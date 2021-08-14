@@ -1,93 +1,88 @@
-"use strict";
+import { TabContext } from "../tabContext";
+import { TabSync } from "../tabSync";
+import { AwpplayerSetup } from "./awpplayerSetup";
 
-const { TabContext } = require("../tabContext");
-const { TabSync } = require("../tabSync");
-const { AwpplayerSetup } = require("./awpplayerSetup");
+export class VilosplayerSetup extends AwpplayerSetup {
+  private previousSeek: number;
+  private preventCallIfTriggered: Map<string, number>;
 
-class VilosplayerSetup extends AwpplayerSetup {
-  /** @type {Number} */
-  #previousSeek;
-  /** @type {Map<String,Number>} */
-  #preventCallIfTriggered;
-
-  /** @param {TabContext} tabContext @param {TabSync} tabSync */
-  constructor(tabContext, tabSync) {
+  constructor(tabContext: TabContext, tabSync: TabSync) {
     super("vilosplayer", tabContext, tabSync);
-    this.#previousSeek = 0;
-    this.#preventCallIfTriggered = new Map();
+    this.previousSeek = 0;
+    this.preventCallIfTriggered = new Map();
   }
 
-  _onPlay(a) {
+  _onPlay(callback: (...events: any[]) => void): void {
     VILOS_PLAYERJS.on("play", () => {
       if (
-        !this.#preventCallIfTriggered.has("play") ||
+        !this.preventCallIfTriggered.has("play") ||
         this.tabContext.performance.now() -
-          this.#preventCallIfTriggered.get("play") >
+          this.preventCallIfTriggered.get("play")! >
           200
       ) {
-        a();
+        callback();
       }
     });
   }
 
-  _onPause(a) {
+  _onPause(callback: (...events: any[]) => void): void {
     VILOS_PLAYERJS.on("pause", () => {
       if (
-        !this.#preventCallIfTriggered.has("pause") ||
+        !this.preventCallIfTriggered.has("pause") ||
         this.tabContext.performance.now() -
-          this.#preventCallIfTriggered.get("pause") >
+          this.preventCallIfTriggered.get("pause")! >
           200
       ) {
-        a();
+        callback();
       }
     });
   }
 
-  _onSeek(a) {
+  _onSeek(callback: (...events: any[]) => void): void {
     VILOS_PLAYERJS.on("timeupdate", (e) => {
       if (this.tabContext.window.document.hidden) {
         return;
       }
       if (
-        !this.#preventCallIfTriggered.has("seek") ||
+        !this.preventCallIfTriggered.has("seek") ||
         this.tabContext.performance.now() -
-          this.#preventCallIfTriggered.get("seek") >
+          this.preventCallIfTriggered.get("seek")! >
           200
       ) {
-        let previousSeek = this.#previousSeek;
-        this.#previousSeek = e.seconds;
+        let previousSeek = this.previousSeek;
+        this.previousSeek = e.seconds;
         if (Math.abs(e.seconds - previousSeek) < 0.5) return;
-        a(e.seconds, e);
+        callback(e.seconds, e);
       }
     });
   }
 
-  _getTime() {
+  override _getTime() {
     return new Promise((resolve) => {
       VILOS_PLAYERJS.getCurrentTime(resolve);
     });
   }
 
-  _isPlay() {
+  override _isPlay() {
     return new Promise((resolve) => {
       VILOS_PLAYERJS.getPaused((paused) => resolve(paused === false));
     });
   }
 
-  _seekTo(time) {
-    this.#preventCallIfTriggered.set("seek", this.tabContext.performance.now());
+  _seekTo(time: number) {
+    this.preventCallIfTriggered.set("seek", this.tabContext.performance.now());
     VILOS_PLAYERJS.setCurrentTime(time);
   }
 
-  _setState(state) {
+  _setState(state: boolean) {
     if (state) {
-      this.#preventCallIfTriggered.set(
+      this.preventCallIfTriggered.set(
         "play",
         this.tabContext.performance.now()
       );
       VILOS_PLAYERJS.play();
     } else {
-      this.#preventCallIfTriggered.set(
+      this.preventCallIfTriggered.set(
         "pause",
         this.tabContext.performance.now()
       );
@@ -95,9 +90,7 @@ class VilosplayerSetup extends AwpplayerSetup {
     }
   }
 
-  playerExist() {
+  override playerExist() {
     return typeof VILOS_PLAYERJS === "object";
   }
 }
-
-exports.VilosplayerSetup = VilosplayerSetup;

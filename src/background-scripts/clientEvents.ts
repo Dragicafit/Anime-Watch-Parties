@@ -1,27 +1,28 @@
-const { ClientContext } = require("./clientContext");
-const { ClientTab } = require("./clientTab");
-const { ClientSync } = require("./clientSync");
-const { ClientUtils } = require("./clientUtils");
+import { ClientContext } from "./clientContext";
+import { ClientTab } from "./clientTab";
+import { ClientSync } from "./clientSync";
+import { ClientUtils } from "./clientUtils";
+import { IoCallback } from "../server/io/ioConst";
 
-class ClientEvent {
-  /** @type {ClientContext} */
-  clientContext;
-  /** @type {ClientUtils} */
-  clientUtils;
-  /** @type {ClientSync} */
-  clientSync;
+export class ClientEvent {
+  clientContext: ClientContext;
+  clientUtils: ClientUtils;
+  clientSync: ClientSync;
 
-  /** @param {ClientContext} clientContext @param {ClientUtils} clientUtils @param {ClientSync} clientSync */
-  constructor(clientContext, clientUtils, clientSync) {
+  constructor(
+    clientContext: ClientContext,
+    clientUtils: ClientUtils,
+    clientSync: ClientSync
+  ) {
     this.clientContext = clientContext;
     this.clientUtils = clientUtils;
     this.clientSync = clientSync;
   }
 
-  askInfo(tabId, clientTab = this.clientContext.clientTabs.get(tabId)) {
+  askInfo(tabId: number, clientTab = this.clientContext.clientTabs.get(tabId)) {
     console.log("ask info");
 
-    this.clientContext.browser.runtime
+    browser.runtime
       .sendMessage({
         command: "sendInfo",
         roomnum: clientTab?.roomnum,
@@ -29,14 +30,14 @@ class ClientEvent {
       })
       .catch(this.clientUtils.reportError);
 
-    this.clientContext.browser.tabs.sendMessage(tabId, {
+    browser.tabs.sendMessage(tabId, {
       command: "sendInfo",
       roomnum: clientTab?.roomnum,
       host: clientTab?.host,
     });
   }
 
-  scriptLoaded(tabId) {
+  scriptLoaded(tabId: number) {
     console.log("script loaded");
 
     if (!this.clientContext.clientTabs.has(tabId)) {
@@ -49,7 +50,7 @@ class ClientEvent {
     this.askInfo(tabId);
   }
 
-  joinRoom(tab, tabId, roomnum) {
+  joinRoom(tab: browser.tabs.Tab, tabId: number, roomnum: string) {
     console.log(`join room`);
 
     // for (let [tabId2, clientTab2] of this.clientContext.clientTabs.entries()) {
@@ -62,14 +63,17 @@ class ClientEvent {
     //   }
     // }
 
-    this.clientContext.socket.emit(
-      "joinRoom",
-      { roomnum: roomnum },
-      (err, data) => this.joinedRoom(err, data, tab, tabId)
-    );
+    this.clientContext.socket.emit("joinRoom", { roomnum: roomnum }, <
+      IoCallback
+    >((err, data) => this.joinedRoom(err, data, tab, tabId)));
   }
 
-  joinedRoom(err, data, tab, tabId) {
+  joinedRoom(
+    err: string | null,
+    data: any,
+    tab: browser.tabs.Tab,
+    tabId: number
+  ) {
     if (err) {
       console.log(err);
       return;
@@ -81,7 +85,7 @@ class ClientEvent {
         new ClientTab(this.clientContext)
       );
     }
-    let clientTab = this.clientContext.clientTabs.get(tabId);
+    let clientTab = this.clientContext.clientTabs.get(tabId)!;
     clientTab.roomnum = data.roomnum;
     clientTab.host = data.host;
 
@@ -114,10 +118,10 @@ class ClientEvent {
     this.askInfo(tabId, clientTab);
   }
 
-  leaveRoom(tabId) {
+  leaveRoom(tabId: number) {
     console.log(`leave room`);
 
-    let { roomnum } = this.clientContext.clientTabs.get(tabId);
+    let { roomnum } = this.clientContext.clientTabs.get(tabId)!;
     this.clientContext.clientTabs.delete(tabId);
 
     if (this.clientContext.clientTabs.size == 0) {
@@ -125,7 +129,7 @@ class ClientEvent {
     }
   }
 
-  changeStateClient(roomnum, time, state) {
+  changeStateClient(roomnum: string, time: number, state: boolean) {
     console.log(`change state client`);
 
     for (let [tabId, clientTab] of this.clientContext.clientTabs.entries()) {
@@ -135,22 +139,22 @@ class ClientEvent {
     }
   }
 
-  changeStateClientTab(tabId, time, state) {
+  changeStateClientTab(tabId: number, time: number, state: boolean) {
     console.log(`change state client`);
 
-    this.clientContext.browser.tabs.sendMessage(tabId, {
+    browser.tabs.sendMessage(tabId, {
       command: "changeStateClient",
       time: time,
       state: state,
     });
   }
 
-  sendState(tabId, time, state) {
+  sendState(tabId: number, time: number, state: boolean) {
     console.log(`send state`);
     this.clientSync.changeStateServer(tabId, time, state);
   }
 
-  getUsers(roomnum, onlineUsers) {
+  getUsers(roomnum: string, onlineUsers: number) {
     console.log(`get users: ${onlineUsers}`);
 
     for (let [tabId, clientTab] of this.clientContext.clientTabs.entries()) {
@@ -162,7 +166,7 @@ class ClientEvent {
     }
   }
 
-  unSetHost(roomnum) {
+  unSetHost(roomnum: string) {
     console.log("Unsetting host");
 
     for (let [tabId, clientTab] of this.clientContext.clientTabs.entries()) {
@@ -174,7 +178,12 @@ class ClientEvent {
     }
   }
 
-  changeVideoClient(roomnum, site, location, videoId) {
+  changeVideoClient(
+    roomnum: string,
+    site: string,
+    location: string,
+    videoId: string
+  ) {
     console.log("change video client");
     console.log(`video id is: ${videoId}`);
 
@@ -184,14 +193,19 @@ class ClientEvent {
     }
   }
 
-  changeVideoClientTab(tabId, site, location, videoId) {
+  changeVideoClientTab(
+    tabId: number,
+    site: string,
+    location: string,
+    videoId: string
+  ) {
     console.log("change video client");
     console.log(`video id is: ${videoId}`);
 
-    this.clientContext.browser.tabs
+    browser.tabs
       .get(tabId)
       .then((tab) => {
-        let url = this.clientSync.parseUrl(tab.url);
+        let url = this.clientSync.parseUrl(tab.url!);
 
         if (url.site === site && url.videoId === videoId) return;
 
@@ -210,7 +224,7 @@ class ClientEvent {
           default:
             return;
         }
-        this.clientContext.browser.tabs.update(tabId, {
+        browser.tabs.update(tabId, {
           active: true,
           url: newUrl,
         });
@@ -218,7 +232,7 @@ class ClientEvent {
       .catch(this.clientUtils.reportError);
   }
 
-  restartSocket(tab, tabId, roomnum) {
+  restartSocket(tab: browser.tabs.Tab, tabId: number, roomnum: string) {
     this.clientContext.socket.close();
     setTimeout(() => {
       this.clientContext.socket.connect();
@@ -226,5 +240,3 @@ class ClientEvent {
     }, 100);
   }
 }
-
-exports.ClientEvent = ClientEvent;

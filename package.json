@@ -6,9 +6,9 @@
     "start": "ts-node --project src/server/tsconfig.json src/server/server.ts",
     "debug": "DEBUG=*erverAWP:* npm start",
     "test": "jest",
-    "browserify-background-scripts": "cd src/background-scripts && browserify -d clientScript.ts | exorcist background-script.js.map > background-script.js",
-    "browserify-web-accessible-resources": "cd src/web-accessible-resources/js && browserify -d tabScript.ts | exorcist script.js.map > script.js",
-    "release": "npm run browserify-background-scripts && npm run browserify-web-accessible-resources && ./concat.ps1 && zip -r -FS Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json src/icons/* src/dependencies/* src/background-scripts/background-script.js src/content-scripts/listener.js src/web-accessible-resources/js/script.js src/web-accessible-resources/css/script.css src/popup/*",
+    "browserify-background-scripts": "mkdir -p built/src/background-scripts/ && cd src/background-scripts/ && browserify --debug --plugin [ tsify ] clientScript.ts | exorcist ../../built/src/background-scripts/background-script.js.map > ../../built/src/background-scripts/background-script.js",
+    "browserify-web-accessible-resources": "mkdir -p built/src/web-accessible-resources/js/ && cd src/web-accessible-resources/js/ && browserify --debug --plugin [ tsify ] tabScript.ts | exorcist ../../../built/src/web-accessible-resources/js/script.js.map > ../../../built/src/web-accessible-resources/js/script.js",
+    "release": "npm run browserify-background-scripts && npm run browserify-web-accessible-resources && ./concat.ps1 && mkdir -p built/Release/Firefox/ && zip -r -FS built/Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json src/icons/* src/dependencies/* built/src/background-scripts/background-script.js built/src/background-scripts/background-script.js.map src/content-scripts/listener.js built/src/web-accessible-resources/js/script.js built/src/web-accessible-resources/js/script.js.map built/src/web-accessible-resources/css/script.css src/popup/*",
     "cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj \"/C=FR/ST=Ile-de-France/L=Paris/O=Dragicafit/OU=Org/CN=localhost\" -sha256"
   },
   "repository": {
@@ -18,6 +18,7 @@
   "author": "Dragicafit",
   "license": "MIT",
   "dependencies": {
+    "@vbrick/player.js": "^0.2.2",
     "connect-redis": "^6.0.0",
     "debug": "^4.3.2",
     "dotenv": "^10.0.0",
@@ -48,7 +49,11 @@
     "@types/debug": "^4.1.7",
     "@types/express": "^4.17.13",
     "@types/express-session": "^1.17.4",
+    "@types/firefox-webext-browser": "^82.0.1",
     "@types/jest": "^26.0.24",
+    "@types/jquery": "^3.5.6",
+    "@types/jqueryui": "^1.12.16",
+    "@types/jwplayer": "^8.2.7",
     "@types/node": "^16.4.9",
     "@types/passport": "^1.0.7",
     "@types/redis": "^2.8.31",
@@ -65,34 +70,5 @@
     "tsify": "^5.0.4",
     "tslib": "^2.3.0",
     "typescript": "^4.3.5"
-  },
-  "browserify": {
-    "transform": [
-      [
-        "babelify",
-        {
-          "plugins": [
-            "@babel/plugin-proposal-class-properties",
-            "@babel/plugin-proposal-private-methods"
-          ],
-          "presets": [
-            [
-              "@babel/preset-env",
-              {
-                "targets": {
-                  "firefox": "85"
-                }
-              }
-            ]
-          ]
-        }
-      ]
-    ],
-    "plugins": [
-      [
-        "tsify",
-        "noImplicitAny"
-      ]
-    ]
   }
 }

@@ -1,43 +1,45 @@
-const { ClientContext } = require("./clientContext");
-const { ClientEvent } = require("./clientEvents");
-const { ClientUtils } = require("./clientUtils");
-const { ClientSync } = require("./clientSync");
+import { ClientContext } from "./clientContext";
+import { ClientEvent } from "./clientEvents";
+import { ClientUtils } from "./clientUtils";
+import { ClientSync } from "./clientSync";
 
-module.exports = {
-  /** @param {ClientContext} clientContext @param {ClientUtils} clientUtils @param {ClientEvent} clientEvent @param {ClientSync} clientSync */
-  start: function (clientContext, clientUtils, clientEvent, clientSync) {
-    clientContext.browser.tabs.onUpdated.addListener(
-      (tabId, changeInfo, tab) => {
-        if (!clientContext.clientTabs.has(tabId)) return;
-        console.log("updated", tabId, changeInfo, tab);
+export default {
+  start: function (
+    clientContext: ClientContext,
+    clientUtils: ClientUtils,
+    clientEvent: ClientEvent,
+    clientSync: ClientSync
+  ) {
+    browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+      if (!clientContext.clientTabs.has(tabId)) return;
+      console.log("updated", tabId, changeInfo, tab);
 
-        if (changeInfo.url) {
-          if (clientContext.clientTabs.get(tabId).host) {
-            clientSync.changeVideoServer(tab);
-          } else {
-            clientSync.syncClient(tabId);
-          }
-        }
-
-        if (changeInfo.status === "complete") {
-          clientUtils.insertScript(tabId);
+      if (changeInfo.url) {
+        if (clientContext.clientTabs.get(tabId)?.host) {
+          clientSync.changeVideoServer(tab);
+        } else {
+          clientSync.syncClient(tabId);
         }
       }
-    );
-    clientContext.browser.tabs.onRemoved.addListener((tabId) => {
+
+      if (changeInfo.status === "complete") {
+        clientUtils.insertScript(tabId);
+      }
+    });
+    browser.tabs.onRemoved.addListener((tabId) => {
       if (!clientContext.clientTabs.has(tabId)) return;
       console.log("removed");
 
       clientEvent.leaveRoom(tabId);
     });
 
-    clientContext.browser.runtime.onMessage.addListener((message, sender) => {
+    browser.runtime.onMessage.addListener((message, sender) => {
       if (sender.tab == null) return clientUtils.getActiveTab().then(func);
       func(sender.tab);
 
-      function func(tab) {
+      function func(tab: browser.tabs.Tab) {
         if (tab == null) return;
-        let tabId = tab.id;
+        let tabId = tab.id!;
 
         switch (message?.command) {
           case "askInfo":
@@ -73,7 +75,7 @@ module.exports = {
     clientContext.socket.on("getUsers", (data) =>
       clientEvent.getUsers(data.roomnum, data.onlineUsers)
     );
-    clientContext.socket.on("unSetHost", () =>
+    clientContext.socket.on("unSetHost", (data) =>
       clientEvent.unSetHost(data.roomnum)
     );
     clientContext.socket.on("changeVideoClient", (data) =>
