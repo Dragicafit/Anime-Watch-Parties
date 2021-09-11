@@ -15,10 +15,14 @@ export class ClientUtils {
         .query({
           currentWindow: true,
           active: true,
-          url: ["*://*.wakanim.tv/*", "*://*.crunchyroll.com/*"],
+          url: [
+            "*://*.wakanim.tv/*",
+            "*://*.crunchyroll.com/*",
+            "*://*.funimation.com/*",
+          ],
         })
         .then((tabs) => {
-          if (tabs.length !== 0) return resolve(tabs[0]);
+          if (tabs.length > 0) return resolve(tabs[0]);
           browser.tabs
             .create({ url: "https://www.wakanim.tv/" })
             .then((tab) => resolve(tab))

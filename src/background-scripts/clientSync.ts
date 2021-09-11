@@ -1,5 +1,9 @@
 import { ClientContext } from "./clientContext";
-import { parseUrlWakanim, parseUrlCrunchyroll } from "./clientConst";
+import {
+  parseUrlWakanim,
+  parseUrlCrunchyroll,
+  parseUrlFunimation,
+} from "./clientConst";
 import { ClientEvent } from "./clientEvents";
 import { ClientTab } from "./clientTab";
 import { IoCallback } from "../server/io/ioConst";
@@ -28,6 +32,14 @@ export class ClientSync {
       return {
         videoId: pathname.groups!.videoId,
         site: "crunchyroll",
+        location: pathname.groups!.location,
+      };
+    }
+    pathname = url.match(parseUrlFunimation);
+    if (pathname != null) {
+      return {
+        videoId: pathname.groups!.videoId,
+        site: "funimation",
         location: pathname.groups!.location,
       };
     }

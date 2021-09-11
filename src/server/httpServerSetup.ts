@@ -20,6 +20,13 @@ var template = handlebars.compile(`
     },
     "https://www.crunchyroll.com"
   );
+  opener.postMessage(
+    {
+      direction: "from-popupTwitch-AWP",
+      command: "success",
+    },
+    "https://www.funimation.com"
+  );
   </script></head>
   {{#each auths}}
   <table>

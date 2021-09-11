@@ -72,11 +72,18 @@ it.each([
   ["videoId", "wakanim", "us"],
   ["videoId", "wakanim", "uS"],
   ["videoId", "crunchyroll", "US"],
+  ["videoId", "funimation", "US"],
   ["videoId", "crunchyroll", null],
   ["videoId", "crunchyroll", undefined],
   [Array(301).join("x"), "wakanim", "US"],
-  ["dr-stone/episode-11-prologue-of-dr-stone-801916", "crunchyroll", null],
   ["11396", "wakanim", "FR"],
+  ["dr-stone/episode-11-prologue-of-dr-stone-801916", "crunchyroll", null],
+  ["dr-stone/episode-11-prologue-of-dr-stone-801916", "crunchyroll", "fr"],
+  [
+    "bofuri-i-dont-want-to-get-hurt-so-ill-max-out-my-defense/defense-and-first-battle",
+    "funimation",
+    "en",
+  ],
 ])("Valid", (videoId2, site2, location2) => {
   videoId = videoId2;
   site = site2;
@@ -178,6 +185,7 @@ it.each([
   undefined,
   "wakavim",
   "crunchyboll",
+  "funimotion",
   "crunchyroll ",
   Infinity,
   NaN,

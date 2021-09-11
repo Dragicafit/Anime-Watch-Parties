@@ -57,6 +57,7 @@
     "@types/node": "^16.4.9",
     "@types/passport": "^1.0.7",
     "@types/redis": "^2.8.31",
+    "@types/video.js": "^7.3.26",
     "babelify": "^10.0.0",
     "browserify": "^17.0.0",
     "exorcist": "^2.0.0",

@@ -4,7 +4,7 @@ import { IoUtils } from "./ioUtils";
 
 const regexRoom = /^\w{1,30}$/;
 const regexVideoId = /^[\w\/-]{1,300}$/;
-const regexSite = /^(wakanim|crunchyroll)$/;
+const regexSite = /^(wakanim|crunchyroll|funimation)$/;
 const regexLocation = /^[a-zA-Z]{2}$/;
 
 export default {

@@ -221,6 +221,9 @@ export class ClientEvent {
               newUrl = `https://www.crunchyroll.com/${videoId}`;
             }
             break;
+          case "funimation":
+            newUrl = `https://www.funimation.com/${location}/shows/${videoId}`;
+            break;
           default:
             return;
         }
