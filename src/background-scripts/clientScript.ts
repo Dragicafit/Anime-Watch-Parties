@@ -2,10 +2,10 @@
 
 import io from "socket.io-client";
 import { ClientContext } from "./clientContext";
-import { ClientUtils } from "./clientUtils";
 import { ClientEvent } from "./clientEvents";
 import { ClientSync } from "./clientSync";
 import clientTransmission from "./clientTransmission";
+import { ClientUtils } from "./clientUtils";
 
 let socket = io("https://localhost:4000", {
   secure: true,

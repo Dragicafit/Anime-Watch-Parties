@@ -1,8 +1,8 @@
-import { ClientContext } from "./clientContext";
-import { ClientTab } from "./clientTab";
-import { ClientSync } from "./clientSync";
-import { ClientUtils } from "./clientUtils";
 import { IoCallback } from "../server/io/ioConst";
+import { ClientContext } from "./clientContext";
+import { ClientSync } from "./clientSync";
+import { ClientTab } from "./clientTab";
+import { ClientUtils } from "./clientUtils";
 
 export class ClientEvent {
   clientContext: ClientContext;

@@ -1,12 +1,12 @@
-import { ClientContext } from "./clientContext";
+import { IoCallback } from "../server/io/ioConst";
 import {
-  parseUrlWakanim,
   parseUrlCrunchyroll,
   parseUrlFunimation,
+  parseUrlWakanim,
 } from "./clientConst";
+import { ClientContext } from "./clientContext";
 import { ClientEvent } from "./clientEvents";
 import { ClientTab } from "./clientTab";
-import { IoCallback } from "../server/io/ioConst";
 
 export class ClientSync {
   clientContext: ClientContext;
@@ -141,14 +141,5 @@ export class ClientSync {
         }
       })
     );
-  }
-
-  openPopupTwitch(tabId: number, roomnum: string): void {
-    console.log("open popup twitch");
-
-    browser.tabs.sendMessage(tabId, {
-      command: "openPopupTwitch",
-      roomnum: roomnum,
-    });
   }
 }

@@ -1,6 +1,6 @@
 import { Socket } from "socket.io-client";
-import { ClientTab } from "./clientTab";
 import { ClientRoom } from "./clientRoom";
+import { ClientTab } from "./clientTab";
 
 export class ClientContext {
   socket: Socket;

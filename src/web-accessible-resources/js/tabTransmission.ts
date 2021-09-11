@@ -14,9 +14,6 @@ export default {
         case "sendInfo":
           tabEvent.sendInfo(event.data.roomnum, event.data.host);
           break;
-        case "openPopupTwitch":
-          tabEvent.openPopupTwitch(event.data.roomnum);
-          break;
         case "changeStateClient":
           tabEvent.changeStateClient(event.data.time, event.data.state);
           break;

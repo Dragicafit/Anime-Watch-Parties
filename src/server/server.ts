@@ -1,14 +1,12 @@
-import "dotenv/config";
-import fs from "fs";
-import express from "express";
 import debugModule from "debug";
+import "dotenv/config";
+import express from "express";
+import fs from "fs";
 import https from "https";
-import { createAdapter } from "socket.io-redis";
 import { RedisClient } from "redis";
-import rateLimiter from "./middleware/rateLimiter";
-import passport from "./middleware/passport";
+import { createAdapter } from "socket.io-redis";
 import ioServerSetup from "./ioServerSetup";
-import httpServerSetup from "./httpServerSetup";
+import rateLimiter from "./middleware/rateLimiter";
 
 const app = express();
 const debug = debugModule("serverAWP");
@@ -32,9 +30,7 @@ const io = new IoServer(server, {
 const redisClient = new RedisClient({});
 
 rateLimiter.start(app, io, redisClient);
-passport.start(app, io, redisClient);
 ioServerSetup.start(io);
-httpServerSetup.start(app);
 
 const port = process.env.PORT || 4000;
 

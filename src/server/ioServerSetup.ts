@@ -1,17 +1,17 @@
 import debugModule from "debug";
-import { Server as IoServer, Socket } from "socket.io";
 import { performance } from "perf_hooks";
-import filterInput from "./middleware/filterInput";
-import ioDisconnecting from "./io/ioDisconnecting";
-import ioChangeVideoServer from "./io/ioChangeVideoServer";
+import { Server as IoServer, Socket } from "socket.io";
 import ioChangeStateServer from "./io/ioChangeStateServer";
+import ioChangeVideoServer from "./io/ioChangeVideoServer";
+import { IoDebugSocket } from "./io/ioConst";
+import { IoContext, SocketContext } from "./io/ioContext";
+import ioDisconnecting from "./io/ioDisconnecting";
 import ioJoinRoom from "./io/ioJoinRoom";
 import ioLeaveRoom from "./io/ioLeaveRoom";
-import ioSyncClient from "./io/ioSyncClient";
 import { IoRoom } from "./io/ioRoom";
-import { IoContext, SocketContext } from "./io/ioContext";
+import ioSyncClient from "./io/ioSyncClient";
 import { IoUtils } from "./io/ioUtils";
-import { IoDebugSocket } from "./io/ioConst";
+import filterInput from "./middleware/filterInput";
 
 const debug = debugModule("ioServerAWP");
 

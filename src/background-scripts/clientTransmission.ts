@@ -1,7 +1,7 @@
 import { ClientContext } from "./clientContext";
 import { ClientEvent } from "./clientEvents";
-import { ClientUtils } from "./clientUtils";
 import { ClientSync } from "./clientSync";
+import { ClientUtils } from "./clientUtils";
 
 export default {
   start: function (
