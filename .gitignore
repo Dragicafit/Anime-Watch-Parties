@@ -1,9 +1,3 @@
-script.js
-script.js.map
-background-script.js
-background-script.js.map
-script.css
-package-lock.json
 *.pem
 
 
@@ -561,6 +555,7 @@ internal/
 **/.vs
 **/.vscode/*
 !**/.vscode/tasks.json
+!**/.vscode/launch.json
 !**/.vscode/settings.template.json
 !**/.vscode/launch.template.json
 !**/.vscode/extensions.json
