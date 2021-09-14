@@ -11,6 +11,7 @@ const portTest = Number(process.env.PORT_TEST) || 4001;
 const port = Number(process.env.PORT) !== portTest ? portTest : portTest + 1;
 
 const supportedEventsTest = {
+  CREATE_ROOM: "createRoom",
   JOIN_ROOM: "joinRoom",
   LEAVE_ROOM: "leaveRoom",
   CHANGE_STATE_SERVER: "changeStateServer",
@@ -76,14 +77,14 @@ describe("test argument middleware", function () {
   });
 
   it("accepts without data and callback", () => {
-    Object.values(supportedEvents).map((supportedEvent) =>
+    Object.values(supportedEvents).forEach((supportedEvent) =>
       socket.emit(supportedEvent)
     );
     return new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
   it("accepts without callback", () => {
-    Object.values(supportedEvents).map((supportedEvent) =>
+    Object.values(supportedEvents).forEach((supportedEvent) =>
       socket.emit(supportedEvent, {})
     );
     return new Promise((resolve) => setTimeout(resolve, 1000));
@@ -399,36 +400,34 @@ describe("test connection", function () {
 
     it("simple connection", () => {
       return new Promise<void>((resolve) =>
-        socket.emit("joinRoom", { roomnum: "roomnum" }, <IoCallback>((
-          err,
-          data
-        ) => {
+        socket.emit("createRoom", <IoCallback>((err, data) => {
           expect(err).toBeNull();
           expect(data).toEqual({
             host: true,
-            roomnum: "roomnum",
+            roomnum: expect.any(String),
             onlineUsers: 1,
             state: false,
             time: 0,
           });
+          expect(
+            io.sockets.adapter.rooms.get(`room-${data.roomnum}`)
+          ).toBeDefined();
+          expect(
+            io.sockets.adapter.rooms.get(`room-${data.roomnum}`)!.size
+          ).toBe(1);
+
           resolve();
         }))
-      ).then(() => {
-        expect(io.sockets.adapter.rooms.get(`room-roomnum`)).toBeDefined();
-        expect(io.sockets.adapter.rooms.get(`room-roomnum`)!.size).toBe(1);
-      });
+      );
     });
 
     it("get online users", () => {
       return new Promise<void>((resolve) => {
-        socket.emit("joinRoom", { roomnum: "roomnum" }, <IoCallback>((
-          err,
-          data
-        ) => {
+        socket.emit("createRoom", <IoCallback>((err, data) => {
           expect(err).toBeNull();
           expect(data).toEqual({
             host: true,
-            roomnum: "roomnum",
+            roomnum: expect.any(String),
             onlineUsers: 1,
             state: false,
             time: 0,
@@ -487,87 +486,62 @@ describe("test connection", function () {
     });
 
     it("simple connection", () => {
-      return Promise.all([
-        new Promise<void>((resolve) => {
-          socket1.emit("joinRoom", { roomnum: "roomnum" }, <IoCallback>((
-            err,
-            data
+      return new Promise<void>((resolve) => {
+        socket1.emit("createRoom", <IoCallback>((err, data) => {
+          expect(err).toBeNull();
+          expect(data).toEqual({
+            host: true,
+            roomnum: expect.any(String),
+            onlineUsers: 1,
+            state: false,
+            time: 0,
+          });
+          socket2.emit("joinRoom", { roomnum: data.roomnum }, <IoCallback>((
+            err2,
+            data2
           ) => {
-            expect(err).toBeNull();
-            expect(data).toEqual({
-              host: true,
-              roomnum: "roomnum",
-              onlineUsers: 1,
-              state: false,
-              time: 0,
-            });
-            resolve();
-          }));
-        }),
-        new Promise<void>((resolve) => {
-          socket2.emit("joinRoom", { roomnum: "roomnum" }, <IoCallback>((
-            err,
-            data
-          ) => {
-            expect(err).toBeNull();
-            expect(data).toEqual({
+            expect(err2).toBeNull();
+            expect(data2).toEqual({
               host: false,
-              roomnum: "roomnum",
+              roomnum: expect.any(String),
               onlineUsers: 2,
               state: false,
               time: 0,
             });
+            expect(
+              io.sockets.adapter.rooms.get(`room-${data.roomnum}`)
+            ).toBeDefined();
+            expect(
+              io.sockets.adapter.rooms.get(`room-${data.roomnum}`)!.size
+            ).toBe(2);
+
             resolve();
           }));
-        }),
-      ]).then(() => {
-        expect(io.sockets.adapter.rooms.get(`room-roomnum`)).toBeDefined();
-        expect(io.sockets.adapter.rooms.get(`room-roomnum`)!.size).toBe(2);
+        }));
       });
     });
 
     it("get online users", () => {
-      return Promise.all([
-        new Promise<void>((resolve) =>
-          socket1.emit("joinRoom", { roomnum: "roomnum" }, <IoCallback>((
-            err,
-            data
-          ) => {
-            expect(err).toBeNull();
-            expect(data).toEqual({
-              host: true,
-              roomnum: "roomnum",
-              onlineUsers: 1,
-              state: false,
-              time: 0,
-            });
-            resolve();
-          }))
-        ),
-
-        new Promise<void>((resolve) =>
-          socket2.emit("joinRoom", { roomnum: "roomnum" }, <IoCallback>((
-            err,
-            data
-          ) => {
-            expect(err).toBeNull();
-            expect(data).toEqual({
-              host: false,
-              roomnum: "roomnum",
-              onlineUsers: 2,
-              state: false,
-              time: 0,
-            });
-            resolve();
-          }))
-        ),
-        new Promise<void>((resolve) => {
-          socket1.on("getUsers", function (data) {
-            expect(data.onlineUsers).toBe(2);
-            resolve();
-          });
-        }),
-      ]);
+      return new Promise<void>((resolve) => {
+        socket1.emit("createRoom", <IoCallback>((err, data) => {
+          return Promise.all([
+            new Promise<void>((resolve2) => {
+              socket2.emit("joinRoom", { roomnum: data.roomnum }, <IoCallback>((
+                err2,
+                data2
+              ) => {
+                resolve2();
+              }));
+            }),
+            new Promise<void>((resolve2) => {
+              socket1.on("getUsers", function (data2) {
+                expect(data2.onlineUsers).toBe(2);
+                resolve2();
+              });
+            }),
+          ]).then(() => resolve());
+        }));
+      });
     });
   });
 });

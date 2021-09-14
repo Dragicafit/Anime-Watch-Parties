@@ -3,6 +3,7 @@ import { IoCallback, supportedEvents } from "../../src/server/io/ioConst";
 import filterInput from "../../src/server/middleware/filterInput";
 
 const supportedEventsTest = {
+  CREATE_ROOM: "createRoom",
   JOIN_ROOM: "joinRoom",
   LEAVE_ROOM: "leaveRoom",
   CHANGE_STATE_SERVER: "changeStateServer",

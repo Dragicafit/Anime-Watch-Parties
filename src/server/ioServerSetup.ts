@@ -5,6 +5,7 @@ import ioChangeStateServer from "./io/ioChangeStateServer";
 import ioChangeVideoServer from "./io/ioChangeVideoServer";
 import { IoDebugSocket } from "./io/ioConst";
 import { IoContext, SocketContext } from "./io/ioContext";
+import ioCreateRoom from "./io/ioCreateRoom";
 import ioDisconnecting from "./io/ioDisconnecting";
 import ioJoinRoom from "./io/ioJoinRoom";
 import ioLeaveRoom from "./io/ioLeaveRoom";
@@ -33,6 +34,7 @@ export default {
       let socketContext = new SocketContext(io, socket, performance);
       let ioUtils = new IoUtils(socketContext);
       ioDisconnecting.start(socketContext, ioUtils, debugDisconnecting);
+      ioCreateRoom.start(socketContext, ioUtils);
       ioJoinRoom.start(socketContext, ioUtils);
       ioLeaveRoom.start(socketContext, ioUtils);
       ioChangeStateServer.start(socketContext, ioUtils);

@@ -4,6 +4,7 @@ import { IoCallback, IoDebugSocket, supportedEvents } from "../io/ioConst";
 
 const debug = debugModule("filterInputServerAWP");
 
+const CREATE_ROOM = supportedEvents.CREATE_ROOM;
 const JOIN_ROOM = supportedEvents.JOIN_ROOM;
 const LEAVE_ROOM = supportedEvents.LEAVE_ROOM;
 const CHANGE_STATE_SERVER = supportedEvents.CHANGE_STATE_SERVER;
@@ -11,6 +12,7 @@ const CHANGE_VIDEO_SERVER = supportedEvents.CHANGE_VIDEO_SERVER;
 const SYNC_CLIENT = supportedEvents.SYNC_CLIENT;
 
 const debugArgument = debug.extend("argument");
+const debugCreateRoom = debug.extend(CREATE_ROOM);
 const debugJoinRoom = debug.extend(JOIN_ROOM);
 const debugLeaveRoom = debug.extend(LEAVE_ROOM);
 const debugChangeStateServer = debug.extend(CHANGE_STATE_SERVER);
@@ -56,6 +58,12 @@ export default {
       }
 
       switch (event) {
+        case CREATE_ROOM:
+          events[1] = <IoDebugSocket>((...args) => {
+            debugCreateRoom(`${socket.id}:`, ...args);
+          });
+          events[2] = callback;
+          break;
         case JOIN_ROOM:
           events[1] = <IoDebugSocket>((...args) => {
             debugJoinRoom(`${socket.id}:`, ...args);

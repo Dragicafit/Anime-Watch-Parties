@@ -15,7 +15,7 @@ export default {
       };
       debugSocket(`${socketContext.io.sockets.sockets.size} sockets connected`);
 
-      for (const roomnum of ioUtils.roomnums) {
+      for (const roomnum of ioUtils.getJoinedRoomnums()) {
         ioUtils.leaveRoom(debugSocket, roomnum);
       }
     });

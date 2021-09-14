@@ -3,6 +3,9 @@ import { SocketContext } from "./ioContext";
 import { IoRoom, Room } from "./ioRoom";
 
 const regexPrefix = /^room-/g;
+const supportedChar =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const maxLengthRoomnum = 5;
 
 export class IoUtils {
   socketContext: SocketContext;
@@ -52,23 +55,63 @@ export class IoUtils {
     toCallback.onlineUsers = room.size;
   }
 
+  createRandomRoomnum(): string {
+    let text = "";
+    for (let i = 0; i < maxLengthRoomnum; i++)
+      text += supportedChar.charAt(
+        Math.floor(Math.random() * supportedChar.length)
+      );
+    return text;
+  }
+
+  createRoom(
+    debugSocket: IoDebugSocket,
+    callback: IoCallback,
+    toCallback: any = {}
+  ) {
+    let oldJoinedRoomnums = this.getJoinedRoomnums();
+    if (oldJoinedRoomnums.length >= 10) {
+      debugSocket("too many rooms joined");
+      return callback("access denied");
+    }
+    let roomnum = this.createRandomRoomnum();
+    while (this.getRoom(roomnum) != null) {
+      roomnum = this.createRandomRoomnum();
+    }
+
+    this.socketContext.socket.join(`room-${roomnum}`);
+    let room = this.getRoom(roomnum);
+    if (room == null) {
+      debugSocket("room is null (error socket.io)");
+      return callback("error server");
+    }
+    this._configure(debugSocket, roomnum, room, callback, toCallback);
+
+    this.updateRoomUsers(debugSocket, roomnum, toCallback);
+  }
+
   joinRoom(
     debugSocket: IoDebugSocket,
     roomnum: string,
     callback: IoCallback,
     toCallback: any = {}
   ) {
-    let oldRoomnums = this.roomnums;
-    if (oldRoomnums.includes(roomnum)) {
-      return this._configure(debugSocket, roomnum, callback, toCallback);
+    let room = this.getRoom(roomnum);
+    if (room == null) {
+      debugSocket(`room-${roomnum} does not exists`);
+      return callback("access denied");
     }
-    if (oldRoomnums.length >= 10) {
+    let oldJoinedRoomnums = this.getJoinedRoomnums();
+    if (oldJoinedRoomnums.includes(roomnum)) {
+      return this._configure(debugSocket, roomnum, room, callback, toCallback);
+    }
+    if (oldJoinedRoomnums.length >= 10) {
       debugSocket("too many rooms joined");
       return callback("access denied");
     }
 
     this.socketContext.socket.join(`room-${roomnum}`);
-    this._configure(debugSocket, roomnum, callback, toCallback);
+    this._configure(debugSocket, roomnum, room, callback, toCallback);
 
     this.updateRoomUsers(debugSocket, roomnum, toCallback);
   }
@@ -76,16 +119,12 @@ export class IoUtils {
   _configure(
     debugSocket: IoDebugSocket,
     roomnum: string,
+    room: Room,
     callback: IoCallback,
     toCallback: any = {}
   ) {
     debugSocket(`connected to room-${roomnum}`);
 
-    let room = this.getRoom(roomnum);
-    if (room == null) {
-      debugSocket("room is null (error socket.io)");
-      return callback("error server");
-    }
     let ioRoom = room.ioRoom;
     if (ioRoom == null) {
       ioRoom = room.ioRoom = new IoRoom(roomnum);
@@ -129,14 +168,18 @@ export class IoUtils {
   }
 
   getRoomIfIn(roomnum: string) {
-    return this.roomnums.includes(roomnum) ? this.getRoom(roomnum) : null;
+    return this.getJoinedRoomnums().includes(roomnum)
+      ? this.getRoom(roomnum)
+      : null;
   }
 
   getIoRoomIfIn(roomnum: string) {
-    return this.roomnums.includes(roomnum) ? this.getIoRoom(roomnum) : null;
+    return this.getJoinedRoomnums().includes(roomnum)
+      ? this.getIoRoom(roomnum)
+      : null;
   }
 
-  get roomnums() {
+  getJoinedRoomnums() {
     return [...this.socketContext.socket.rooms]
       .slice(1)
       .map((room) => room?.replace(regexPrefix, ""));

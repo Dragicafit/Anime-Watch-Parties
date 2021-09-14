@@ -26,6 +26,22 @@ export default {
         clientUtils.insertScript(tabId);
       }
     });
+    browser.tabs.onUpdated.addListener(
+      (tabId, changeInfo, tab) => {
+        if (changeInfo.status !== "complete" || tab.url == null) {
+          return;
+        }
+        const url = new URL(tab.url);
+        const roomnum = url.pathname.match(/^\/(?<roomnum>[a-zA-Z0-9]{5})$/)
+          ?.groups!["roomnum"];
+        if (roomnum == null) {
+          console.log("invalid roomnum", url.pathname.substring(1));
+          return;
+        }
+        clientEvent.joinRoom(tab, tabId, roomnum);
+      },
+      { urls: ["*://*.awp.moe/*"] }
+    );
     browser.tabs.onRemoved.addListener((tabId) => {
       if (!clientContext.clientTabs.has(tabId)) return;
       console.log("removed");
@@ -47,6 +63,9 @@ export default {
             break;
           case "insertScript":
             clientUtils.insertScript(tabId);
+            break;
+          case "createRoom":
+            clientEvent.createRoom(tab, tabId);
             break;
           case "joinRoom":
             clientEvent.joinRoom(tab, tabId, message.roomnum);

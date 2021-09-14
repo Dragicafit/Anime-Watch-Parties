@@ -50,8 +50,16 @@ export class ClientEvent {
     this.askInfo(tabId);
   }
 
+  createRoom(tab: browser.tabs.Tab, tabId: number) {
+    console.log(`create from tab ${tabId}`);
+
+    this.clientContext.socket.emit("createRoom", <IoCallback>(
+      ((err, data) => this.joinedRoom(err, data, tab, tabId))
+    ));
+  }
+
   joinRoom(tab: browser.tabs.Tab, tabId: number, roomnum: string) {
-    console.log(`join room`);
+    console.log(`join room ${roomnum} from tab ${tabId}`);
 
     // for (let [tabId2, clientTab2] of this.clientContext.clientTabs.entries()) {
     //   if (clientTab2?.roomnum !== roomnum) continue;
@@ -79,6 +87,10 @@ export class ClientEvent {
       return;
     }
 
+    let oldClientTab = this.clientContext.clientTabs.get(tabId);
+    if (oldClientTab != null) {
+      this.leaveRoom(tabId);
+    }
     if (!this.clientContext.clientTabs.has(tabId)) {
       this.clientContext.clientTabs.set(
         tabId,
@@ -124,9 +136,7 @@ export class ClientEvent {
     let { roomnum } = this.clientContext.clientTabs.get(tabId)!;
     this.clientContext.clientTabs.delete(tabId);
 
-    if (this.clientContext.clientTabs.size == 0) {
-      this.clientContext.socket.emit("leaveRoom", { roomnum: roomnum });
-    }
+    this.clientContext.socket.emit("leaveRoom", { roomnum: roomnum });
   }
 
   changeStateClient(roomnum: string, time: number, state: boolean) {

@@ -7,6 +7,7 @@ export interface IoDebugSocket {
 }
 
 export enum supportedEvents {
+  CREATE_ROOM = "createRoom",
   JOIN_ROOM = "joinRoom",
   LEAVE_ROOM = "leaveRoom",
   CHANGE_STATE_SERVER = "changeStateServer",
