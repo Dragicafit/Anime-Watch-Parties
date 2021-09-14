@@ -11,10 +11,24 @@ export default {
     clientSync: ClientSync
   ) {
     browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+      if (changeInfo.status === "complete" && tab.url != null) {
+        const url = new URL(tab.url);
+        if (url.hostname == "www.awp.moe" || url.hostname == "awp.moe") {
+          const roomnum = url.pathname.match(/^\/(?<roomnum>[a-zA-Z0-9]{5})$/)
+            ?.groups!["roomnum"];
+          if (roomnum == null) {
+            console.log("invalid roomnum", url.pathname.substring(1));
+            return;
+          }
+          clientEvent.joinRoom(tab, tabId, roomnum);
+          return;
+        }
+      }
+
       if (!clientContext.clientTabs.has(tabId)) return;
-      console.log("updated", tabId, changeInfo, tab);
 
       if (changeInfo.url) {
+        console.log("updated: change url", tabId, changeInfo, tab);
         if (clientContext.clientTabs.get(tabId)?.host) {
           clientSync.changeVideoServer(tab);
         } else {
@@ -23,25 +37,10 @@ export default {
       }
 
       if (changeInfo.status === "complete") {
+        console.log("updated: complete", tabId, changeInfo, tab);
         clientUtils.insertScript(tabId);
       }
     });
-    browser.tabs.onUpdated.addListener(
-      (tabId, changeInfo, tab) => {
-        if (changeInfo.status !== "complete" || tab.url == null) {
-          return;
-        }
-        const url = new URL(tab.url);
-        const roomnum = url.pathname.match(/^\/(?<roomnum>[a-zA-Z0-9]{5})$/)
-          ?.groups!["roomnum"];
-        if (roomnum == null) {
-          console.log("invalid roomnum", url.pathname.substring(1));
-          return;
-        }
-        clientEvent.joinRoom(tab, tabId, roomnum);
-      },
-      { urls: ["*://*.awp.moe/*"] }
-    );
     browser.tabs.onRemoved.addListener((tabId) => {
       if (!clientContext.clientTabs.has(tabId)) return;
       console.log("removed");

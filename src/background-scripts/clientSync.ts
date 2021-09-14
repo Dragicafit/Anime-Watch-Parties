@@ -43,7 +43,7 @@ export class ClientSync {
         location: pathname.groups!.location,
       };
     }
-    return {};
+    return null;
   }
 
   askState(tabId: number) {
@@ -66,9 +66,10 @@ export class ClientSync {
     tab: browser.tabs.Tab,
     clientTab: ClientTab = this.clientContext.clientTabs.get(tab.id!)!
   ): void {
-    console.log("change video server");
-
     let url = this.parseUrl(tab.url!);
+    if (url == null) {
+      return;
+    }
     console.log(`change video to ${url.videoId}`);
 
     this.clientContext.socket.emit("changeVideoServer", {

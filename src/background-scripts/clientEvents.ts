@@ -88,7 +88,7 @@ export class ClientEvent {
     }
 
     let oldClientTab = this.clientContext.clientTabs.get(tabId);
-    if (oldClientTab != null) {
+    if (oldClientTab != null && oldClientTab.roomnum !== data.roomnum) {
       this.leaveRoom(tabId);
     }
     if (!this.clientContext.clientTabs.has(tabId)) {
@@ -136,7 +136,14 @@ export class ClientEvent {
     let { roomnum } = this.clientContext.clientTabs.get(tabId)!;
     this.clientContext.clientTabs.delete(tabId);
 
-    this.clientContext.socket.emit("leaveRoom", { roomnum: roomnum });
+    if (
+      Array.from(
+        this.clientContext.clientTabs,
+        ([key, value]) => value.roomnum
+      ).filter((roomnum2) => roomnum2 === roomnum).length == 0
+    ) {
+      this.clientContext.socket.emit("leaveRoom", { roomnum: roomnum });
+    }
   }
 
   changeStateClient(roomnum: string, time: number, state: boolean) {
@@ -217,7 +224,7 @@ export class ClientEvent {
       .then((tab) => {
         let url = this.clientSync.parseUrl(tab.url!);
 
-        if (url.site === site && url.videoId === videoId) return;
+        if (url?.site === site && url?.videoId === videoId) return;
 
         let newUrl;
         switch (site) {
@@ -225,7 +232,7 @@ export class ClientEvent {
             newUrl = `https://www.wakanim.tv/${location}/v2/catalogue/episode/${videoId}`;
             break;
           case "crunchyroll":
-            if (url.site === "crunchyroll" && url.location != null) {
+            if (url?.site === "crunchyroll" && url?.location != null) {
               newUrl = `https://www.crunchyroll.com/${url.location}/${videoId}`;
             } else {
               newUrl = `https://www.crunchyroll.com/${videoId}`;
