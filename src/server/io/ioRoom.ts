@@ -32,6 +32,7 @@ export class IoRoom {
     this.currVideo = currVideo;
     this.site = site;
     this.location = location;
+    this.updateState(false, 0);
   }
 
   isStateDefined() {
