@@ -22,8 +22,13 @@
     "scripts": ["built/src/background-scripts/background-script.js"]
   },
   "browser_action": {
+    "browser_style": true,
     "default_title": "Anime Watch Parties",
-    "default_popup": "src/popup/popup.html"
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "src/icons/desactivate.svg",
+      "32": "src/icons/desactivate.svg"
+    }
   },
   "web_accessible_resources": [
     "built/src/web-accessible-resources/js/script.js",
