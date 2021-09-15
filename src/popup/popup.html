@@ -5,13 +5,26 @@
     <title>Popup</title>
 
     <script src="/src/dependencies/jquery.min.js"></script>
+    <script src="/src/dependencies/clipboard.min.js"></script>
   </head>
 
   <body>
     <div>
       <div id="userFormArea">
         <h2>Hello!</h2>
-        <h3 id="roomnumURL"></h3>
+        <div id="copyRoomnumURL" style="display: none">
+          <input type="text" id="roomnumURL" size="16" readonly />
+          <span class="input-group-button">
+            <button class="btn" data-clipboard-target="#roomnumURL">
+              <img
+                src="/src/icons/copy.svg"
+                alt="Copy to clipboard"
+                width="16px"
+              />
+            </button>
+          </span>
+        </div>
+        <br />
         <input id="create" type="button" value="Create a room" />
       </div>
       <div id="roomArea">

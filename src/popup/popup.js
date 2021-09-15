@@ -2,11 +2,9 @@ let regexRoom = /^\w{1,30}$/;
 
 function chat() {
   $(function () {
-    let $create = $("#create");
-    let $roomnumURL = $("#roomnumURL");
-
-    $create.on("click", (e) => {
-      $roomnumURL.text("");
+    $("#create").on("click", (e) => {
+      $("#roomnumURL").text("");
+      $("#copyRoomnumURL").hide();
       browser.runtime.sendMessage({
         command: "createRoom",
       });
@@ -19,16 +17,17 @@ function chat() {
   });
 }
 
+new ClipboardJS(".btn");
+
 function sendInfo(roomnum, onlineUsers) {
   console.log("get info");
 
   if (roomnum != null) {
-    document.getElementById(
-      "roomnumURL"
-    ).innerText = `https://awp.moe/${roomnum}`;
+    $("#roomnumURL").val(`https://awp.moe/${roomnum}`);
+    $("#copyRoomnumURL").show();
   }
   if (onlineUsers != null) {
-    document.getElementById("online-users").innerHTML = onlineUsers;
+    $("#online-users").text(onlineUsers);
   }
 }
 
