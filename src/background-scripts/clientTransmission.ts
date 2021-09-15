@@ -47,6 +47,9 @@ export default {
 
       clientEvent.leaveRoom(tabId);
     });
+    browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+      clientUtils.changeIcon(tabId, tab);
+    });
 
     browser.runtime.onMessage.addListener((message, sender) => {
       if (sender.tab == null) return clientUtils.getActiveTab().then(func);
@@ -70,7 +73,7 @@ export default {
             clientEvent.joinRoom(tab, tabId, message.roomnum);
             break;
           case "scriptLoaded":
-            clientEvent.scriptLoaded(tabId);
+            clientEvent.scriptLoaded(tab, tabId);
             break;
           case "sendState":
             clientEvent.sendState(tabId, message.time, message.state);

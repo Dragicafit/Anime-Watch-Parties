@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   sodipodi:docname="crunchyroll.svg"
+   inkscape:version="1.1 (c4e8f9ed74, 2021-05-24)"
+   id="svg5"
+   version="1.1"
+   viewBox="0 0 100 80"
+   height="80mm"
+   width="100mm"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2"
+     inkscape:cx="267.25"
+     inkscape:cy="185.25"
+     inkscape:window-width="1448"
+     inkscape:window-height="949"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer2"
+     inkscape:object-nodes="true"
+     width="100mm"
+     inkscape:snap-global="true"
+     height="80mm" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Calque 2"
+     style="display:inline">
+    <path
+       id="path54683"
+       style="fill:#b3b3b3;fill-opacity:1;stroke-width:0.133256"
+       d="M 0.28901386,0.37413567 0.44907798,39.875362 33.377521,39.806129 49.118982,20.128133 Z"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       id="path54681"
+       style="fill:#ff9100;fill-opacity:1;stroke-width:0.133256"
+       d="M 50.127516,20.628885 34.269976,40.197571 49.734774,59.884413 99.774977,40.073938 Z"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       id="path469"
+       style="fill:#b3b3b3;fill-opacity:1;stroke-width:0.133256"
+       d="M 33.412658,40.617907 0.4175857,40.856564 0.16226384,79.730284 48.635927,60.242799 Z"
+       sodipodi:nodetypes="ccccc" />
+  </g>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline">
+    <path
+       style="fill:#000000;stroke-width:0.315421"
+       id="path104326"
+       d="" />
+  </g>
+</svg>

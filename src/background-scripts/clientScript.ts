@@ -13,7 +13,7 @@ let socket = io("https://localhost:4000", {
 });
 let clientContext = new ClientContext(socket, new Map(), new Map());
 let clientUtils = new ClientUtils(clientContext);
-let clientSync = new ClientSync(clientContext);
+let clientSync = new ClientSync(clientContext, clientUtils);
 let clientEvent = new ClientEvent(clientContext, clientUtils, clientSync);
 clientSync.clientEvent = clientEvent;
 clientTransmission.start(clientContext, clientUtils, clientEvent, clientSync);

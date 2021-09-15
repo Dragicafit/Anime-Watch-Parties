@@ -1,49 +1,17 @@
 import { IoCallback } from "../server/io/ioConst";
-import {
-  parseUrlCrunchyroll,
-  parseUrlFunimation,
-  parseUrlWakanim,
-} from "./clientConst";
 import { ClientContext } from "./clientContext";
 import { ClientEvent } from "./clientEvents";
 import { ClientTab } from "./clientTab";
+import { ClientUtils } from "./clientUtils";
 
 export class ClientSync {
   clientContext: ClientContext;
+  clientUtils: ClientUtils;
   clientEvent: ClientEvent | undefined;
 
-  constructor(clientContext: ClientContext) {
+  constructor(clientContext: ClientContext, clientUtils: ClientUtils) {
     this.clientContext = clientContext;
-  }
-
-  parseUrl(url: string) {
-    console.log("parse url");
-
-    let pathname = url.match(parseUrlWakanim);
-    if (pathname != null) {
-      return {
-        videoId: pathname.groups!.videoId,
-        site: "wakanim",
-        location: pathname.groups!.location,
-      };
-    }
-    pathname = url.match(parseUrlCrunchyroll);
-    if (pathname != null) {
-      return {
-        videoId: pathname.groups!.videoId,
-        site: "crunchyroll",
-        location: pathname.groups!.location,
-      };
-    }
-    pathname = url.match(parseUrlFunimation);
-    if (pathname != null) {
-      return {
-        videoId: pathname.groups!.videoId,
-        site: "funimation",
-        location: pathname.groups!.location,
-      };
-    }
-    return null;
+    this.clientUtils = clientUtils;
   }
 
   askState(tabId: number) {
@@ -66,7 +34,7 @@ export class ClientSync {
     tab: browser.tabs.Tab,
     clientTab: ClientTab = this.clientContext.clientTabs.get(tab.id!)!
   ): void {
-    let url = this.parseUrl(tab.url!);
+    let url = this.clientUtils.parseUrl(tab.url!);
     if (url == null) {
       return;
     }

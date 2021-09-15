@@ -1,7 +1,6 @@
 import { IoCallback } from "../server/io/ioConst";
 import { ClientContext } from "./clientContext";
 import { ClientSync } from "./clientSync";
-import { ClientTab } from "./clientTab";
 import { ClientUtils } from "./clientUtils";
 
 export class ClientEvent {
@@ -37,16 +36,10 @@ export class ClientEvent {
     });
   }
 
-  scriptLoaded(tabId: number) {
+  scriptLoaded(tab: browser.tabs.Tab, tabId: number) {
     console.log("script loaded");
 
-    if (!this.clientContext.clientTabs.has(tabId)) {
-      this.clientContext.clientTabs.set(
-        tabId,
-        new ClientTab(this.clientContext)
-      );
-    }
-
+    this.clientUtils.joinTab(tab, tabId);
     this.askInfo(tabId);
   }
 
@@ -91,12 +84,7 @@ export class ClientEvent {
     if (oldClientTab != null && oldClientTab.roomnum !== data.roomnum) {
       this.leaveRoom(tabId);
     }
-    if (!this.clientContext.clientTabs.has(tabId)) {
-      this.clientContext.clientTabs.set(
-        tabId,
-        new ClientTab(this.clientContext)
-      );
-    }
+    this.clientUtils.joinTab(tab, tabId);
     let clientTab = this.clientContext.clientTabs.get(tabId)!;
     clientTab.roomnum = data.roomnum;
     clientTab.host = data.host;
@@ -222,7 +210,7 @@ export class ClientEvent {
     browser.tabs
       .get(tabId)
       .then((tab) => {
-        let url = this.clientSync.parseUrl(tab.url!);
+        let url = this.clientUtils.parseUrl(tab.url!);
 
         if (url?.site === site && url?.videoId === videoId) return;
 
