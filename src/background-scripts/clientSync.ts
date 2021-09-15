@@ -22,14 +22,6 @@ export class ClientSync {
     });
   }
 
-  startEmbed(tabId: number) {
-    console.log("start embed");
-
-    browser.tabs.sendMessage(tabId, {
-      command: "startEmbed",
-    });
-  }
-
   changeVideoServer(
     tab: browser.tabs.Tab,
     clientTab: ClientTab = this.clientContext.clientTabs.get(tab.id!)!

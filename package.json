@@ -1,7 +1,7 @@
 {
   "name": "anime-watch-parties",
   "version": "0.1.0",
-  "description": "Watch your favorite anime with your streamer.",
+  "description": "Watch your favorite anime on Crunchyroll, Funimation or Wakanim with your friends.",
   "scripts": {
     "start": "ts-node --project src/server/tsconfig.json src/server/server.ts",
     "debug": "DEBUG=*erverAWP:* npm start",
@@ -29,7 +29,7 @@
   "bugs": {
     "url": "https://github.com/Dragicafit/Anime-Watch-Parties/issues"
   },
-  "homepage": "https://github.com/Dragicafit/Anime-Watch-Parties#readme",
+  "homepage": "https://github.com/Dragicafit/Anime-Watch-Parties",
   "devDependencies": {
     "@tsconfig/node16": "^1.0.2",
     "@tsconfig/recommended": "^1.0.1",

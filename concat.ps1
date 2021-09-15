@@ -6,6 +6,4 @@ PATH_SRC="src/web-accessible-resources/css/"
 
 mkdir -p $PATH_SCRIPT_CSS &&
 cat "src/dependencies/jquery-ui.min.css" > $SCRIPT_CSS &&
-echo "" >> $SCRIPT_CSS &&
-cat "${PATH_SRC}embed.css" >> $SCRIPT_CSS &&
 echo "" >> $SCRIPT_CSS

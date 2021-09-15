@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Anime Watch Parties",
-  "description": "Watch your favorite anime with your streamer.",
+  "description": "Watch your favorite anime on Crunchyroll, Funimation or Wakanim with your friends.",
   "version": "0.1",
   "author": "Dragicafit",
   "icons": {

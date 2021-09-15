@@ -110,8 +110,6 @@ export class ClientEvent {
 
     if (clientTab.host) {
       console.log("You are the new host!");
-    } else {
-      //this.clientSync.startEmbed(tabId);
     }
     console.log(`send room number after joinRoom ${clientTab.roomnum}`);
 
