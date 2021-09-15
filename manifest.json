@@ -5,10 +5,8 @@
   "version": "0.1",
   "author": "Dragicafit",
   "icons": {
-    "16": "src/icons/icon.svg",
-    "48": "src/icons/icon.svg",
-    "96": "src/icons/icon.svg",
-    "128": "src/icons/icon.svg"
+    "48": "src/icons/activate.svg",
+    "96": "src/icons/icon.svg"
   },
   "homepage_url": "https://github.com/Dragicafit/Anime-Watch-Parties",
   "permissions": [
