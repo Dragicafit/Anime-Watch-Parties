@@ -21,11 +21,6 @@ export class ClientUtils {
         .query({
           currentWindow: true,
           active: true,
-          url: [
-            "*://*.wakanim.tv/*",
-            "*://*.crunchyroll.com/*",
-            "*://*.funimation.com/*",
-          ],
         })
         .then((tabs) => {
           if (tabs.length > 0) return resolve(tabs[0]);
@@ -38,7 +33,7 @@ export class ClientUtils {
     });
   }
 
-  insertScript(tabId: number) {
+  insertScript(tab: browser.tabs.Tab, tabId: number) {
     console.log("insert script");
 
     browser.tabs
@@ -47,6 +42,7 @@ export class ClientUtils {
         file: "/src/content-scripts/listener.js",
       })
       .catch(this.reportError);
+    this.joinTab(tab, tabId);
   }
 
   joinTab(tab: browser.tabs.Tab, tabId: number) {

@@ -38,7 +38,7 @@ export default {
 
       if (changeInfo.status === "complete") {
         console.log("updated: complete", tabId, changeInfo, tab);
-        clientUtils.insertScript(tabId);
+        clientUtils.insertScript(tab, tabId);
       }
     });
     browser.tabs.onRemoved.addListener((tabId) => {
@@ -64,7 +64,7 @@ export default {
             clientEvent.askInfo(tabId);
             break;
           case "insertScript":
-            clientUtils.insertScript(tabId);
+            clientUtils.insertScript(tab, tabId);
             break;
           case "createRoom":
             clientEvent.createRoom(tab, tabId);

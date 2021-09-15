@@ -1,6 +1,6 @@
-let regexRoom = /^\w{1,30}$/;
+function scriptLoaded() {
+  console.log("scipt loaded");
 
-function chat() {
   $(function () {
     $("#create").on("click", (e) => {
       $("#roomnumURL").text("");
@@ -50,9 +50,4 @@ browser.runtime.onMessage.addListener((message) => {
 
 function reportError(error) {
   console.error(`Could not beastify: ${error}`);
-}
-
-function scriptLoaded() {
-  console.log("scipt loaded");
-  chat();
 }

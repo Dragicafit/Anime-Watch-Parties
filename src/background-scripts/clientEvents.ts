@@ -39,7 +39,6 @@ export class ClientEvent {
   scriptLoaded(tab: browser.tabs.Tab, tabId: number) {
     console.log("script loaded");
 
-    this.clientUtils.joinTab(tab, tabId);
     this.askInfo(tabId);
   }
 
