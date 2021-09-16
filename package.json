@@ -30,7 +30,7 @@
   "bugs": {
     "url": "https://github.com/Dragicafit/Anime-Watch-Parties/issues"
   },
-  "homepage": "https://github.com/Dragicafit/Anime-Watch-Parties",
+  "homepage": "https://github.com/Dragicafit/Anime-Watch-Parties#readme",
   "devDependencies": {
     "@tsconfig/node16": "^1.0.2",
     "@tsconfig/recommended": "^1.0.1",
