@@ -11,8 +11,8 @@ export default {
     clientSync: ClientSync
   ) {
     browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-      if (changeInfo.status === "complete" && tab.url != null) {
-        const url = new URL(tab.url);
+      if (changeInfo.url != null) {
+        const url = new URL(changeInfo.url);
         if (url.hostname == "www.awp.moe" || url.hostname == "awp.moe") {
           const roomnum = url.pathname.match(/^\/(?<roomnum>[a-zA-Z0-9]{5})$/)
             ?.groups!["roomnum"];
@@ -27,7 +27,7 @@ export default {
 
       if (!clientContext.clientTabs.has(tabId)) return;
 
-      if (changeInfo.url) {
+      if (changeInfo.url != null) {
         console.log("updated: change url", tabId, changeInfo, tab);
         if (clientContext.clientTabs.get(tabId)?.host) {
           clientSync.changeVideoServer(tab);
