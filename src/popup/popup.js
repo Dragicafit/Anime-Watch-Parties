@@ -1,19 +1,9 @@
 function scriptLoaded() {
   console.log("scipt loaded");
 
-  $(function () {
-    $("#create").on("click", (e) => {
-      $("#roomnumURL").text("");
-      $("#copyRoomnumURL").hide();
-      browser.runtime.sendMessage({
-        command: "createRoom",
-      });
-    });
-
-    console.log("ask info");
-    browser.runtime.sendMessage({
-      command: "askInfo",
-    });
+  console.log("ask info");
+  browser.runtime.sendMessage({
+    command: "askInfo",
   });
 }
 
@@ -35,6 +25,14 @@ browser.runtime.sendMessage({
   command: "insertScript",
 });
 
+$("#create").on("click", (e) => {
+  $("#roomnumURL").text("");
+  $("#copyRoomnumURL").hide();
+  browser.runtime.sendMessage({
+    command: "createRoom",
+  });
+});
+
 browser.runtime.onMessage.addListener((message) => {
   switch (message?.command) {
     case "sendInfo":
@@ -47,7 +45,10 @@ browser.runtime.onMessage.addListener((message) => {
       break;
   }
 });
+browser.runtime.sendMessage({
+  command: "askInfo",
+});
 
 function reportError(error) {
-  console.error(`Could not beastify: ${error}`);
+  console.error(`error: ${error}`);
 }
