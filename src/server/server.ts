@@ -5,6 +5,7 @@ import fs from "fs";
 import https from "https";
 import { RedisClient } from "redis";
 import { createAdapter } from "socket.io-redis";
+import httpsServerSetup from "./httpsServerSetup";
 import ioServerSetup from "./ioServerSetup";
 import rateLimiter from "./middleware/rateLimiter";
 
@@ -31,6 +32,7 @@ const redisClient = new RedisClient({});
 
 rateLimiter.start(app, io, redisClient);
 ioServerSetup.start(io);
+httpsServerSetup.start(app);
 
 const port = process.env.PORT || 4000;
 
