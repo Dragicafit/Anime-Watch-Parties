@@ -4,46 +4,50 @@ import express from "express";
 import fs from "fs";
 import https from "https";
 import { RedisClient } from "redis";
-import { createAdapter } from "socket.io-redis";
+import { Server as IoServer } from "socket.io";
+import { createAdapter } from "@socket.io/redis-adapter";
 import httpsServerSetup from "./httpsServerSetup";
 import ioServerSetup from "./ioServerSetup";
 import rateLimiter from "./middleware/rateLimiter";
 
-const app = express();
+process.title = "AnimeWatchParties";
+
 const debug = debugModule("serverAWP");
-const server = https.createServer(
+
+const debugMain = debug.extend("main");
+
+const port = process.env.PORT || 4000;
+const extensionIds = process.env
+  .EXTENSION_IDS!.split(",")
+  .map((extensionId) => extensionId.trim());
+
+const app = express();
+const pubClient = new RedisClient({});
+const subClient = pubClient.duplicate();
+const httpsServer = https.createServer(
   {
     key: fs.readFileSync("key.pem"),
     cert: fs.readFileSync("cert.pem"),
   },
   app
 );
-const { Server: IoServer } = require("socket.io");
-const io = new IoServer(server, {
-  perMessageDeflate: false,
-  cors: {
-    origin: process.env
-      .EXTENSION_IDS!.split(",")
-      .map((extensionId) => extensionId.trim()),
-    credentials: true,
+const io = new IoServer(httpsServer, {
+  cors: { origin: "*", credentials: true },
+  allowRequest: (req, callback) => {
+    const isOriginValid =
+      req.headers.origin == null ||
+      extensionIds.some(
+        (extensionId) => req.headers.origin!.match(extensionId) != null
+      );
+    callback(null, isOriginValid);
   },
+  adapter: createAdapter(pubClient, subClient),
 });
-const redisClient = new RedisClient({});
 
-rateLimiter.start(app, io, redisClient);
+rateLimiter.start(app, io, pubClient);
 ioServerSetup.start(io);
 httpsServerSetup.start(app);
 
-const port = process.env.PORT || 4000;
-
-const debugMain = debug.extend("main");
-
-process.title = "AnimeWatchParties";
-
-const pubClient = redisClient;
-const subClient = pubClient.duplicate();
-io.adapter(createAdapter({ pubClient, subClient }));
-
-server.listen(port, () => {
+httpsServer.listen(port, () => {
   debugMain(`Server listening at port ${port}`);
 });

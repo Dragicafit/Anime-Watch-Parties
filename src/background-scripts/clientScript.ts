@@ -8,7 +8,6 @@ import clientTransmission from "./clientTransmission";
 import { ClientUtils } from "./clientUtils";
 
 let socket = io("https://animewatchparties.com", {
-  secure: true,
   withCredentials: true,
 });
 let clientContext = new ClientContext(socket, new Map(), new Map());
