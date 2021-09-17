@@ -24,9 +24,7 @@
   });
 
   let s = document.createElement("script");
-  s.src = browser.runtime.getURL(
-    "/built/src/web-accessible-resources/js/script.js"
-  );
+  s.src = browser.runtime.getURL("/src/web-accessible-resources/js/script.js");
   s.onload = function () {
     browser.runtime.sendMessage({
       command: "scriptLoaded",
