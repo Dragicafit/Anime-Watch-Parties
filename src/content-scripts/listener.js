@@ -33,12 +33,4 @@
     });
   };
   (document.head || document.documentElement).appendChild(s);
-
-  let css = document.createElement("link");
-  css.rel = "stylesheet";
-  css.type = "text/css";
-  css.href = browser.runtime.getURL(
-    "/built/src/web-accessible-resources/css/script.css"
-  );
-  (document.head || document.documentElement).appendChild(css);
 })();
