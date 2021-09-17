@@ -1,7 +1,6 @@
 "use strict";
 
 import $ from "jquery";
-import jqueryUiBrowserify from "./jquery-ui-browserify";
 import { BrightcovePlayerSetup } from "./player/brightcovePlayerSetup";
 import { JwplayerSetup } from "./player/jwplayerSetup";
 import { PlayerAWP } from "./player/playerAWP";
@@ -11,8 +10,6 @@ import { TabEvents } from "./tabEvents";
 import { TabRoom } from "./tabRoom";
 import { TabSync } from "./tabSync";
 import tabTransmission from "./tabTransmission";
-
-jqueryUiBrowserify($);
 
 let tabContext = new TabContext(
   "https://localhost:4000",

@@ -29,7 +29,6 @@
     }
   },
   "web_accessible_resources": [
-    "built/src/web-accessible-resources/js/script.js",
-    "built/src/web-accessible-resources/css/script.css"
+    "built/src/web-accessible-resources/js/script.js"
   ]
 }
