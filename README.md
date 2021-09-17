@@ -76,3 +76,9 @@ Finaly load the extension in your browser:
 - Firefox: Go to `about:debugging#/runtime/this-firefox`, click on `Load Temporay Add-on...` and select the `manifest.json` file in `built/Firefox/`.
 - Chromium: Go to `chrome://extensions`, enable debugging, click on `Load Unpacked` and select the `built/Chrome/` directory.
 - Chrome: Go to `chrome://extensions`, enable debugging, click on `Load Unpacked` and select the `built/Chrome/` directory.
+
+## Related
+
+This project is a continuation of [Wakanim With Friends](https://github.com/Dragicafit/Wakanim-With-Friends).
+
+[Roll Together](https://github.com/samuraiexx/roll_together) is a similar project.
