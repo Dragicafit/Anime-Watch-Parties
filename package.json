@@ -6,9 +6,10 @@
     "start": "ts-node --project src/server/tsconfig.json src/server/server.ts",
     "debug": "DEBUG=*erverAWP:* npm start",
     "test": "jest",
+    "release": "npm run build-extension && mkdirp built/Release/Firefox/ && zip -FS built/Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json src/icons/* src/dependencies/* built/src/background-scripts/background-script.js built/src/background-scripts/background-script.js.map src/content-scripts/listener.js built/src/web-accessible-resources/js/script.js built/src/web-accessible-resources/js/script.js.map src/popup/*",
+    "build-extension": "npm run browserify-background-scripts && npm run browserify-web-accessible-resources",
     "browserify-background-scripts": "mkdirp built/src/background-scripts/ && cd src/background-scripts/ && browserify --debug --plugin [ tsify ] clientScript.ts | exorcist ../../built/src/background-scripts/background-script.js.map > ../../built/src/background-scripts/background-script.js",
     "browserify-web-accessible-resources": "mkdirp built/src/web-accessible-resources/js/ && cd src/web-accessible-resources/js/ && browserify --debug --plugin [ tsify ] tabScript.ts | exorcist ../../../built/src/web-accessible-resources/js/script.js.map > ../../../built/src/web-accessible-resources/js/script.js",
-    "release": "npm run browserify-background-scripts && npm run browserify-web-accessible-resources && mkdirp built/Release/Firefox/ && zip -FS built/Release/Firefox/Anime-Watch-Parties.xpi LICENSE manifest.json src/icons/* src/dependencies/* built/src/background-scripts/background-script.js built/src/background-scripts/background-script.js.map src/content-scripts/listener.js built/src/web-accessible-resources/js/script.js built/src/web-accessible-resources/js/script.js.map src/popup/*",
     "cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj \"/C=FR/ST=Ile-de-France/L=Paris/O=Dragicafit/OU=Org/CN=localhost\" -sha256"
   },
   "repository": {

@@ -28,12 +28,12 @@ $ npm install
 Compile the extension:
 
 ```ShellSession
-$ npm run browserify-background-scripts && npm run browserify-web-accessible-resources
+$ npm run build-extension
 ```
 
 Finaly load the extension in your browser:
 
-- Firefox: Go to `about:debugging#/runtime/this-firefox`, click on `Load Temporay Add-on...` and select the folder.
+- Firefox: Go to `about:debugging#/runtime/this-firefox`, click on `Load Temporay Add-on...` and select the manifest.json file.
 - Chromium: Go to `chrome://extensions`, enable debugging, click on `Load Unpacked` and select the folder.
 - Chrome: Go to `chrome://extensions`, enable debugging, click on `Load Unpacked` and select the folder.
 
@@ -62,7 +62,7 @@ First things to do:
 Compile the extension:
 
 ```ShellSession
-$ npm run release
+$ npm run build-extension
 ```
 
 Then start the server:
@@ -73,6 +73,6 @@ $ npm run debug
 
 Finaly load the extension in your browser:
 
-- Firefox: Go to `about:debugging#/runtime/this-firefox`, click on `Load Temporay Add-on...` and select the folder.
+- Firefox: Go to `about:debugging#/runtime/this-firefox`, click on `Load Temporay Add-on...` and select the manifest.json file.
 - Chromium: Go to `chrome://extensions`, enable debugging, click on `Load Unpacked` and select the folder.
 - Chrome: Go to `chrome://extensions`, enable debugging, click on `Load Unpacked` and select the folder.
