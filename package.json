@@ -10,7 +10,7 @@
     "build-extension": "rm -rf built/Firefox/ && mkdirp built/Firefox/ && npm run browserify-background-scripts && npm run browserify-web-accessible-resources && cpy --parents LICENSE manifest.json src/icons/* src/dependencies/* src/content-scripts/listener.js src/popup/* built/Firefox/",
     "browserify-background-scripts": "mkdirp built/Firefox/src/background-scripts/ && cd src/background-scripts/ && browserify --debug --plugin [ tsify ] clientScript.ts | exorcist ../../built/Firefox/src/background-scripts/background-script.js.map > ../../built/Firefox/src/background-scripts/background-script.js",
     "browserify-web-accessible-resources": "mkdirp built/Firefox/src/web-accessible-resources/js/ && cd src/web-accessible-resources/js/ && browserify --debug --plugin [ tsify ] tabScript.ts | exorcist ../../../built/Firefox/src/web-accessible-resources/js/script.js.map > ../../../built/Firefox/src/web-accessible-resources/js/script.js",
-    "cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj \"/C=FR/ST=Ile-de-France/L=Paris/O=Dragicafit/OU=Org/CN=localhost\" -sha256"
+    "cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj \"/CN=localhost\" -sha256"
   },
   "repository": {
     "type": "git",
