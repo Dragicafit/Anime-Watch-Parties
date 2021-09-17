@@ -28,7 +28,7 @@ $ npm install
 Compile the extension:
 
 ```ShellSession
-$ npm run release
+$ npm run browserify-background-scripts && npm run browserify-web-accessible-resources
 ```
 
 Finaly load the extension in your browser:
@@ -46,9 +46,6 @@ This project uses [Node.js](https://nodejs.org/en/) and [Redis](https://redis.io
 - Linux:
   - go to [https://nodejs.org/en/download/package-manager/](https://nodejs.org/en/download/package-manager/) and follow instructions to download `Node.js v16.x`.
   - install `docker` and `docker-compose` then run `docker-compose up -d` to start the `Redis server`
-- Windows:
-  - go to [https://nodejs.org/en/download/current/](https://nodejs.org/en/download/current/) to download the Windows Installer.
-  - go to [https://docs.docker.com/desktop/windows/install/](https://docs.docker.com/desktop/windows/install/) and follow instructions to download `Docker Desktop` then run `docker-compose up -d` to start the `Redis server`
 
 To install all the depedencies, use the [command `npm install`](https://docs.npmjs.com/getting-started/installing-npm-packages-locally) :
 
