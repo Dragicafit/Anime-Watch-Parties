@@ -53,7 +53,7 @@ To install all the depedencies, use the [command `npm install`](https://docs.npm
 $ npm install
 ```
 
-First tihngs to do:
+First things to do:
 
 - copy the file `.env.example` to `.env`
 - modify the url in `src/background-scripts/clientScript.ts` from `https://animewatchparties.com` to `https://localhost:4000`
