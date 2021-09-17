@@ -32,7 +32,7 @@ const httpsServer = https.createServer(
   app
 );
 const io = new IoServer(httpsServer, {
-  cors: { origin: "*", credentials: true },
+  cors: { origin: "*" },
   allowRequest: (req, callback) => {
     const isOriginValid =
       req.headers.origin == null ||

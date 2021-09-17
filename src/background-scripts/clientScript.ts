@@ -7,9 +7,7 @@ import { ClientSync } from "./clientSync";
 import clientTransmission from "./clientTransmission";
 import { ClientUtils } from "./clientUtils";
 
-let socket = io("https://animewatchparties.com", {
-  withCredentials: true,
-});
+let socket = io("https://animewatchparties.com");
 let clientContext = new ClientContext(socket, new Map(), new Map());
 let clientUtils = new ClientUtils(clientContext);
 let clientSync = new ClientSync(clientContext, clientUtils);
