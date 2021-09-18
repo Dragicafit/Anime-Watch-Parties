@@ -4,9 +4,9 @@ This extension allows you to enjoy your favorite anime on Crunchyroll, Funimatio
 
 ## Install
 
-- Firefox: Download the [xpi release](https://github.com/Dragicafit/Anime-Watch-Parties/releases/download/v0.1.0-beta/Anime-Watch-Parties.xpi), go to `about:debugging#/runtime/this-firefox`, click on `Load Temporay Add-on...` and select the xpi file.
-- Chromium: Download the [crx release](https://github.com/Dragicafit/Anime-Watch-Parties/releases/download/v0.1.0-beta/Anime-Watch-Parties.crx), go to `chrome://extensions`, enable debugging, drag and drop the crx file.
-- Chrome: Download the [crx release](https://github.com/Dragicafit/Anime-Watch-Parties/releases/download/v0.1.0-beta/Anime-Watch-Parties.crx), go to `chrome://extensions`, enable debugging, drag and drop the crx file.
+- Firefox: Download the [xpi release](https://github.com/Dragicafit/Anime-Watch-Parties/releases/download/v0.1.1-beta/Anime-Watch-Parties.xpi), go to `about:debugging#/runtime/this-firefox`, click on `Load Temporay Add-on...` and select the xpi file.
+- Chromium: Download the [crx release](https://github.com/Dragicafit/Anime-Watch-Parties/releases/download/v0.1.1-beta/Anime-Watch-Parties.crx), go to `chrome://extensions`, enable debugging, drag and drop the crx file.
+- Chrome: Download the [crx release](https://github.com/Dragicafit/Anime-Watch-Parties/releases/download/v0.1.1-beta/Anime-Watch-Parties.crx), go to `chrome://extensions`, enable debugging, drag and drop the crx file.
 
 ## Developing or debugging the extension
 
