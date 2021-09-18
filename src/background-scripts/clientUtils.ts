@@ -92,7 +92,7 @@ export class ClientUtils {
       });
       return;
     }
-    let url = this.parseUrl(tab.url!);
+    let url = tab.url == null ? null : this.parseUrl(tab.url);
     switch (url?.site) {
       case "wakanim":
         browser.browserAction.setIcon({ path: "src/icons/wakanim.svg" });

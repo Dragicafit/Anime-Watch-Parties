@@ -26,7 +26,7 @@ export class ClientSync {
     tab: browser.tabs.Tab,
     clientTab: ClientTab = this.clientContext.clientTabs.get(tab.id!)!
   ): void {
-    let url = this.clientUtils.parseUrl(tab.url!);
+    let url = tab.url == null ? null : this.clientUtils.parseUrl(tab.url);
     if (url == null) {
       return;
     }

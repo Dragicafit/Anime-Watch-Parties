@@ -207,7 +207,7 @@ export class ClientEvent {
     browser.tabs
       .get(tabId)
       .then((tab) => {
-        let url = this.clientUtils.parseUrl(tab.url!);
+        let url = tab.url == null ? null : this.clientUtils.parseUrl(tab.url);
 
         if (url?.site === site && url?.videoId === videoId) return;
 

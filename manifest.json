@@ -13,7 +13,7 @@
     "*://*.wakanim.tv/*/episode/*",
     "*://*.crunchyroll.com/*/*",
     "*://*.funimation.com/*/shows/*",
-    "tabs"
+    "*://*.awp.moe/*"
   ],
   "background": {
     "scripts": ["src/background-scripts/background-script.js"]
