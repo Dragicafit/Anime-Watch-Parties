@@ -6,7 +6,7 @@
     "start": "ts-node --project src/server/tsconfig.json src/server/server.ts",
     "debug": "DEBUG=*erverAWP:* npm start",
     "test": "jest",
-    "release": "npm run build-extension && mkdirp built/Release/Firefox/ && jszip-cli add --noconfig --force -o built/Release/Firefox/Anime-Watch-Parties.xpi built/Firefox/",
+    "release": "npm run build-extension && mkdirp built/Release/Firefox/ && jszip-cli add --noconfig --force -o built/Release/Firefox/Anime-Watch-Parties.xpi built/Firefox/src built/Firefox/LICENSE built/Firefox/manifest.json",
     "build-extension": "rimraf built/Firefox/ && mkdirp built/Firefox/ && npm run browserify-background-scripts && npm run browserify-web-accessible-resources && cpy --parents LICENSE manifest.json src/icons/* src/dependencies/* src/content-scripts/listener.js src/popup/* built/Firefox/",
     "browserify-background-scripts": "mkdirp built/Firefox/src/background-scripts/ && cd src/background-scripts/ && browserify --debug --plugin [ tsify ] clientScript.ts | exorcist ../../built/Firefox/src/background-scripts/background-script.js.map > ../../built/Firefox/src/background-scripts/background-script.js",
     "browserify-web-accessible-resources": "mkdirp built/Firefox/src/web-accessible-resources/js/ && cd src/web-accessible-resources/js/ && browserify --debug --plugin [ tsify ] tabScript.ts | exorcist ../../../built/Firefox/src/web-accessible-resources/js/script.js.map > ../../../built/Firefox/src/web-accessible-resources/js/script.js",
