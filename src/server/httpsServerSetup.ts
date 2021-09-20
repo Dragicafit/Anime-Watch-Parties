@@ -16,6 +16,13 @@ export default {
       express.static(path.join(__dirname, "../icons/activate.svg"))
     );
 
+    app.use(
+      "/logo.svg",
+      express.static(path.join(__dirname, "../icons/logo.svg"))
+    );
+
+    app.use(express.static(path.join(__dirname, "public/")));
+
     app.get("/*", function (req, res) {
       res.render("home");
     });

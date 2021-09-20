@@ -1,8 +1,13 @@
-# Anime-Watch-Parties
+[![Mozilla Add-ons](https://img.shields.io/amo/v/anime-watch-parties?label=Firefox&logo=Firefox)](https://addons.mozilla.org/firefox/addon/anime-watch-parties/)
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/goinehmnmhnoaepodbngfgdgjeibgelh?label=Chrome&logo=Google%20Chrome)](https://chrome.google.com/webstore/detail/anime-watch-parties/goinehmnmhnoaepodbngfgdgjeibgelh)
+[![Github](https://img.shields.io/github/license/Dragicafit/Anime-Watch-Parties?logo=Github)](https://github.com/Dragicafit/Anime-Watch-Parties)
 
+# Anime Watch Parties
+
+Anime Watch Parties is a cross-platform extension that synchronizes videos on major anime websites.
 This extension allows you to enjoy your favorite anime on Crunchyroll, Funimation or Wakanim with your friends.
 
-## Install
+## Manual Install
 
 - Firefox: Download the [xpi release](https://github.com/Dragicafit/Anime-Watch-Parties/releases/download/v0.1.1-beta/Anime-Watch-Parties.xpi), go to `about:debugging#/runtime/this-firefox`, click on `Load Temporay Add-on...` and select the xpi file.
 - Chromium: Download the [crx release](https://github.com/Dragicafit/Anime-Watch-Parties/releases/download/v0.1.1-beta/Anime-Watch-Parties.crx), go to `chrome://extensions`, enable debugging, drag and drop the crx file.

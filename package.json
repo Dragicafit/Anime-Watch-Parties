@@ -1,7 +1,7 @@
 {
   "name": "anime-watch-parties",
   "version": "0.1.1",
-  "description": "Watch your favorite anime on Crunchyroll, Funimation or Wakanim with your friends.",
+  "description": "A cross-platform extension that synchronizes videos on major anime websites.",
   "scripts": {
     "start": "ts-node --project src/server/tsconfig.json src/server/server.ts",
     "debug": "DEBUG=*erverAWP:* npm start",
