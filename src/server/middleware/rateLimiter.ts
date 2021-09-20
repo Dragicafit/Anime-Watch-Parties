@@ -12,16 +12,16 @@ export default {
       new RateLimiterRedis({
         storeClient: redisClient,
         keyPrefix: "limit",
-        points: 5,
+        points: 50,
         duration: 1,
-        inmemoryBlockOnConsumed: 10,
+        inmemoryBlockOnConsumed: 100,
       }),
       new RateLimiterRedis({
         storeClient: redisClient,
         keyPrefix: "burst",
-        points: 10,
+        points: 100,
         duration: 10,
-        inmemoryBlockOnConsumed: 10,
+        inmemoryBlockOnConsumed: 100,
       })
     );
 
