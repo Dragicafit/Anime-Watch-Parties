@@ -4,3 +4,5 @@ export const parseUrlCrunchyroll =
   /^https:\/\/(?:www\.)?crunchyroll\.com\/(?:(?<location>[a-zA-Z]{2})\/)?(?<videoId>[\w-]+\/[\w-]+-\d+)\/?(?:\?.*)?$/;
 export const parseUrlFunimation =
   /^https:\/\/(?:www\.)?funimation\.com\/(?<location>[a-zA-Z]{2})\/shows\/(?<videoId>[\w-]+\/[\w-]+)\/?(?:\?.*)?$/;
+export const parseUrlAdn =
+  /^https:\/\/(?:www\.)?animedigitalnetwork\.fr\/video\/(?<videoId>[\w-]+\/[\w-]+)/;

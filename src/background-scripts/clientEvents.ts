@@ -226,6 +226,9 @@ export class ClientEvent {
           case "funimation":
             newUrl = `https://www.funimation.com/${location}/shows/${videoId}`;
             break;
+          case "adn":
+            newUrl = `https://animedigitalnetwork.fr/video/${videoId}`;
+            break;
           default:
             return;
         }

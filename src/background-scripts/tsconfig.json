@@ -3,6 +3,5 @@
 
   "compilerOptions": {
     "outDir": "../../built/Firefox/src/background-scripts"
-  },
-  "typeRoots": ["../../node_modules/@types"]
+  }
 }

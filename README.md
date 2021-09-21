@@ -5,7 +5,7 @@
 # Anime Watch Parties
 
 Anime Watch Parties is a cross-platform extension that synchronizes videos on major anime websites.
-This extension allows you to enjoy your favorite anime on Crunchyroll, Funimation or Wakanim with your friends.
+This extension allows you to enjoy your favorite anime on Crunchyroll, Funimation, Wakanim or ADN with your friends.
 
 ## Manual Install
 

@@ -73,6 +73,7 @@ it.each([
   ["videoId", "wakanim", "uS"],
   ["videoId", "crunchyroll", "US"],
   ["videoId", "funimation", "US"],
+  ["videoId", "adn", "fr"],
   ["videoId", "crunchyroll", null],
   ["videoId", "crunchyroll", undefined],
   [Array(301).join("x"), "wakanim", "US"],
@@ -84,6 +85,7 @@ it.each([
     "funimation",
     "en",
   ],
+  ["dr-stone/13693-episode-1-stone-world", "adn", "fr"],
 ])("Valid", (videoId2, site2, location2) => {
   videoId = videoId2;
   site = site2;
@@ -186,6 +188,7 @@ it.each([
   "wakavim",
   "crunchyboll",
   "funimotion",
+  "adm",
   "crunchyroll ",
   Infinity,
   NaN,

@@ -13,6 +13,7 @@
     "*://*.wakanim.tv/*/episode/*",
     "*://*.crunchyroll.com/*/*",
     "*://*.funimation.com/*/shows/*",
+    "*://*.animedigitalnetwork.fr/video/*",
     "*://*.awp.moe/*"
   ],
   "background": {

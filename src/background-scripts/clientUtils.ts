@@ -1,4 +1,5 @@
 import {
+  parseUrlAdn,
   parseUrlCrunchyroll,
   parseUrlFunimation,
   parseUrlWakanim,
@@ -82,6 +83,14 @@ export class ClientUtils {
         location: pathname.groups!.location,
       };
     }
+    pathname = url.match(parseUrlAdn);
+    if (pathname != null) {
+      return {
+        videoId: pathname.groups!.videoId,
+        site: "adn",
+        location: "fr",
+      };
+    }
     return null;
   }
 
@@ -105,6 +114,11 @@ export class ClientUtils {
       case "funimation":
         browser.browserAction.setIcon({
           path: "src/icons/funimation.svg",
+        });
+        break;
+      case "adn":
+        browser.browserAction.setIcon({
+          path: "src/icons/adn.svg",
         });
         break;
       default:
