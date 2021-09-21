@@ -8,7 +8,7 @@
     "48": "src/icons/activate.svg",
     "96": "src/icons/icon.svg"
   },
-  "homepage_url": "https://github.com/Dragicafit/Anime-Watch-Parties#readme",
+  "homepage_url": "https://animewatchparties.com",
   "permissions": [
     "*://*.wakanim.tv/*/episode/*",
     "*://*.crunchyroll.com/*/*",
