@@ -3,22 +3,28 @@ import { TabSync } from "../tabSync";
 import { AwpPlayerInterface } from "./awpPlayerInterface";
 
 export abstract class AwpplayerSetup implements AwpPlayerInterface {
-  name: string;
-  tabContext: TabContext;
-  tabSync: TabSync;
+  private name: string;
+  protected tabContext: TabContext;
+  protected tabSync: TabSync;
 
-  constructor(name: string, tabContext: TabContext, tabSync: TabSync) {
+  public constructor(name: string, tabContext: TabContext, tabSync: TabSync) {
     this.name = name;
     this.tabContext = tabContext;
     this.tabSync = tabSync;
-    this._waitForExist();
+    this.waitForExist();
   }
 
-  abstract _onPlay(callback?: (...events: any[]) => void): void;
-  abstract _onPause(callback?: (...events: any[]) => void): void;
-  abstract _onSeek(callback?: (...events: any[]) => void): void;
+  protected abstract player(): any;
 
-  onPlay() {
+  protected abstract _onPlay(callback?: (...events: any[]) => void): void;
+  protected abstract _onPause(callback?: (...events: any[]) => void): void;
+  protected abstract _onSeek(callback?: (...events: any[]) => void): void;
+  protected abstract _getTime(): Promise<number>;
+  protected abstract _isPlay(): Promise<boolean>;
+  protected abstract _seekTo(time: number): void;
+  protected abstract _setState(state: boolean): void;
+
+  public onPlay(): void {
     this._onPlay((e) => {
       console.log(`${this.name} playing`, e);
       if (!this.tabContext.tabRoom.host) return this.tabSync.syncClient();
@@ -26,7 +32,7 @@ export abstract class AwpplayerSetup implements AwpPlayerInterface {
     });
   }
 
-  onPause() {
+  public onPause(): void {
     this._onPause((e) => {
       console.log(`${this.name} pausing`, e);
       if (!this.tabContext.tabRoom.host) return;
@@ -34,7 +40,7 @@ export abstract class AwpplayerSetup implements AwpPlayerInterface {
     });
   }
 
-  onSeek() {
+  public onSeek(): void {
     this._onSeek((offset, e) => {
       console.log(`${this.name} seeking ${offset} sec`, e);
       if (!this.tabContext.tabRoom.host) return;
@@ -42,47 +48,45 @@ export abstract class AwpplayerSetup implements AwpPlayerInterface {
     });
   }
 
-  getTime() {
+  public getTime(): Promise<any> {
     if (!this.playerExist()) return Promise.resolve(0);
     return this._getTime();
   }
-  _getTime(): Promise<any> {
-    return Promise.reject(new Error("not initialized"));
-  }
 
-  isPlay() {
+  public isPlay(): Promise<any> {
     if (!this.playerExist()) return Promise.resolve(false);
     return this._isPlay();
   }
-  _isPlay(): Promise<any> {
-    return Promise.reject(new Error("not initialized"));
-  }
 
-  seekTo(time: number) {
+  public seekTo(time: number): void {
     if (!this.playerExist()) return;
     this._seekTo(time);
   }
-  abstract _seekTo(time: number): void;
 
-  setState(state: boolean) {
+  public setState(state: boolean): void {
     if (!this.playerExist()) return;
     this._setState(state);
   }
-  abstract _setState(state: boolean): void;
 
-  playerExist() {
-    return false;
-  }
-
-  _waitForExist(): void {
+  private waitForExist(): void {
     if (!this.playerExist()) {
-      setTimeout(this._waitForExist.bind(this), 500);
+      setTimeout(this.waitForExist.bind(this), 500);
       return;
     }
     this.onPlay();
     this.onPause();
     this.onSeek();
   }
-}
 
-exports.AwpplayerSetup = AwpplayerSetup;
+  public playerExist(): boolean {
+    try {
+      return this._playerExist();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  protected _playerExist(): boolean {
+    return this.player() != null;
+  }
+}

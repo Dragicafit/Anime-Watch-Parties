@@ -2,49 +2,48 @@ import { TabContext } from "../tabContext";
 import { TabSync } from "../tabSync";
 import { AwpplayerSetup } from "./awpplayerSetup";
 
-export class VilosplayerSetup extends AwpplayerSetup {
+export abstract class VideoJsSetup extends AwpplayerSetup {
   private previousSeek: number;
   private preventCallIfTriggered: Map<string, number>;
 
-  public constructor(tabContext: TabContext, tabSync: TabSync) {
-    super("vilosplayer", tabContext, tabSync);
+  public constructor(name: string, tabContext: TabContext, tabSync: TabSync) {
+    super(name, tabContext, tabSync);
     this.previousSeek = 0;
     this.preventCallIfTriggered = new Map();
   }
 
-  protected override player() {
-    return VILOS_PLAYERJS;
-  }
-
   protected override _onPlay(callback: (...events: any[]) => void): void {
-    this.player().on("play", () => {
+    this.player().on("play", (e: any) => {
       if (
         !this.preventCallIfTriggered.has("play") ||
         this.tabContext.performance.now() -
           this.preventCallIfTriggered.get("play")! >
           200
       ) {
-        callback();
+        callback(e);
       }
     });
   }
 
   protected override _onPause(callback: (...events: any[]) => void): void {
-    this.player().on("pause", () => {
+    this.player().on("pause", (e: any) => {
       if (
         !this.preventCallIfTriggered.has("pause") ||
         this.tabContext.performance.now() -
           this.preventCallIfTriggered.get("pause")! >
           200
       ) {
-        callback();
+        callback(e);
       }
     });
   }
 
   protected override _onSeek(callback: (...events: any[]) => void): void {
-    this.player().on("timeupdate", (e) => {
-      if (this.tabContext.window.document.hidden) {
+    this.player().on("timeupdate", (e: any) => {
+      if (
+        this.tabContext.window.document.hidden ||
+        e.manuallyTriggered !== true
+      ) {
         return;
       }
       if (
@@ -54,28 +53,24 @@ export class VilosplayerSetup extends AwpplayerSetup {
           200
       ) {
         let oldPreviousSeek = this.previousSeek;
-        this.previousSeek = e.seconds;
-        if (Math.abs(e.seconds - oldPreviousSeek) < 0.5) return;
-        callback(e.seconds, e);
+        this.previousSeek = this.player().currentTime();
+        if (Math.abs(this.previousSeek - oldPreviousSeek) < 0.5) return;
+        callback(this.previousSeek, e);
       }
     });
   }
 
   protected override _getTime(): Promise<number> {
-    return new Promise((resolve) => {
-      this.player().getCurrentTime(resolve);
-    });
+    return Promise.resolve(this.player().currentTime());
   }
 
   protected override _isPlay(): Promise<boolean> {
-    return new Promise((resolve) => {
-      this.player().getPaused((paused) => resolve(paused === false));
-    });
+    return Promise.resolve(!this.player().paused());
   }
 
   protected override _seekTo(time: number): void {
     this.preventCallIfTriggered.set("seek", this.tabContext.performance.now());
-    this.player().setCurrentTime(time);
+    this.player().currentTime(time);
   }
 
   protected override _setState(state: boolean): void {

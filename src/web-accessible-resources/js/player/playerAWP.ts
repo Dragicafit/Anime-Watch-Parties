@@ -2,6 +2,7 @@ import { AdnVideoJsSetup } from "./adnVideoJsSetup";
 import { AwpPlayerInterface } from "./awpPlayerInterface";
 import { BrightcovePlayerSetup } from "./brightcovePlayerSetup";
 import { JwplayerSetup } from "./jwplayerSetup";
+import { NonExistantSetup } from "./nonExistantSetup";
 import { VilosplayerSetup } from "./vilosplayerSetup";
 
 export class PlayerAWP implements AwpPlayerInterface {
@@ -9,69 +10,67 @@ export class PlayerAWP implements AwpPlayerInterface {
   private vilosplayer: VilosplayerSetup;
   private brightcovePlayer: BrightcovePlayerSetup;
   private adnVideoJs: AdnVideoJsSetup;
+  private nonExistant: NonExistantSetup;
 
-  constructor(
+  public constructor(
     jwplayer: JwplayerSetup,
     vilosplayer: VilosplayerSetup,
     brightcovePlayer: BrightcovePlayerSetup,
-    adnVideoJs: AdnVideoJsSetup
+    adnVideoJs: AdnVideoJsSetup,
+    nonExistant: NonExistantSetup
   ) {
     this.jwplayer = jwplayer;
     this.vilosplayer = vilosplayer;
     this.brightcovePlayer = brightcovePlayer;
     this.adnVideoJs = adnVideoJs;
+    this.nonExistant = nonExistant;
   }
 
-  get awpplayer():
-    | JwplayerSetup
-    | VilosplayerSetup
-    | BrightcovePlayerSetup
-    | AdnVideoJsSetup
-    | null {
-    if (this.jwplayer?.playerExist()) {
+  private getAwpplayer(): AwpPlayerInterface {
+    if (this.jwplayer.playerExist()) {
       return this.jwplayer;
     }
-    if (this.vilosplayer?.playerExist()) {
+    if (this.vilosplayer.playerExist()) {
       return this.vilosplayer;
     }
-    if (this.brightcovePlayer?.playerExist()) {
+    if (this.brightcovePlayer.playerExist()) {
       return this.brightcovePlayer;
     }
-    if (this.adnVideoJs?.playerExist()) {
+    if (this.adnVideoJs.playerExist()) {
       return this.adnVideoJs;
     }
-    return null;
+    return this.nonExistant;
   }
 
   onPlay() {
-    return this.awpplayer!.onPlay();
+    return this.getAwpplayer().onPlay();
   }
 
   onPause() {
-    return this.awpplayer!.onPause();
+    return this.getAwpplayer().onPause();
   }
 
   onSeek() {
-    return this.awpplayer!.onSeek();
+    return this.getAwpplayer().onSeek();
   }
 
   getTime() {
-    return this.awpplayer!.getTime();
+    return this.getAwpplayer().getTime();
   }
 
   isPlay() {
-    return this.awpplayer!.isPlay();
+    return this.getAwpplayer().isPlay();
   }
 
   seekTo(time: number) {
-    return this.awpplayer!.seekTo(time);
+    return this.getAwpplayer().seekTo(time);
   }
 
   setState(state: boolean) {
-    return this.awpplayer!.setState(state);
+    return this.getAwpplayer().setState(state);
   }
 
   playerExist() {
-    return this.awpplayer!.playerExist();
+    return this.getAwpplayer().playerExist();
   }
 }

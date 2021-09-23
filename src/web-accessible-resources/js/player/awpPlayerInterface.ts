@@ -5,13 +5,13 @@ export interface AwpPlayerInterface {
 
   onSeek(): void;
 
-  getTime(): void;
+  getTime(): Promise<number>;
 
-  isPlay(): void;
+  isPlay(): Promise<boolean>;
 
   seekTo(time: number): void;
 
   setState(state: boolean): void;
 
-  playerExist(): void;
+  playerExist(): boolean;
 }

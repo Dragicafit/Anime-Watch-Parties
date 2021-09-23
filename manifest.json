@@ -14,7 +14,8 @@
     "*://*.crunchyroll.com/*/*",
     "*://*.funimation.com/*/shows/*",
     "*://*.animedigitalnetwork.fr/video/*",
-    "*://*.awp.moe/*"
+    "*://*.awp.moe/*",
+    "webNavigation"
   ],
   "background": {
     "scripts": ["src/background-scripts/background-script.js"]
