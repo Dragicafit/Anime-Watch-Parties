@@ -10,12 +10,14 @@
   },
   "homepage_url": "https://animewatchparties.com",
   "permissions": [
-    "*://*.wakanim.tv/*/episode/*",
-    "*://*.crunchyroll.com/*/*",
-    "*://*.funimation.com/*/shows/*",
-    "*://*.animedigitalnetwork.fr/video/*",
-    "*://*.awp.moe/*",
-    "webNavigation"
+    "https://www.wakanim.tv/*/episode/*",
+    "https://www.crunchyroll.com/*/*",
+    "https://api.crunchyroll.com/*",
+    "https://www.funimation.com/*/shows/*",
+    "https://animedigitalnetwork.fr/video/*",
+    "https://awp.moe/*",
+    "webNavigation",
+    "cookies"
   ],
   "background": {
     "scripts": ["src/background-scripts/background-script.js"]

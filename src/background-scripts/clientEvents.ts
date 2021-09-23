@@ -207,34 +207,34 @@ export class ClientEvent {
     browser.tabs
       .get(tabId)
       .then((tab) => {
-        let url = tab.url == null ? null : this.clientUtils.parseUrl(tab.url);
+        this.clientUtils.parseUrlTab(tab).then((url) => {
+          if (url?.site === site && url?.videoId === videoId) return;
 
-        if (url?.site === site && url?.videoId === videoId) return;
-
-        let newUrl;
-        switch (site) {
-          case "wakanim":
-            newUrl = `https://www.wakanim.tv/${location}/v2/catalogue/episode/${videoId}`;
-            break;
-          case "crunchyroll":
-            if (url?.site === "crunchyroll" && url?.location != null) {
-              newUrl = `https://www.crunchyroll.com/${url.location}/${videoId}`;
-            } else {
-              newUrl = `https://www.crunchyroll.com/${videoId}`;
-            }
-            break;
-          case "funimation":
-            newUrl = `https://www.funimation.com/${location}/shows/${videoId}`;
-            break;
-          case "adn":
-            newUrl = `https://animedigitalnetwork.fr/video/${videoId}`;
-            break;
-          default:
-            return;
-        }
-        browser.tabs.update(tabId, {
-          active: true,
-          url: newUrl,
+          let newUrl;
+          switch (site) {
+            case "wakanim":
+              newUrl = `https://www.wakanim.tv/${location}/v2/catalogue/episode/${videoId}`;
+              break;
+            case "crunchyroll":
+              if (url?.site === "crunchyroll" && url?.location != null) {
+                newUrl = `https://www.crunchyroll.com/${url.location}/${videoId}`;
+              } else {
+                newUrl = `https://www.crunchyroll.com/${videoId}`;
+              }
+              break;
+            case "funimation":
+              newUrl = `https://www.funimation.com/${location}/shows/${videoId}`;
+              break;
+            case "adn":
+              newUrl = `https://animedigitalnetwork.fr/video/${videoId}`;
+              break;
+            default:
+              return;
+          }
+          browser.tabs.update(tabId, {
+            active: true,
+            url: newUrl,
+          });
         });
       })
       .catch(this.clientUtils.reportError);

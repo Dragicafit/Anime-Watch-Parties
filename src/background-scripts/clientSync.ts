@@ -26,28 +26,32 @@ export class ClientSync {
     tab: browser.tabs.Tab,
     clientTab: ClientTab = this.clientContext.clientTabs.get(tab.id!)!
   ): void {
-    let url = tab.url == null ? null : this.clientUtils.parseUrl(tab.url);
-    if (url == null) {
-      return;
-    }
-    console.log(`change video to ${url.videoId}`);
+    this.clientUtils.parseUrlTab(tab).then((url) => {
+      if (url == null) {
+        return;
+      }
+      console.log(`change video to ${url.videoId}`);
 
-    this.clientContext.socket.emit("changeVideoServer", {
-      roomnum: clientTab.roomnum,
-      site: url.site,
-      location: url.location,
-      videoId: url.videoId,
-    });
-    for (let [tabId2, clientRoom2] of this.clientContext.clientTabs.entries()) {
-      if (clientRoom2?.roomnum !== clientTab.roomnum || tabId2 === tab.id)
-        continue;
-      this.clientEvent!.changeVideoClientTab(
+      this.clientContext.socket.emit("changeVideoServer", {
+        roomnum: clientTab.roomnum,
+        site: url.site,
+        location: url.location,
+        videoId: url.videoId,
+      });
+      for (const [
         tabId2,
-        url.site!,
-        url.location!,
-        url.videoId!
-      );
-    }
+        clientRoom2,
+      ] of this.clientContext.clientTabs.entries()) {
+        if (clientRoom2?.roomnum !== clientTab.roomnum || tabId2 === tab.id)
+          continue;
+        this.clientEvent!.changeVideoClientTab(
+          tabId2,
+          url.site!,
+          url.location!,
+          url.videoId!
+        );
+      }
+    });
   }
 
   changeStateServer(

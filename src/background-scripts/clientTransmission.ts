@@ -11,16 +11,18 @@ export default {
     clientSync: ClientSync
   ) {
     browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-      if (changeInfo.url != null) {
-        const url = new URL(changeInfo.url);
-        if (url.hostname == "www.awp.moe" || url.hostname == "awp.moe") {
-          const roomnum = url.pathname.match(/^\/(?<roomnum>[a-zA-Z0-9]{5})$/)
-            ?.groups!["roomnum"];
-          if (roomnum == null) {
-            console.log("invalid roomnum", url.pathname.substring(1));
-            return;
+      if (tab.url != null) {
+        const url = new URL(tab.url);
+        if (url.host == "awp.moe") {
+          if (changeInfo.url != null) {
+            const roomnum = url.pathname.match(/^\/(?<roomnum>[a-zA-Z0-9]{5})$/)
+              ?.groups!["roomnum"];
+            if (roomnum == null) {
+              console.log("invalid roomnum", url.pathname.substring(1));
+              return;
+            }
+            clientEvent.joinRoom(tab, tabId, roomnum);
           }
-          clientEvent.joinRoom(tab, tabId, roomnum);
           return;
         }
       }
@@ -38,7 +40,12 @@ export default {
 
       if (changeInfo.status === "complete") {
         console.log("updated: complete", tabId, changeInfo, tab);
-        clientUtils.insertScript(tab, tabId);
+        if (clientContext.clientTabs.get(tabId)?.host) {
+          clientSync.changeVideoServer(tab);
+        } else {
+          clientSync.syncClient(tabId);
+        }
+        insertScript(tab, tabId);
       }
     });
     browser.tabs.onRemoved.addListener((tabId) => {
@@ -64,7 +71,7 @@ export default {
             clientEvent.askInfo(tabId);
             break;
           case "insertScript":
-            clientUtils.insertScript(tab, tabId);
+            insertScript(tab, tabId);
             break;
           case "createRoom":
             clientEvent.createRoom(tab, tabId);
@@ -107,5 +114,35 @@ export default {
         data.videoId
       )
     );
+
+    function insertScript(tab: browser.tabs.Tab, tabId: number) {
+      console.log("insert script");
+
+      browser.webNavigation
+        .getAllFrames({ tabId: tabId })
+        .then((details) => {
+          for (const detail of details) {
+            const url = new URL(detail.url);
+            if (
+              [
+                "www.wakanim.tv",
+                "www.crunchyroll.com",
+                "www.funimation.com",
+                "animedigitalnetwork.fr",
+              ].includes(url.host)
+            ) {
+              browser.tabs
+                .executeScript(tabId, {
+                  runAt: "document_end",
+                  file: "/src/content-scripts/listener.js",
+                  frameId: detail.frameId,
+                })
+                .catch(clientUtils.reportError);
+            }
+          }
+        })
+        .catch(clientUtils.reportError);
+      clientUtils.joinTab(tab, tabId);
+    }
   },
 };
