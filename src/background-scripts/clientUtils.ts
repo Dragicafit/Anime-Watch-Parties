@@ -96,22 +96,14 @@ export class ClientUtils {
         resolve(null);
         return;
       }
-      browser.cookies
-        .get({ name: "session_id", url: "https://www.crunchyroll.com" })
-        .then((cookie) => {
-          this.askUrl(tab.id!, cookie?.value)
-            .then((url2) => {
-              console.log("ask url", url2);
-              if (url2 == null) {
-                resolve(null);
-                return;
-              }
-              resolve(this.parseUrl(url2));
-            })
-            .catch((error) => {
-              this.reportError(error);
-              resolve(null);
-            });
+      this.askUrl(tab.id)
+        .then((url2) => {
+          console.log("ask url", url2);
+          if (url2 == null) {
+            resolve(null);
+            return;
+          }
+          resolve(this.parseUrl(url2));
         })
         .catch((error) => {
           this.reportError(error);
@@ -120,10 +112,7 @@ export class ClientUtils {
     });
   }
 
-  askUrl(
-    tabId: number,
-    session_id: string | null | undefined
-  ): Promise<string | null> {
+  askUrl(tabId: number): Promise<string | null | undefined> {
     return new Promise((resolve) => {
       browser.webNavigation
         .getAllFrames({ tabId: tabId })
@@ -132,19 +121,13 @@ export class ClientUtils {
             const url = new URL(detail.url);
             if (
               url.host === "www.crunchyroll.com" &&
-              url.pathname === "/affiliate_iframeplayer" &&
-              session_id != null
+              url.pathname === "/affiliate_iframeplayer"
             ) {
               console.log("ask url", url);
               for (const [key, value] of url.searchParams) {
                 if (key === "media_id") {
-                  fetch(
-                    `https://api.crunchyroll.com/info.0.json?media_id=${value}&session_id=${session_id}`
-                  )
-                    .then((response) => response.json())
-                    .then((json) => {
-                      resolve(json.data.url);
-                    })
+                  this.crunchyrollMediaIdToUrl(value)
+                    .then((url2) => resolve(url2))
                     .catch((error) => {
                       this.reportError(error);
                       resolve(null);
@@ -166,6 +149,50 @@ export class ClientUtils {
           }
           resolve(null);
         })
+        .catch((error) => {
+          this.reportError(error);
+          resolve(null);
+        });
+    });
+  }
+
+  crunchyrollMediaIdToUrl(
+    media_id: string
+  ): Promise<string | null | undefined> {
+    return new Promise((resolve) => {
+      this.getSessionId()
+        .then((session_id) => {
+          if (session_id == null) {
+            resolve(null);
+            return;
+          }
+          fetch(
+            `https://api.crunchyroll.com/info.0.json?media_id=${media_id}&session_id=${session_id}`
+          )
+            .then((response) => response.json())
+            .then((json) => {
+              resolve(json.data.url);
+            })
+            .catch((error) => {
+              this.reportError(error);
+              resolve(null);
+            });
+        })
+        .catch((error) => {
+          this.reportError(error);
+          resolve(null);
+        });
+    });
+  }
+
+  getSessionId(): Promise<string | null | undefined> {
+    return new Promise((resolve) => {
+      browser.cookies
+        .get({
+          name: "session_id",
+          url: "https://www.crunchyroll.com",
+        })
+        .then((cookie) => resolve(cookie?.value))
         .catch((error) => {
           this.reportError(error);
           resolve(null);
