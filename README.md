@@ -62,7 +62,7 @@ First things to do:
 
 - copy the file `.env.example` to `.env`
 - modify the url in `src/background-scripts/clientScript.ts` from `https://animewatchparties.com` to `https://localhost:4000`
-- run `npm run cert` to create a self-signed certificate (the server uses https)
+- run `npm run cert` to create a self-signed certificate (the server uses https) and you have to allow it: [https://localhost:4000](https://localhost:4000).
 
 Compile the extension:
 
