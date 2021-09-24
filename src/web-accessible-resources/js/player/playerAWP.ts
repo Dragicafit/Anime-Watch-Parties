@@ -1,6 +1,7 @@
 import { AdnVideoJsSetup } from "./adnVideoJsSetup";
 import { AwpPlayerInterface } from "./awpPlayerInterface";
 import { BrightcovePlayerSetup } from "./brightcovePlayerSetup";
+import { FunimationPlayerSetup } from "./funimationPlayerSetup";
 import { JwplayerSetup } from "./jwplayerSetup";
 import { NonExistantSetup } from "./nonExistantSetup";
 import { VilosplayerSetup } from "./vilosplayerSetup";
@@ -9,6 +10,7 @@ export class PlayerAWP implements AwpPlayerInterface {
   private jwplayer: JwplayerSetup;
   private vilosplayer: VilosplayerSetup;
   private brightcovePlayer: BrightcovePlayerSetup;
+  private funimationPlayer: FunimationPlayerSetup;
   private adnVideoJs: AdnVideoJsSetup;
   private nonExistant: NonExistantSetup;
 
@@ -16,12 +18,14 @@ export class PlayerAWP implements AwpPlayerInterface {
     jwplayer: JwplayerSetup,
     vilosplayer: VilosplayerSetup,
     brightcovePlayer: BrightcovePlayerSetup,
+    funimationPlayer: FunimationPlayerSetup,
     adnVideoJs: AdnVideoJsSetup,
     nonExistant: NonExistantSetup
   ) {
     this.jwplayer = jwplayer;
     this.vilosplayer = vilosplayer;
     this.brightcovePlayer = brightcovePlayer;
+    this.funimationPlayer = funimationPlayer;
     this.adnVideoJs = adnVideoJs;
     this.nonExistant = nonExistant;
   }
@@ -35,6 +39,9 @@ export class PlayerAWP implements AwpPlayerInterface {
     }
     if (this.brightcovePlayer.playerExist()) {
       return this.brightcovePlayer;
+    }
+    if (this.funimationPlayer.playerExist()) {
+      return this.funimationPlayer;
     }
     if (this.adnVideoJs.playerExist()) {
       return this.adnVideoJs;

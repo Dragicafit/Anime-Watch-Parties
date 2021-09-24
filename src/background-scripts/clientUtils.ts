@@ -2,6 +2,7 @@ import {
   parseUrlAdn,
   parseUrlCrunchyroll,
   parseUrlFunimation,
+  parseUrlNewFunimation,
   parseUrlWakanim,
 } from "./clientConst";
 import { ClientContext } from "./clientContext";
@@ -68,6 +69,14 @@ export class ClientUtils {
       return {
         videoId: pathname.groups!.videoId,
         site: "funimation",
+        location: pathname.groups!.location,
+      };
+    }
+    pathname = url.match(parseUrlNewFunimation);
+    if (pathname != null) {
+      return {
+        videoId: pathname.groups!.videoId,
+        site: "newFunimation",
         location: pathname.groups!.location,
       };
     }
@@ -218,6 +227,7 @@ export class ClientUtils {
           });
           break;
         case "funimation":
+        case "newFunimation":
           browser.browserAction.setIcon({
             path: "src/icons/funimation.svg",
           });

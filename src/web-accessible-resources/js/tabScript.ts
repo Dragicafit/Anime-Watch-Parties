@@ -3,6 +3,7 @@
 import $ from "jquery";
 import { AdnVideoJsSetup } from "./player/adnVideoJsSetup";
 import { BrightcovePlayerSetup } from "./player/brightcovePlayerSetup";
+import { FunimationPlayerSetup } from "./player/funimationPlayerSetup";
 import { JwplayerSetup } from "./player/jwplayerSetup";
 import { NonExistantSetup } from "./player/nonExistantSetup";
 import { PlayerAWP } from "./player/playerAWP";
@@ -26,6 +27,7 @@ tabContext.playerAWP = new PlayerAWP(
   new JwplayerSetup(tabContext, tabSync),
   new VilosplayerSetup(tabContext, tabSync),
   new BrightcovePlayerSetup(tabContext, tabSync),
+  new FunimationPlayerSetup(tabContext, tabSync),
   new AdnVideoJsSetup(tabContext, tabSync),
   new NonExistantSetup(tabContext, tabSync)
 );
