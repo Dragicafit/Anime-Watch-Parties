@@ -30,7 +30,7 @@ export class ClientSync {
       if (url == null) {
         return;
       }
-      console.log(`change video to ${url.videoId}`);
+      console.log("change url to", url);
 
       this.clientContext.socket.emit("changeVideoServer", {
         roomnum: clientTab.roomnum,
@@ -44,12 +44,11 @@ export class ClientSync {
       ] of this.clientContext.clientTabs.entries()) {
         if (clientRoom2?.roomnum !== clientTab.roomnum || tabId2 === tab.id)
           continue;
-        this.clientEvent!.changeVideoClientTab(
-          tabId2,
-          url.site!,
-          url.location!,
-          url.videoId!
-        );
+        this.clientEvent!.changeVideoClientTab(tabId2, {
+          site: url.site,
+          location: url.location,
+          videoId: url.videoId,
+        });
       }
     });
   }
@@ -90,12 +89,11 @@ export class ClientSync {
           return console.log(err);
         }
         if (data.videoId != null) {
-          this.clientEvent!.changeVideoClient(
-            data.roomnum,
-            data.site,
-            data.location,
-            data.videoId
-          );
+          this.clientEvent!.changeVideoClient(data.roomnum, {
+            site: data.site,
+            location: data.location,
+            videoId: data.videoId,
+          });
         }
         if (data.time != null && data.state != null) {
           this.clientEvent!.changeStateClient(

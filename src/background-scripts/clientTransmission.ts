@@ -40,11 +40,6 @@ export default {
 
       if (changeInfo.status === "complete") {
         console.log("updated: complete", tabId, changeInfo, tab);
-        if (clientContext.clientTabs.get(tabId)?.host) {
-          clientSync.changeVideoServer(tab);
-        } else {
-          clientSync.syncClient(tabId);
-        }
         insertScript(tab, tabId);
       }
     });
@@ -107,12 +102,11 @@ export default {
       clientEvent.unSetHost(data.roomnum)
     );
     clientContext.socket.on("changeVideoClient", (data) =>
-      clientEvent.changeVideoClient(
-        data.roomnum,
-        data.site,
-        data.location,
-        data.videoId
-      )
+      clientEvent.changeVideoClient(data.roomnum, {
+        site: data.site,
+        location: data.location,
+        videoId: data.videoId,
+      })
     );
 
     function insertScript(tab: browser.tabs.Tab, tabId: number) {

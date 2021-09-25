@@ -46,7 +46,7 @@ export class ClientUtils {
   }
 
   parseUrl(url: string) {
-    console.log("parse url");
+    console.log("parse url", url);
 
     let pathname = url.match(parseUrlWakanim);
     if (pathname != null) {
@@ -94,7 +94,7 @@ export class ClientUtils {
   parseUrlTab(tab: browser.tabs.Tab): Promise<any> {
     const url = tab?.url;
     if (url != null) {
-      console.log("parse tab");
+      console.log("parse tab", url);
       const parseUrl = this.parseUrl(url);
       if (parseUrl != null) {
         return Promise.resolve(parseUrl);
@@ -105,7 +105,7 @@ export class ClientUtils {
         resolve(null);
         return;
       }
-      this.askUrl(tab.id)
+      this.askUrl(tab, tab.id)
         .then((url2) => {
           console.log("ask url", url2);
           if (url2 == null) {
@@ -121,47 +121,70 @@ export class ClientUtils {
     });
   }
 
-  askUrl(tabId: number): Promise<string | null | undefined> {
+  askUrl(
+    tab: browser.tabs.Tab,
+    tabId: number
+  ): Promise<string | null | undefined> {
     return new Promise((resolve) => {
-      browser.webNavigation
-        .getAllFrames({ tabId: tabId })
-        .then((details) => {
-          for (const detail of details) {
-            const url = new URL(detail.url);
-            if (
-              url.host === "www.crunchyroll.com" &&
-              url.pathname === "/affiliate_iframeplayer"
-            ) {
-              console.log("ask url", url);
-              for (const [key, value] of url.searchParams) {
-                if (key === "media_id") {
-                  this.crunchyrollMediaIdToUrl(value)
-                    .then((url2) => resolve(url2))
-                    .catch((error) => {
-                      this.reportError(error);
-                      resolve(null);
-                    });
-                  return;
+      let clientUtils = this;
+      if (tab.status === "complete") {
+        action();
+        return;
+      }
+      browser.tabs.onUpdated.addListener(listener);
+      function listener(
+        tabId2: number,
+        changeInfo: browser.tabs._OnUpdatedChangeInfo
+      ) {
+        if (tabId != tabId2 || changeInfo?.status !== "complete") {
+          return;
+        }
+        browser.tabs.onUpdated.removeListener(listener);
+        action();
+      }
+
+      function action() {
+        browser.webNavigation
+          .getAllFrames({ tabId: tabId })
+          .then((details) => {
+            for (const detail of details) {
+              const url = new URL(detail.url);
+              if (
+                url.host === "www.crunchyroll.com" &&
+                url.pathname === "/affiliate_iframeplayer"
+              ) {
+                console.log("ask url", url);
+                for (const [key, value] of url.searchParams) {
+                  if (key === "media_id") {
+                    clientUtils
+                      .crunchyrollMediaIdToUrl(value)
+                      .then((url2) => resolve(url2))
+                      .catch((error) => {
+                        clientUtils.reportError(error);
+                        resolve(null);
+                      });
+                    return;
+                  }
                 }
+                resolve(null);
+                return;
               }
-              resolve(null);
-              return;
+              if (
+                url.host === "www.wakanim.tv" &&
+                url.pathname.includes("/v2/catalogue/embeddedplayer/")
+              ) {
+                console.log("ask url", url);
+                resolve(detail.url.replace("embeddedplayer", "episode"));
+                return;
+              }
             }
-            if (
-              url.host === "www.wakanim.tv" &&
-              url.pathname.includes("/v2/catalogue/embeddedplayer/")
-            ) {
-              console.log("ask url", url);
-              resolve(detail.url.replace("embeddedplayer", "episode"));
-              return;
-            }
-          }
-          resolve(null);
-        })
-        .catch((error) => {
-          this.reportError(error);
-          resolve(null);
-        });
+            resolve(null);
+          })
+          .catch((error) => {
+            clientUtils.reportError(error);
+            resolve(null);
+          });
+      }
     });
   }
 
@@ -246,6 +269,6 @@ export class ClientUtils {
   }
 
   reportError(error: any) {
-    console.error(`error: ${error}`);
+    console.error("error:", error);
   }
 }

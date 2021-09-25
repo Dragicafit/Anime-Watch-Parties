@@ -17,6 +17,7 @@
     "https://www.funimation.com/v/*",
     "https://animedigitalnetwork.fr/video/*",
     "https://awp.moe/*",
+    "tabs",
     "webNavigation",
     "cookies"
   ],

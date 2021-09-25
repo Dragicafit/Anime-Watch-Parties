@@ -89,12 +89,11 @@ export class ClientEvent {
     clientTab.host = data.host;
 
     if (data.videoId != null) {
-      this.changeVideoClient(
-        data.roomnum,
-        data.site,
-        data.location,
-        data.videoId
-      );
+      this.changeVideoClient(data.roomnum, {
+        site: data.site,
+        location: data.location,
+        videoId: data.videoId,
+      });
     } else if (data.host) {
       this.clientSync.changeVideoServer(tab);
     }
@@ -182,58 +181,66 @@ export class ClientEvent {
 
   changeVideoClient(
     roomnum: string,
-    site: string,
-    location: string,
-    videoId: string
+    url: {
+      site: string;
+      location: string;
+      videoId: string;
+    }
   ) {
     console.log("change video client");
-    console.log(`video id is: ${videoId}`);
+    console.log("new url is", url);
 
     for (let [tabId, clientTab] of this.clientContext.clientTabs.entries()) {
       if (clientTab?.roomnum !== roomnum) continue;
-      this.changeVideoClientTab(tabId, site, location, videoId);
+      this.changeVideoClientTab(tabId, url);
     }
   }
 
   changeVideoClientTab(
     tabId: number,
-    site: string,
-    location: string,
-    videoId: string
+    url: {
+      site: string;
+      location: string;
+      videoId: string;
+    }
   ) {
     console.log("change video client");
-    console.log(`video id is: ${videoId}`);
+    console.log("new url is", url);
 
     browser.tabs
       .get(tabId)
       .then((tab) => {
-        this.clientUtils.parseUrlTab(tab).then((url) => {
-          if (url?.site === site && url?.videoId === videoId) return;
+        this.clientUtils.parseUrlTab(tab).then((oldUrl) => {
+          console.log("old url is", oldUrl);
+          if (oldUrl?.site === url.site && oldUrl?.videoId === url.videoId) {
+            return;
+          }
 
           let newUrl;
-          switch (site) {
+          switch (url.site) {
             case "wakanim":
-              newUrl = `https://www.wakanim.tv/${location}/v2/catalogue/episode/${videoId}`;
+              newUrl = `https://www.wakanim.tv/${url.location}/v2/catalogue/episode/${url.videoId}`;
               break;
             case "crunchyroll":
               if (url?.site === "crunchyroll" && url?.location != null) {
-                newUrl = `https://www.crunchyroll.com/${url.location}/${videoId}`;
+                newUrl = `https://www.crunchyroll.com/${oldUrl.location}/${url.videoId}`;
               } else {
-                newUrl = `https://www.crunchyroll.com/${videoId}`;
+                newUrl = `https://www.crunchyroll.com/${url.videoId}`;
               }
               break;
             case "funimation":
-              newUrl = `https://www.funimation.com/${location}/shows/${videoId}`;
+              newUrl = `https://www.funimation.com/${url.location}/shows/${url.videoId}`;
               break;
             case "newFunimation":
-              newUrl = `https://www.funimation.com/v/${videoId}`;
+              newUrl = `https://www.funimation.com/v/${url.videoId}`;
               break;
             case "adn":
-              newUrl = `https://animedigitalnetwork.fr/video/${videoId}`;
+              newUrl = `https://animedigitalnetwork.fr/video/${url.videoId}`;
               break;
             default:
               return;
           }
+          console.log("change video client to", newUrl);
           browser.tabs.update(tabId, {
             active: true,
             url: newUrl,

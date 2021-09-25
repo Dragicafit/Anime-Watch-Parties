@@ -50,5 +50,5 @@ browser.runtime.sendMessage({
 });
 
 function reportError(error) {
-  console.error(`error: ${error}`);
+  console.error("error:", error);
 }
