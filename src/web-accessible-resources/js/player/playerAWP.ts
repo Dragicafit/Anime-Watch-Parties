@@ -1,32 +1,36 @@
 import { AdnVideoJsSetup } from "./adnVideoJsSetup";
 import { AwpPlayerInterface } from "./awpPlayerInterface";
 import { BrightcovePlayerSetup } from "./brightcovePlayerSetup";
+import { CrunchyrollPlayerSetup } from "./crunchyrollPlayerSetup";
 import { FunimationPlayerSetup } from "./funimationPlayerSetup";
 import { JwplayerSetup } from "./jwplayerSetup";
 import { NonExistantSetup } from "./nonExistantSetup";
-import { VilosplayerSetup } from "./vilosplayerSetup";
+import { VideoJsSetup } from "./videoJsSetup";
 
 export class PlayerAWP implements AwpPlayerInterface {
   private jwplayer: JwplayerSetup;
-  private vilosplayer: VilosplayerSetup;
+  private crunchyrollPlayer: CrunchyrollPlayerSetup;
   private brightcovePlayer: BrightcovePlayerSetup;
   private funimationPlayer: FunimationPlayerSetup;
   private adnVideoJs: AdnVideoJsSetup;
+  private videoJs: VideoJsSetup;
   private nonExistant: NonExistantSetup;
 
   public constructor(
     jwplayer: JwplayerSetup,
-    vilosplayer: VilosplayerSetup,
+    crunchyrollPlayer: CrunchyrollPlayerSetup,
     brightcovePlayer: BrightcovePlayerSetup,
     funimationPlayer: FunimationPlayerSetup,
     adnVideoJs: AdnVideoJsSetup,
+    videoJs: VideoJsSetup,
     nonExistant: NonExistantSetup
   ) {
     this.jwplayer = jwplayer;
-    this.vilosplayer = vilosplayer;
+    this.crunchyrollPlayer = crunchyrollPlayer;
     this.brightcovePlayer = brightcovePlayer;
     this.funimationPlayer = funimationPlayer;
     this.adnVideoJs = adnVideoJs;
+    this.videoJs = videoJs;
     this.nonExistant = nonExistant;
   }
 
@@ -34,8 +38,8 @@ export class PlayerAWP implements AwpPlayerInterface {
     if (this.jwplayer.playerExist()) {
       return this.jwplayer;
     }
-    if (this.vilosplayer.playerExist()) {
-      return this.vilosplayer;
+    if (this.crunchyrollPlayer.playerExist()) {
+      return this.crunchyrollPlayer;
     }
     if (this.brightcovePlayer.playerExist()) {
       return this.brightcovePlayer;
@@ -45,6 +49,9 @@ export class PlayerAWP implements AwpPlayerInterface {
     }
     if (this.adnVideoJs.playerExist()) {
       return this.adnVideoJs;
+    }
+    if (this.videoJs.playerExist()) {
+      return this.videoJs;
     }
     return this.nonExistant;
   }

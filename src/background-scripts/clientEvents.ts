@@ -29,11 +29,13 @@ export class ClientEvent {
       })
       .catch(this.clientUtils.reportError);
 
-    browser.tabs.sendMessage(tabId, {
-      command: "sendInfo",
-      roomnum: clientTab?.roomnum,
-      host: clientTab?.host,
-    });
+    browser.tabs
+      .sendMessage(tabId, {
+        command: "sendInfo",
+        roomnum: clientTab?.roomnum,
+        host: clientTab?.host,
+      })
+      .catch(this.clientUtils.reportError);
   }
 
   scriptLoaded(tab: browser.tabs.Tab, tabId: number) {
@@ -143,11 +145,13 @@ export class ClientEvent {
   changeStateClientTab(tabId: number, time: number, state: boolean) {
     console.log(`change state client`);
 
-    browser.tabs.sendMessage(tabId, {
-      command: "changeStateClient",
-      time: time,
-      state: state,
-    });
+    browser.tabs
+      .sendMessage(tabId, {
+        command: "changeStateClient",
+        time: time,
+        state: state,
+      })
+      .catch(this.clientUtils.reportError);
   }
 
   sendState(tabId: number, time: number, state: boolean) {

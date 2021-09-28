@@ -96,6 +96,6 @@ export class JwplayerSetup extends AwpplayerSetup {
   }
 
   protected override _playerExist(): boolean {
-    return typeof jwplayer().play === "function";
+    return typeof this.player().play === "function";
   }
 }

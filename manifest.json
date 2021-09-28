@@ -12,6 +12,8 @@
   "permissions": [
     "https://www.wakanim.tv/*/episode/*",
     "https://www.crunchyroll.com/*/*",
+    "https://static.crunchyroll.com/*",
+    "https://beta.crunchyroll.com/*/watch/*",
     "https://api.crunchyroll.com/*",
     "https://www.funimation.com/*/shows/*",
     "https://www.funimation.com/v/*",

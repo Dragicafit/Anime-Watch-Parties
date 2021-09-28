@@ -2,9 +2,11 @@ function scriptLoaded() {
   console.log("scipt loaded");
 
   console.log("ask info");
-  browser.runtime.sendMessage({
-    command: "askInfo",
-  });
+  browser.runtime
+    .sendMessage({
+      command: "askInfo",
+    })
+    .catch(reportError);
 }
 
 new ClipboardJS(".btn");
@@ -21,16 +23,20 @@ function sendInfo(roomnum, onlineUsers) {
   }
 }
 
-browser.runtime.sendMessage({
-  command: "insertScript",
-});
+browser.runtime
+  .sendMessage({
+    command: "joinTab",
+  })
+  .catch(reportError);
 
 $("#create").on("click", (e) => {
   $("#roomnumURL").text("");
   $("#copyRoomnumURL").hide();
-  browser.runtime.sendMessage({
-    command: "createRoom",
-  });
+  browser.runtime
+    .sendMessage({
+      command: "createRoom",
+    })
+    .catch(reportError);
 });
 
 browser.runtime.onMessage.addListener((message) => {
@@ -45,9 +51,11 @@ browser.runtime.onMessage.addListener((message) => {
       break;
   }
 });
-browser.runtime.sendMessage({
-  command: "askInfo",
-});
+browser.runtime
+  .sendMessage({
+    command: "askInfo",
+  })
+  .catch(reportError);
 
 function reportError(error) {
   console.error("error:", error);

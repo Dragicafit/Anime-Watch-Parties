@@ -2,7 +2,9 @@ import {
   parseUrlAdn,
   parseUrlCrunchyroll,
   parseUrlFunimation,
+  parseUrlNewCrunchyroll,
   parseUrlNewFunimation,
+  parseUrlSerieCrunchyroll,
   parseUrlWakanim,
 } from "./clientConst";
 import { ClientContext } from "./clientContext";
@@ -43,6 +45,7 @@ export class ClientUtils {
       );
     }
     this.changeIcon(tabId, tab);
+    this.insertScript(tab, tabId);
   }
 
   parseUrl(url: string) {
@@ -59,7 +62,8 @@ export class ClientUtils {
     pathname = url.match(parseUrlCrunchyroll);
     if (pathname != null) {
       return {
-        videoId: pathname.groups!.videoId1 + pathname.groups!.videoId2,
+        videoId:
+          pathname.groups!.serie_name + "/episode-" + pathname.groups!.media_id,
         site: "crunchyroll",
         location: pathname.groups!.location,
       };
@@ -154,22 +158,58 @@ export class ClientUtils {
                 url.pathname === "/affiliate_iframeplayer"
               ) {
                 console.log("ask url", url);
-                for (const [key, value] of url.searchParams) {
-                  if (key === "media_id") {
-                    clientUtils
-                      .crunchyrollMediaIdToUrl(value)
-                      .then((url2) => resolve(url2))
-                      .catch((error) => {
-                        clientUtils.reportError(error);
-                        resolve(null);
-                      });
-                    return;
-                  }
+                let media_id = url.searchParams.get("media_id");
+                if (media_id != null) {
+                  clientUtils
+                    .crunchyrollMediaIdToUrl(media_id)
+                    .then((url2) => resolve(url2))
+                    .catch((error) => {
+                      clientUtils.reportError(error);
+                      resolve(null);
+                    });
+                  return;
                 }
-                resolve(null);
-                return;
-              }
-              if (
+              } else if (
+                url.host === "beta.crunchyroll.com" &&
+                url.pathname.includes("/watch")
+              ) {
+                console.log("ask url", url);
+                let pathname = url.pathname.match(parseUrlNewCrunchyroll);
+                if (pathname != null) {
+                  browser.tabs
+                    .sendMessage(tabId, {
+                      command: "askUrlSerie",
+                    })
+                    .then((urlSerie) => {
+                      let pathnameSerie = urlSerie.match(
+                        parseUrlSerieCrunchyroll
+                      );
+                      if (pathnameSerie != null) {
+                        let serie_etp_guid =
+                          pathnameSerie.groups!.serie_etp_guid;
+                        if (serie_etp_guid != null) {
+                          clientUtils
+                            .crunchyrollEtpGuidToUrl(
+                              pathname!.groups!.etp_guid,
+                              serie_etp_guid
+                            )
+                            .then((url2) => resolve(url2))
+                            .catch((error) => {
+                              clientUtils.reportError(error);
+                              resolve(null);
+                            });
+                          return;
+                        }
+                      }
+                      resolve(null);
+                    })
+                    .catch((error) => {
+                      clientUtils.reportError(error);
+                      setTimeout(action, 500);
+                    });
+                  return;
+                }
+              } else if (
                 url.host === "www.wakanim.tv" &&
                 url.pathname.includes("/v2/catalogue/embeddedplayer/")
               ) {
@@ -204,6 +244,60 @@ export class ClientUtils {
             .then((response) => response.json())
             .then((json) => {
               resolve(json.data.url);
+            })
+            .catch((error) => {
+              this.reportError(error);
+              resolve(null);
+            });
+        })
+        .catch((error) => {
+          this.reportError(error);
+          resolve(null);
+        });
+    });
+  }
+
+  crunchyrollEtpGuidToUrl(
+    etp_guid: string,
+    serie_etp_guid: string
+  ): Promise<string | null | undefined> {
+    return new Promise((resolve) => {
+      this.getSessionId()
+        .then((session_id) => {
+          if (session_id == null) {
+            resolve(null);
+            return;
+          }
+          fetch(
+            `https://www.crunchyroll.com/ajax/?req=RpcApiSearch_GetSearchCandidates`
+          )
+            .then((response) => response.text())
+            .then((text) => JSON.parse(text.split("\n")[1]))
+            .then((json) => {
+              for (const serie_info of json.data) {
+                if (serie_info.etp_guid === serie_etp_guid) {
+                  let series_id = serie_info.id;
+                  fetch(
+                    `https://api.crunchyroll.com/list_media.0.json?series_id=${series_id}&limit=10000&session_id=${session_id}`
+                  )
+                    .then((response) => response.json())
+                    .then((json2) => {
+                      for (const media_info of json2.data) {
+                        if (media_info.etp_guid === etp_guid) {
+                          resolve(media_info.url);
+                          return;
+                        }
+                      }
+                      resolve(null);
+                    })
+                    .catch((error) => {
+                      this.reportError(error);
+                      resolve(null);
+                    });
+                  return;
+                }
+              }
+              resolve(null);
             })
             .catch((error) => {
               this.reportError(error);
@@ -266,6 +360,44 @@ export class ClientUtils {
           });
       }
     });
+  }
+
+  insertScript(tab: browser.tabs.Tab, tabId: number) {
+    console.log("insert script");
+
+    browser.webNavigation
+      .getAllFrames({ tabId: tabId })
+      .then((details) => {
+        for (const detail of details) {
+          const url = new URL(detail.url);
+          if (
+            [
+              "www.wakanim.tv",
+              "static.crunchyroll.com",
+              "www.funimation.com",
+              "animedigitalnetwork.fr",
+            ].includes(url.host)
+          ) {
+            browser.tabs
+              .executeScript(tabId, {
+                runAt: "document_end",
+                file: "/src/content-scripts/listener.js",
+                frameId: detail.frameId,
+              })
+              .catch(this.reportError);
+          }
+          if (url.host === "beta.crunchyroll.com") {
+            browser.tabs
+              .executeScript(tabId, {
+                runAt: "document_end",
+                file: "/src/content-scripts/listener2.js",
+                frameId: detail.frameId,
+              })
+              .catch(this.reportError);
+          }
+        }
+      })
+      .catch(this.reportError);
   }
 
   reportError(error: any) {

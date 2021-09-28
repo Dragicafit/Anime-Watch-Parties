@@ -40,7 +40,9 @@ export default {
 
       if (changeInfo.status === "complete") {
         console.log("updated: complete", tabId, changeInfo, tab);
-        insertScript(tab, tabId);
+        for (let i = 0; i < 10; i++) {
+          setTimeout(() => clientUtils.insertScript(tab, tabId), i * 1000);
+        }
       }
     });
     browser.tabs.onRemoved.addListener((tabId) => {
@@ -65,8 +67,8 @@ export default {
           case "askInfo":
             clientEvent.askInfo(tabId);
             break;
-          case "insertScript":
-            insertScript(tab, tabId);
+          case "joinTab":
+            clientUtils.joinTab(tab, tabId);
             break;
           case "createRoom":
             clientEvent.createRoom(tab, tabId);
@@ -108,35 +110,5 @@ export default {
         videoId: data.videoId,
       })
     );
-
-    function insertScript(tab: browser.tabs.Tab, tabId: number) {
-      console.log("insert script");
-
-      browser.webNavigation
-        .getAllFrames({ tabId: tabId })
-        .then((details) => {
-          for (const detail of details) {
-            const url = new URL(detail.url);
-            if (
-              [
-                "www.wakanim.tv",
-                "www.crunchyroll.com",
-                "www.funimation.com",
-                "animedigitalnetwork.fr",
-              ].includes(url.host)
-            ) {
-              browser.tabs
-                .executeScript(tabId, {
-                  runAt: "document_end",
-                  file: "/src/content-scripts/listener.js",
-                  frameId: detail.frameId,
-                })
-                .catch(clientUtils.reportError);
-            }
-          }
-        })
-        .catch(clientUtils.reportError);
-      clientUtils.joinTab(tab, tabId);
-    }
   },
 };

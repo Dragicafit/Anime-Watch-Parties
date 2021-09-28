@@ -2,7 +2,7 @@ import { TabContext } from "../tabContext";
 import { TabSync } from "../tabSync";
 import { AwpplayerSetup } from "./awpplayerSetup";
 
-export abstract class VideoJsSetup extends AwpplayerSetup {
+export class VideoJsSetup extends AwpplayerSetup {
   private previousSeek: number;
   private preventCallIfTriggered: Map<string, number>;
 
@@ -10,6 +10,10 @@ export abstract class VideoJsSetup extends AwpplayerSetup {
     super(name, tabContext, tabSync);
     this.previousSeek = 0;
     this.preventCallIfTriggered = new Map();
+  }
+
+  protected override player() {
+    return videojs.getPlayers()["player"];
   }
 
   protected override _onPlay(callback: (...events: any[]) => void): void {
@@ -87,5 +91,9 @@ export abstract class VideoJsSetup extends AwpplayerSetup {
       );
       this.player().pause();
     }
+  }
+
+  protected override _playerExist(): boolean {
+    return this.player().hasStarted_ != null;
   }
 }

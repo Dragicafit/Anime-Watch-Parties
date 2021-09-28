@@ -17,9 +17,11 @@ export class ClientSync {
   askState(tabId: number) {
     console.log("ask state");
 
-    browser.tabs.sendMessage(tabId, {
-      command: "askState",
-    });
+    browser.tabs
+      .sendMessage(tabId, {
+        command: "askState",
+      })
+      .catch(this.clientUtils.reportError);
   }
 
   changeVideoServer(
