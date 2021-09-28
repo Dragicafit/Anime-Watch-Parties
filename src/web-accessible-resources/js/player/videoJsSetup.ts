@@ -4,12 +4,10 @@ import { AwpplayerSetup } from "./awpplayerSetup";
 
 export class VideoJsSetup extends AwpplayerSetup {
   private previousSeek: number;
-  private preventCallIfTriggered: Map<string, number>;
 
   public constructor(name: string, tabContext: TabContext, tabSync: TabSync) {
     super(name, tabContext, tabSync);
     this.previousSeek = 0;
-    this.preventCallIfTriggered = new Map();
   }
 
   protected override player() {
@@ -18,27 +16,13 @@ export class VideoJsSetup extends AwpplayerSetup {
 
   protected override _onPlay(callback: (...events: any[]) => void): void {
     this.player().on("play", (e: any) => {
-      if (
-        !this.preventCallIfTriggered.has("play") ||
-        this.tabContext.performance.now() -
-          this.preventCallIfTriggered.get("play")! >
-          200
-      ) {
-        callback(e);
-      }
+      callback(e);
     });
   }
 
   protected override _onPause(callback: (...events: any[]) => void): void {
     this.player().on("pause", (e: any) => {
-      if (
-        !this.preventCallIfTriggered.has("pause") ||
-        this.tabContext.performance.now() -
-          this.preventCallIfTriggered.get("pause")! >
-          200
-      ) {
-        callback(e);
-      }
+      callback(e);
     });
   }
 
@@ -50,17 +34,10 @@ export class VideoJsSetup extends AwpplayerSetup {
       ) {
         return;
       }
-      if (
-        !this.preventCallIfTriggered.has("seek") ||
-        this.tabContext.performance.now() -
-          this.preventCallIfTriggered.get("seek")! >
-          200
-      ) {
-        let oldPreviousSeek = this.previousSeek;
-        this.previousSeek = this.player().currentTime();
-        if (Math.abs(this.previousSeek - oldPreviousSeek) < 0.5) return;
-        callback(this.previousSeek, e);
-      }
+      let oldPreviousSeek = this.previousSeek;
+      this.previousSeek = this.player().currentTime();
+      if (Math.abs(this.previousSeek - oldPreviousSeek) < 0.5) return;
+      callback(this.previousSeek, e);
     });
   }
 
@@ -73,22 +50,13 @@ export class VideoJsSetup extends AwpplayerSetup {
   }
 
   protected override _seekTo(time: number): void {
-    this.preventCallIfTriggered.set("seek", this.tabContext.performance.now());
     this.player().currentTime(time);
   }
 
   protected override _setState(state: boolean): void {
     if (state) {
-      this.preventCallIfTriggered.set(
-        "play",
-        this.tabContext.performance.now()
-      );
       this.player().play();
     } else {
-      this.preventCallIfTriggered.set(
-        "pause",
-        this.tabContext.performance.now()
-      );
       this.player().pause();
     }
   }

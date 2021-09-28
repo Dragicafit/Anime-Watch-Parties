@@ -15,9 +15,9 @@ export class TabEvents {
 
     setTimeout(() => {
       this.tabContext.playerAWP!.getTime().then((clientTime) => {
-        console.log(`current time is: ${clientTime}`);
-        console.log(`current time server is: ${time}`);
-        console.log(`current state server is: ${state}`);
+        console.log("current time is:", clientTime);
+        console.log("current time server is:", time);
+        console.log("current state server is:", state);
 
         this.tabContext.playerAWP!.setState(state);
 

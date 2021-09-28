@@ -48,49 +48,74 @@ export class ClientUtils {
     this.insertScript(tab, tabId);
   }
 
-  parseUrl(url: string) {
-    console.log("parse url", url);
+  parseUrl(urlString: string) {
+    console.log("parse url", urlString);
 
-    let pathname = url.match(parseUrlWakanim);
-    if (pathname != null) {
-      return {
-        videoId: pathname.groups!.videoId,
-        site: "wakanim",
-        location: pathname.groups!.location,
-      };
+    const url = new URL(urlString);
+    if (url.protocol !== "https:") {
+      return null;
     }
-    pathname = url.match(parseUrlCrunchyroll);
-    if (pathname != null) {
-      return {
-        videoId:
-          pathname.groups!.serie_name + "/episode-" + pathname.groups!.media_id,
-        site: "crunchyroll",
-        location: pathname.groups!.location,
-      };
-    }
-    pathname = url.match(parseUrlFunimation);
-    if (pathname != null) {
-      return {
-        videoId: pathname.groups!.videoId,
-        site: "funimation",
-        location: pathname.groups!.location,
-      };
-    }
-    pathname = url.match(parseUrlNewFunimation);
-    if (pathname != null) {
-      return {
-        videoId: pathname.groups!.videoId,
-        site: "newFunimation",
-        location: pathname.groups!.location,
-      };
-    }
-    pathname = url.match(parseUrlAdn);
-    if (pathname != null) {
-      return {
-        videoId: pathname.groups!.videoId,
-        site: "adn",
-        location: "fr",
-      };
+
+    switch (url.host) {
+      case "www.wakanim.tv":
+        {
+          let pathname = url.pathname.match(parseUrlWakanim);
+          if (pathname != null) {
+            return {
+              videoId: pathname.groups!.videoId,
+              site: "wakanim",
+              location: pathname.groups!.location,
+            };
+          }
+        }
+        break;
+      case "www.crunchyroll.com":
+        {
+          let pathname = url.pathname.match(parseUrlCrunchyroll);
+          if (pathname != null) {
+            return {
+              videoId:
+                pathname.groups!.serie_name +
+                "/episode-" +
+                pathname.groups!.media_id,
+              site: "crunchyroll",
+              location: pathname.groups!.location,
+            };
+          }
+        }
+        break;
+      case "www.funimation.com":
+        {
+          let pathname = url.pathname.match(parseUrlFunimation);
+          if (pathname != null) {
+            return {
+              videoId: pathname.groups!.videoId,
+              site: "funimation",
+              location: pathname.groups!.location,
+            };
+          }
+          pathname = url.pathname.match(parseUrlNewFunimation);
+          if (pathname != null) {
+            return {
+              videoId: pathname.groups!.videoId,
+              site: "newFunimation",
+              location: pathname.groups!.location,
+            };
+          }
+        }
+        break;
+      case "animedigitalnetwork.fr":
+        {
+          let pathname = url.pathname.match(parseUrlAdn);
+          if (pathname != null) {
+            return {
+              videoId: pathname.groups!.videoId,
+              site: "adn",
+              location: "fr",
+            };
+          }
+        }
+        break;
     }
     return null;
   }
@@ -171,7 +196,8 @@ export class ClientUtils {
                 }
               } else if (
                 url.host === "beta.crunchyroll.com" &&
-                url.pathname.includes("/watch")
+                url.pathname.includes("/watch") &&
+                detail.frameId === 0
               ) {
                 console.log("ask url", url);
                 let pathname = url.pathname.match(parseUrlNewCrunchyroll);
@@ -180,25 +206,34 @@ export class ClientUtils {
                     .sendMessage(tabId, {
                       command: "askUrlSerie",
                     })
-                    .then((urlSerie) => {
-                      let pathnameSerie = urlSerie.match(
-                        parseUrlSerieCrunchyroll
-                      );
-                      if (pathnameSerie != null) {
-                        let serie_etp_guid =
-                          pathnameSerie.groups!.serie_etp_guid;
-                        if (serie_etp_guid != null) {
-                          clientUtils
-                            .crunchyrollEtpGuidToUrl(
-                              pathname!.groups!.etp_guid,
-                              serie_etp_guid
-                            )
-                            .then((url2) => resolve(url2))
-                            .catch((error) => {
-                              clientUtils.reportError(error);
-                              resolve(null);
-                            });
-                          return;
+                    .then((urlSerieString) => {
+                      if (urlSerieString == null) {
+                        throw new Error("urlSerieString is null");
+                      }
+                      let urlSerie = new URL(urlSerieString);
+                      if (
+                        urlSerie.protocol === "https:" &&
+                        urlSerie.host === "beta.crunchyroll.com"
+                      ) {
+                        let pathnameSerie = urlSerie.pathname.match(
+                          parseUrlSerieCrunchyroll
+                        );
+                        if (pathnameSerie != null) {
+                          let serie_etp_guid =
+                            pathnameSerie.groups!.serie_etp_guid;
+                          if (serie_etp_guid != null) {
+                            clientUtils
+                              .crunchyrollEtpGuidToUrl(
+                                pathname!.groups!.etp_guid,
+                                serie_etp_guid
+                              )
+                              .then((url2) => resolve(url2))
+                              .catch((error) => {
+                                clientUtils.reportError(error);
+                                resolve(null);
+                              });
+                            return;
+                          }
                         }
                       }
                       resolve(null);
@@ -370,13 +405,18 @@ export class ClientUtils {
       .then((details) => {
         for (const detail of details) {
           const url = new URL(detail.url);
+          let site = this.parseUrl(detail.url)?.site;
           if (
-            [
-              "www.wakanim.tv",
-              "static.crunchyroll.com",
-              "www.funimation.com",
-              "animedigitalnetwork.fr",
-            ].includes(url.host)
+            (site === "wakanim" && detail.frameId === 0) ||
+            (url.host === "www.wakanim.tv" &&
+              url.pathname.includes("/v2/catalogue/embeddedplayer/")) ||
+            (url.host === "static.crunchyroll.com" &&
+              (url.pathname === "/vilos-v2/web/vilos/player.html" ||
+                url.pathname === "/vilos/player.html")) ||
+            (site === "newFunimation" && detail.frameId === 0) ||
+            (url.host === "www.funimation.com" &&
+              url.pathname.startsWith("/player/")) ||
+            (site === "adn" && detail.frameId === 0)
           ) {
             browser.tabs
               .executeScript(tabId, {
@@ -386,7 +426,11 @@ export class ClientUtils {
               })
               .catch(this.reportError);
           }
-          if (url.host === "beta.crunchyroll.com") {
+          if (
+            url.host === "beta.crunchyroll.com" &&
+            url.pathname.includes("/watch/") &&
+            detail.frameId === 0
+          ) {
             browser.tabs
               .executeScript(tabId, {
                 runAt: "document_end",
