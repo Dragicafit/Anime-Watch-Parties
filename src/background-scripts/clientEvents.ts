@@ -226,7 +226,7 @@ export class ClientEvent {
               newUrl = `https://www.wakanim.tv/${url.location}/v2/catalogue/episode/${url.videoId}`;
               break;
             case "crunchyroll":
-              if (url?.site === "crunchyroll" && url?.location != null) {
+              if (url?.site === "crunchyroll" && oldUrl?.location != null) {
                 newUrl = `https://www.crunchyroll.com/${oldUrl.location}/${url.videoId}`;
               } else {
                 newUrl = `https://www.crunchyroll.com/${url.videoId}`;

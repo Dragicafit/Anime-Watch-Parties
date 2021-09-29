@@ -1,3 +1,4 @@
+import { parseUrlAwp } from "./clientConst";
 import { ClientContext } from "./clientContext";
 import { ClientEvent } from "./clientEvents";
 import { ClientSync } from "./clientSync";
@@ -11,19 +12,15 @@ export default {
     clientSync: ClientSync
   ) {
     browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-      if (tab.url != null) {
+      if (tab.url != null && changeInfo.url != null) {
         const url = new URL(tab.url);
         if (url.host == "awp.moe") {
-          if (changeInfo.url != null) {
-            const roomnum = url.pathname.match(/^\/(?<roomnum>[a-zA-Z0-9]{5})$/)
-              ?.groups!["roomnum"];
-            if (roomnum == null) {
-              console.log("invalid roomnum", url.pathname.substring(1));
-              return;
-            }
+          const roomnum = url.pathname.match(parseUrlAwp)?.groups?.roomnum;
+          if (roomnum == null) {
+            console.log("invalid roomnum", url.pathname.substring(1));
+          } else {
             clientEvent.joinRoom(tab, tabId, roomnum);
           }
-          return;
         }
       }
 

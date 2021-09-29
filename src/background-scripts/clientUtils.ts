@@ -116,6 +116,8 @@ export class ClientUtils {
           }
         }
         break;
+      case "awp.moe":
+        return { site: "awp" };
     }
     return null;
   }
@@ -438,6 +440,17 @@ export class ClientUtils {
                 frameId: detail.frameId,
               })
               .catch(this.reportError);
+          }
+          if (this.clientContext.clientTabs.get(tabId)?.host !== true) {
+            if (site === "awp" && detail.frameId === 0) {
+              browser.tabs
+                .executeScript(tabId, {
+                  runAt: "document_end",
+                  file: "/src/content-scripts/listener3.js",
+                  frameId: detail.frameId,
+                })
+                .catch(this.reportError);
+            }
           }
         }
       })

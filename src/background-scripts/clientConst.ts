@@ -10,3 +10,4 @@ export const parseUrlFunimation =
   /^\/(?<location>[a-zA-Z]{2})\/shows\/(?<videoId>[\w-]+\/[\w-]+)/;
 export const parseUrlNewFunimation = /^\/v\/(?<videoId>[\w-]+\/[\w-]+)/; //
 export const parseUrlAdn = /^\/video\/(?<videoId>[\w-]+\/\d+)/;
+export const parseUrlAwp = /^\/(?<roomnum>[a-zA-Z0-9]{5})$/;

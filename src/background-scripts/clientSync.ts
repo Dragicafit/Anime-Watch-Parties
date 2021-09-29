@@ -29,7 +29,7 @@ export class ClientSync {
     clientTab: ClientTab = this.clientContext.clientTabs.get(tab.id!)!
   ): void {
     this.clientUtils.parseUrlTab(tab).then((url) => {
-      if (url == null) {
+      if (url == null || url.site === "awp") {
         return;
       }
       console.log("change url to", url);
