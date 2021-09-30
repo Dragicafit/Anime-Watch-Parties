@@ -116,12 +116,15 @@ export class ClientEvent {
     this.askInfo(tabId, clientTab);
   }
 
-  leaveRoom(tabId: number) {
+  leaveRoom(tabId: number): void {
     console.log(`leave room`);
 
     let { roomnum } = this.clientContext.clientTabs.get(tabId)!;
     this.clientContext.clientTabs.delete(tabId);
 
+    if (roomnum == null) {
+      return;
+    }
     if (
       Array.from(
         this.clientContext.clientTabs,

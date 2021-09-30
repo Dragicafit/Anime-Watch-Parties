@@ -28,6 +28,9 @@ export class ClientSync {
     tab: browser.tabs.Tab,
     clientTab: ClientTab = this.clientContext.clientTabs.get(tab.id!)!
   ): void {
+    if (clientTab.roomnum == null) {
+      return;
+    }
     this.clientUtils.parseUrlTab(tab).then((url) => {
       if (url == null || url.site === "awp") {
         return;
@@ -61,6 +64,9 @@ export class ClientSync {
     state: boolean,
     clientTab: ClientTab = this.clientContext.clientTabs.get(tabId)!
   ): void {
+    if (clientTab.roomnum == null) {
+      return;
+    }
     console.log("change state server");
 
     this.clientContext.socket.emit("changeStateServer", {
@@ -79,6 +85,9 @@ export class ClientSync {
     tabId: number,
     clientTab: ClientTab = this.clientContext.clientTabs.get(tabId)!
   ): void {
+    if (clientTab.roomnum == null) {
+      return;
+    }
     console.log("sync client");
 
     this.clientContext.socket.emit(
