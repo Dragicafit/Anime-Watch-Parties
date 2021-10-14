@@ -72,9 +72,11 @@ it.each([
   ["videoId", "wakanim", "us"],
   ["videoId", "wakanim", "uS"],
   ["videoId", "crunchyroll", "US"],
+  ["videoId", "crunchyroll", null],
+  ["videoId", "crunchyroll", undefined],
   ["videoId", "funimation", "US"],
-  ["videoId", "newFunimation", null],
-  ["videoId", "newFunimation", undefined],
+  ["videoId", "funimation", null],
+  ["videoId", "funimation", undefined],
   ["videoId", "adn", "fr"],
   ["videoId", "crunchyroll", null],
   ["videoId", "crunchyroll", undefined],
@@ -89,7 +91,7 @@ it.each([
   ],
   [
     "bofuri-i-dont-want-to-get-hurt-so-ill-max-out-my-defense/defense-and-first-battle",
-    "newFunimation",
+    "funimation",
     null,
   ],
   ["dr-stone/13693-episode-1-stone-world", "adn", "fr"],
@@ -98,7 +100,7 @@ it.each([
   site = site2;
   location = location2;
   changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
-  if (site === "crunchyroll" || site === "newFunimation") {
+  if (site === "crunchyroll" || site === "funimation") {
     location = null;
   }
 

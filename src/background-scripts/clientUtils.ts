@@ -3,7 +3,7 @@ import {
   parseUrlCrunchyroll,
   parseUrlFunimation,
   parseUrlNewCrunchyroll,
-  parseUrlNewFunimation,
+  parseUrlOldFunimation,
   parseUrlSerieCrunchyroll,
   parseUrlWakanim,
 } from "./clientConst";
@@ -94,11 +94,11 @@ export class ClientUtils {
               location: pathname.groups!.location,
             };
           }
-          pathname = url.pathname.match(parseUrlNewFunimation);
+          pathname = url.pathname.match(parseUrlOldFunimation);
           if (pathname != null) {
             return {
               videoId: pathname.groups!.videoId,
-              site: "newFunimation",
+              site: "oldFunimation",
               location: pathname.groups!.location,
             };
           }
@@ -381,7 +381,7 @@ export class ClientUtils {
           });
           break;
         case "funimation":
-        case "newFunimation":
+        case "oldFunimation":
           browser.browserAction.setIcon({
             path: "src/icons/funimation.svg",
           });
@@ -415,7 +415,7 @@ export class ClientUtils {
             (url.host === "static.crunchyroll.com" &&
               (url.pathname === "/vilos-v2/web/vilos/player.html" ||
                 url.pathname === "/vilos/player.html")) ||
-            (site === "newFunimation" && detail.frameId === 0) ||
+            (site === "funimation" && detail.frameId === 0) ||
             (url.host === "www.funimation.com" &&
               url.pathname.startsWith("/player/")) ||
             (site === "adn" && detail.frameId === 0)

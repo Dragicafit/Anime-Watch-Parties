@@ -4,7 +4,7 @@ import { IoUtils } from "./ioUtils";
 
 const regexRoom = /^\w{1,30}$/;
 const regexVideoId = /^[\w\/-]{1,300}$/;
-const regexSite = /^(wakanim|crunchyroll|funimation|newFunimation|adn)$/;
+const regexSite = /^(wakanim|crunchyroll|funimation|adn)$/;
 const regexLocation = /^[a-zA-Z]{2}$/;
 
 export default {
@@ -31,7 +31,7 @@ export default {
           debugSocket("site is not a valid string");
           return callback("wrong input");
         }
-        if (site === "crunchyroll" || site === "newFunimation") {
+        if (site === "crunchyroll" || site === "funimation") {
           location = null;
         } else {
           if (typeof location !== "string" || !regexLocation.test(location)) {

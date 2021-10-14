@@ -229,17 +229,18 @@ export class ClientEvent {
               newUrl = `https://www.wakanim.tv/${url.location}/v2/catalogue/episode/${url.videoId}`;
               break;
             case "crunchyroll":
-              if (url?.site === "crunchyroll" && oldUrl?.location != null) {
+              if (oldUrl?.site === "crunchyroll" && oldUrl?.location != null) {
                 newUrl = `https://www.crunchyroll.com/${oldUrl.location}/${url.videoId}`;
               } else {
                 newUrl = `https://www.crunchyroll.com/${url.videoId}`;
               }
               break;
             case "funimation":
-              newUrl = `https://www.funimation.com/${url.location}/shows/${url.videoId}`;
-              break;
-            case "newFunimation":
-              newUrl = `https://www.funimation.com/v/${url.videoId}`;
+              if (oldUrl?.site === "funimation" && oldUrl?.location != null) {
+                newUrl = `https://www.funimation.com/${oldUrl.location}/shows/${url.videoId}`;
+              } else {
+                newUrl = `https://www.funimation.com/v/${url.videoId}`;
+              }
               break;
             case "adn":
               newUrl = `https://animedigitalnetwork.fr/video/${url.videoId}`;
