@@ -1,3 +1,5 @@
+import { ClientScript } from "../client/clientScript";
+import { ClientTab } from "../client/clientTab";
 import {
   parseUrlAdn,
   parseUrlCrunchyroll,
@@ -6,15 +8,13 @@ import {
   parseUrlOldFunimation,
   parseUrlSerieCrunchyroll,
   parseUrlWakanim,
-} from "./clientConst";
-import { ClientContext } from "./clientContext";
-import { ClientTab } from "./clientTab";
+} from "./backgroundConst";
 
-export class ClientUtils {
-  clientContext: ClientContext;
+export class BackgroundUtils {
+  private clientScript: ClientScript;
 
-  constructor(clientContext: ClientContext) {
-    this.clientContext = clientContext;
+  constructor(clientScript: ClientScript) {
+    this.clientScript = clientScript;
   }
 
   getActiveTab() {
@@ -31,21 +31,10 @@ export class ClientUtils {
           browser.tabs
             .create({ url: "https://www.wakanim.tv/" })
             .then((tab) => resolve(tab))
-            .catch(this.reportError);
+            .catch(this.clientScript.clientUtils.reportError);
         })
-        .catch(this.reportError);
+        .catch(this.clientScript.clientUtils.reportError);
     });
-  }
-
-  joinTab(tab: browser.tabs.Tab, tabId: number) {
-    if (!this.clientContext.clientTabs.has(tabId)) {
-      this.clientContext.clientTabs.set(
-        tabId,
-        new ClientTab(this.clientContext)
-      );
-    }
-    this.changeIcon(tabId, tab);
-    this.insertScript(tab, tabId);
   }
 
   parseUrl(urlString: string) {
@@ -146,7 +135,7 @@ export class ClientUtils {
           resolve(this.parseUrl(url2));
         })
         .catch((error) => {
-          this.reportError(error);
+          this.clientScript.clientUtils.reportError(error);
           resolve(null);
         });
     });
@@ -191,7 +180,7 @@ export class ClientUtils {
                     .crunchyrollMediaIdToUrl(media_id)
                     .then((url2) => resolve(url2))
                     .catch((error) => {
-                      clientUtils.reportError(error);
+                      clientUtils.clientScript.clientUtils.reportError(error);
                       resolve(null);
                     });
                   return;
@@ -231,7 +220,9 @@ export class ClientUtils {
                               )
                               .then((url2) => resolve(url2))
                               .catch((error) => {
-                                clientUtils.reportError(error);
+                                clientUtils.clientScript.clientUtils.reportError(
+                                  error
+                                );
                                 resolve(null);
                               });
                             return;
@@ -241,7 +232,7 @@ export class ClientUtils {
                       resolve(null);
                     })
                     .catch((error) => {
-                      clientUtils.reportError(error);
+                      clientUtils.clientScript.clientUtils.reportError(error);
                       setTimeout(action, 500);
                     });
                   return;
@@ -258,7 +249,7 @@ export class ClientUtils {
             resolve(null);
           })
           .catch((error) => {
-            clientUtils.reportError(error);
+            clientUtils.clientScript.clientUtils.reportError(error);
             resolve(null);
           });
       }
@@ -283,12 +274,12 @@ export class ClientUtils {
               resolve(json.data.url);
             })
             .catch((error) => {
-              this.reportError(error);
+              this.clientScript.clientUtils.reportError(error);
               resolve(null);
             });
         })
         .catch((error) => {
-          this.reportError(error);
+          this.clientScript.clientUtils.reportError(error);
           resolve(null);
         });
     });
@@ -328,7 +319,7 @@ export class ClientUtils {
                       resolve(null);
                     })
                     .catch((error) => {
-                      this.reportError(error);
+                      this.clientScript.clientUtils.reportError(error);
                       resolve(null);
                     });
                   return;
@@ -337,12 +328,12 @@ export class ClientUtils {
               resolve(null);
             })
             .catch((error) => {
-              this.reportError(error);
+              this.clientScript.clientUtils.reportError(error);
               resolve(null);
             });
         })
         .catch((error) => {
-          this.reportError(error);
+          this.clientScript.clientUtils.reportError(error);
           resolve(null);
         });
     });
@@ -357,14 +348,14 @@ export class ClientUtils {
         })
         .then((cookie) => resolve(cookie?.value))
         .catch((error) => {
-          this.reportError(error);
+          this.clientScript.clientUtils.reportError(error);
           resolve(null);
         });
     });
   }
 
-  changeIcon(tabId: number, tab: browser.tabs.Tab) {
-    if (!this.clientContext.clientTabs.has(tabId)) {
+  changeIcon(clientTab: ClientTab, tab: browser.tabs.Tab) {
+    if (clientTab.getClientRoom() == null) {
       browser.browserAction.setIcon({
         path: "src/icons/desactivate.svg",
       });
@@ -426,7 +417,7 @@ export class ClientUtils {
                 file: "/src/content-scripts/listener.js",
                 frameId: detail.frameId,
               })
-              .catch(this.reportError);
+              .catch(this.clientScript.clientUtils.reportError);
           }
           if (
             url.host === "beta.crunchyroll.com" &&
@@ -439,9 +430,12 @@ export class ClientUtils {
                 file: "/src/content-scripts/listener2.js",
                 frameId: detail.frameId,
               })
-              .catch(this.reportError);
+              .catch(this.clientScript.clientUtils.reportError);
           }
-          if (this.clientContext.clientTabs.get(tabId)?.host !== true) {
+          if (
+            this.clientScript.clientContext.clientTabs.get(tabId)?.getHost() !==
+            true
+          ) {
             if (site === "awp" && detail.frameId === 0) {
               browser.tabs
                 .executeScript(tabId, {
@@ -449,15 +443,46 @@ export class ClientUtils {
                   file: "/src/content-scripts/listener3.js",
                   frameId: detail.frameId,
                 })
-                .catch(this.reportError);
+                .catch(this.clientScript.clientUtils.reportError);
             }
           }
         }
       })
-      .catch(this.reportError);
+      .catch(this.clientScript.clientUtils.reportError);
   }
 
-  reportError(error: any) {
-    console.error("error:", error);
+  convertUrl(
+    url: {
+      site: string;
+      location: string | undefined;
+      videoId: string;
+    },
+    oldUrl:
+      | {
+          site: string;
+          location: string | undefined;
+          videoId: string;
+        }
+      | undefined
+  ): void {
+    console.log("old url is", oldUrl);
+    if (oldUrl?.site === url.site && oldUrl?.videoId === url.videoId) {
+      return;
+    }
+
+    switch (url.site) {
+      case "crunchyroll":
+        if (oldUrl?.site === "crunchyroll" && oldUrl?.location != null) {
+          url.location = oldUrl.location;
+        }
+        break;
+      case "funimation":
+        if (oldUrl?.site === "funimation" && oldUrl?.location != null) {
+          url.location = oldUrl.location;
+        }
+        break;
+      default:
+        return;
+    }
   }
 }
