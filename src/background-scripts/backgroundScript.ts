@@ -28,3 +28,13 @@ clientTransmission.start(
   backgroundEvent,
   backgroundSync
 );
+
+browser.tabs
+  .query({})
+  .then((tabs) => {
+    tabs.forEach((tab) => {
+      if (tab.id == null) return;
+      clientScript.clientUtils.createTab(tab.id);
+    });
+  })
+  .catch(clientScript.clientUtils.reportError);
