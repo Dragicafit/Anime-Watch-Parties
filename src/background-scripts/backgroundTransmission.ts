@@ -1,4 +1,5 @@
 import { ClientScript } from "../client/clientScript";
+import { ClientTab } from "../client/clientTab";
 import { parseUrlAwp } from "./backgroundConst";
 import { BackgroundEvent } from "./backgroundEvents";
 import { BackgroundSync } from "./backgroundSync";
@@ -51,9 +52,17 @@ export default {
     });
     browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       const clientTab = clientScript.clientContext.clientTabs.get(tabId);
-      if (clientTab == null) return;
 
       backgroundUtils.changeIcon(clientTab, tab);
+    });
+    browser.windows.onFocusChanged.addListener(() => {
+      backgroundUtils.getActiveTab().then((tab) => {
+        let clientTab: ClientTab | undefined;
+        if (tab.id != null) {
+          clientTab = clientScript.clientContext.clientTabs.get(tab.id);
+        }
+        backgroundUtils.changeIcon(clientTab, tab);
+      });
     });
 
     browser.runtime.onMessage.addListener((message, sender) => {

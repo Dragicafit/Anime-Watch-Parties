@@ -354,8 +354,8 @@ export class BackgroundUtils {
     });
   }
 
-  changeIcon(clientTab: ClientTab, tab: browser.tabs.Tab) {
-    if (clientTab.getClientRoom() == null) {
+  changeIcon(clientTab: ClientTab | undefined, tab: browser.tabs.Tab) {
+    if (clientTab?.getClientRoom() == null) {
       browser.browserAction.setIcon({
         path: "src/icons/desactivate.svg",
       });
