@@ -12,9 +12,11 @@ import {
 
 export class BackgroundUtils {
   private clientScript: ClientScript;
+  private urlFromCrunchyrollBetaToCrunchyroll: Map<string, string>;
 
   constructor(clientScript: ClientScript) {
     this.clientScript = clientScript;
+    this.urlFromCrunchyrollBetaToCrunchyroll = new Map();
   }
 
   getActiveTab() {
@@ -146,7 +148,7 @@ export class BackgroundUtils {
     tabId: number
   ): Promise<string | null | undefined> {
     return new Promise((resolve) => {
-      let clientUtils = this;
+      let backgroundUtils = this;
       if (tab.status === "complete") {
         action();
         return;
@@ -176,11 +178,13 @@ export class BackgroundUtils {
                 console.log("ask url", url);
                 let media_id = url.searchParams.get("media_id");
                 if (media_id != null) {
-                  clientUtils
+                  backgroundUtils
                     .crunchyrollMediaIdToUrl(media_id)
                     .then((url2) => resolve(url2))
                     .catch((error) => {
-                      clientUtils.clientScript.clientUtils.reportError(error);
+                      backgroundUtils.clientScript.clientUtils.reportError(
+                        error
+                      );
                       resolve(null);
                     });
                   return;
@@ -190,6 +194,13 @@ export class BackgroundUtils {
                 url.pathname.includes("/watch") &&
                 detail.frameId === 0
               ) {
+                const crunchyUrl =
+                  backgroundUtils.urlFromCrunchyrollBetaToCrunchyroll.get(
+                    detail.url
+                  );
+                if (crunchyUrl != null) {
+                  return resolve(crunchyUrl);
+                }
                 console.log("ask url", url);
                 let pathname = url.pathname.match(parseUrlNewCrunchyroll);
                 if (pathname != null) {
@@ -213,14 +224,22 @@ export class BackgroundUtils {
                           let serie_etp_guid =
                             pathnameSerie.groups!.serie_etp_guid;
                           if (serie_etp_guid != null) {
-                            clientUtils
+                            backgroundUtils
                               .crunchyrollEtpGuidToUrl(
                                 pathname!.groups!.etp_guid,
                                 serie_etp_guid
                               )
-                              .then((url2) => resolve(url2))
+                              .then((url2) => {
+                                if (url2 != null) {
+                                  backgroundUtils.urlFromCrunchyrollBetaToCrunchyroll.set(
+                                    detail.url,
+                                    url2
+                                  );
+                                }
+                                resolve(url2);
+                              })
                               .catch((error) => {
-                                clientUtils.clientScript.clientUtils.reportError(
+                                backgroundUtils.clientScript.clientUtils.reportError(
                                   error
                                 );
                                 resolve(null);
@@ -232,7 +251,9 @@ export class BackgroundUtils {
                       resolve(null);
                     })
                     .catch((error) => {
-                      clientUtils.clientScript.clientUtils.reportError(error);
+                      backgroundUtils.clientScript.clientUtils.reportError(
+                        error
+                      );
                       setTimeout(action, 500);
                     });
                   return;
@@ -249,7 +270,7 @@ export class BackgroundUtils {
             resolve(null);
           })
           .catch((error) => {
-            clientUtils.clientScript.clientUtils.reportError(error);
+            backgroundUtils.clientScript.clientUtils.reportError(error);
             resolve(null);
           });
       }
