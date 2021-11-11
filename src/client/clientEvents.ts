@@ -1,4 +1,4 @@
-import { IoCallback } from "../server/io/ioConst";
+import { Data, IoCallback } from "../server/io/ioConst";
 import { ClientContext } from "./clientContext";
 import { ClientRoom } from "./clientRoom";
 import { ClientSync } from "./clientSync";
@@ -36,21 +36,25 @@ export class ClientEvent {
     >((err, data) => this.joinedRoom(err, data, clientTab)));
   }
 
-  private joinedRoom(err: string | null, data: any, clientTab: ClientTab) {
+  private joinedRoom(
+    err: string | null,
+    data: Data | undefined,
+    clientTab: ClientTab
+  ): void {
     if (err != null) {
-      console.log(err);
-      return;
+      return console.log(err);
     }
+    if (data == null) return;
 
-    this.leaveOldRoom(clientTab, data);
+    this.leaveOldRoom(clientTab, data.roomnum!);
 
-    const clientRoom = this.clientUtils.joinRoom(clientTab, data.roomnum);
+    const clientRoom = this.clientUtils.joinRoom(clientTab, data.roomnum!);
 
-    this.changeHostClient(clientRoom, data.host);
-    this.changeOnlineUsersClient(clientRoom, data.onlineUsers);
+    this.changeHostClient(clientRoom, data.host!);
+    this.changeOnlineUsersClient(clientRoom, data.onlineUsers!);
     if (data.videoId != null) {
       this.changeVideoClient(clientRoom, {
-        site: data.site,
+        site: data.site!,
         location: data.location,
         videoId: data.videoId,
       });
@@ -69,12 +73,12 @@ export class ClientEvent {
     console.log(`send room number after joinRoom ${clientTab.getRoomnum()}`);
   }
 
-  private leaveOldRoom(clientTab: ClientTab, data: any) {
+  private leaveOldRoom(clientTab: ClientTab, roomnum: string) {
     const clientRoom = clientTab.getClientRoom();
     if (clientRoom == null) {
       return;
     }
-    if (clientRoom.roomnum !== data.roomnum) {
+    if (clientRoom.roomnum !== roomnum) {
       this.leaveRoom(clientTab);
     }
   }

@@ -1,5 +1,16 @@
 export interface IoCallback {
-  (err: string | null, data?: any): void;
+  (err: string | null, data?: Data): void;
+}
+
+export interface Data {
+  roomnum?: string;
+  videoId?: string;
+  site?: string;
+  location?: string;
+  time?: number;
+  state?: boolean;
+  host?: boolean;
+  onlineUsers?: number;
 }
 
 export interface IoDebugSocket {

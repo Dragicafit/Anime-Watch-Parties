@@ -410,10 +410,10 @@ describe("test connection", function () {
             time: 0,
           });
           expect(
-            io.sockets.adapter.rooms.get(`room-${data.roomnum}`)
+            io.sockets.adapter.rooms.get(`room-${data!.roomnum}`)
           ).toBeDefined();
           expect(
-            io.sockets.adapter.rooms.get(`room-${data.roomnum}`)!.size
+            io.sockets.adapter.rooms.get(`room-${data!.roomnum}`)!.size
           ).toBe(1);
 
           resolve();
@@ -496,7 +496,7 @@ describe("test connection", function () {
             state: false,
             time: 0,
           });
-          socket2.emit("joinRoom", { roomnum: data.roomnum }, <IoCallback>((
+          socket2.emit("joinRoom", { roomnum: data!.roomnum }, <IoCallback>((
             err2,
             data2
           ) => {
@@ -509,10 +509,10 @@ describe("test connection", function () {
               time: 0,
             });
             expect(
-              io.sockets.adapter.rooms.get(`room-${data.roomnum}`)
+              io.sockets.adapter.rooms.get(`room-${data!.roomnum}`)
             ).toBeDefined();
             expect(
-              io.sockets.adapter.rooms.get(`room-${data.roomnum}`)!.size
+              io.sockets.adapter.rooms.get(`room-${data!.roomnum}`)!.size
             ).toBe(2);
 
             resolve();
@@ -526,12 +526,11 @@ describe("test connection", function () {
         socket1.emit("createRoom", <IoCallback>((err, data) => {
           return Promise.all([
             new Promise<void>((resolve2) => {
-              socket2.emit("joinRoom", { roomnum: data.roomnum }, <IoCallback>((
-                err2,
-                data2
-              ) => {
-                resolve2();
-              }));
+              socket2.emit("joinRoom", { roomnum: data!.roomnum }, <IoCallback>(
+                ((err2, data2) => {
+                  resolve2();
+                })
+              ));
             }),
             new Promise<void>((resolve2) => {
               socket1.on("getUsers", function (data2) {

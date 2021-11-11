@@ -85,7 +85,9 @@ export class ClientSync {
         if (err) {
           return console.log(err);
         }
-        if (data.videoId != null) {
+        if (data == null) return;
+
+        if (data.videoId != null && data.site != null) {
           this.clientEvent!.changeVideoClient(clientRoom, {
             site: data.site,
             location: data.location,

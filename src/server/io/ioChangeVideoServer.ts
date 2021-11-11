@@ -13,10 +13,10 @@ export default {
       "changeVideoServer",
       (
         debugSocket: IoDebugSocket,
-        roomnum: any,
-        videoId: any,
-        site: any,
-        location: any,
+        roomnum: string,
+        videoId: string,
+        site: string,
+        location: string | undefined,
         callback: IoCallback
       ) => {
         if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
@@ -32,7 +32,7 @@ export default {
           return callback("wrong input");
         }
         if (site === "crunchyroll" || site === "funimation") {
-          location = null;
+          location = undefined;
         } else {
           if (typeof location !== "string" || !regexLocation.test(location)) {
             debugSocket("location is not a valid string");

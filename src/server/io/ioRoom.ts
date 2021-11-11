@@ -28,7 +28,7 @@ export class IoRoom {
     this.lastChange = IoRoom.ioContext.performance.now();
   }
 
-  updateVideo(currVideo: string, site: string, location: string) {
+  updateVideo(currVideo: string, site: string, location: string | undefined) {
     this.currVideo = currVideo;
     this.site = site;
     this.location = location;

@@ -1,4 +1,4 @@
-import { IoCallback, IoDebugSocket } from "./ioConst";
+import { Data, IoCallback, IoDebugSocket } from "./ioConst";
 import { SocketContext } from "./ioContext";
 import { IoUtils } from "./ioUtils";
 
@@ -9,7 +9,7 @@ export default {
     socketContext.socket.on(
       "createRoom",
       (debugSocket: IoDebugSocket, callback: IoCallback) => {
-        let toCallback: any = {};
+        let toCallback: Data = {};
         ioUtils.createRoom(debugSocket, callback, toCallback);
         callback(null, toCallback);
       }

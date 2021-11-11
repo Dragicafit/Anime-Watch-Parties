@@ -10,9 +10,9 @@ export default {
       "changeStateServer",
       (
         debugSocket: IoDebugSocket,
-        roomnum: any,
-        state: any,
-        time: any,
+        roomnum: string,
+        state: boolean,
+        time: number,
         callback: IoCallback
       ) => {
         if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {

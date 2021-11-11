@@ -8,7 +8,7 @@ export default {
   start: function (socketContext: SocketContext, ioUtils: IoUtils) {
     socketContext.socket.on(
       "leaveRoom",
-      (debugSocket: IoDebugSocket, roomnum: any, callback: IoCallback) => {
+      (debugSocket: IoDebugSocket, roomnum: string, callback: IoCallback) => {
         if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
           debugSocket("roomnum is not a valid string");
           return callback("wrong input");

@@ -1,6 +1,11 @@
 import debugModule from "debug";
 import { Socket } from "socket.io";
-import { IoCallback, IoDebugSocket, supportedEvents } from "../io/ioConst";
+import {
+  Data,
+  IoCallback,
+  IoDebugSocket,
+  supportedEvents,
+} from "../io/ioConst";
 
 const debug = debugModule("filterInputServerAWP");
 
@@ -33,16 +38,14 @@ export default {
       }
 
       let event = events[0];
-      let data: any;
+      let data: Data = {};
       let callback: IoCallback = () => {};
 
       if (events[1] == null) {
-        data = {};
         if (typeof events[2] === "function") {
           callback = events[2];
         }
       } else if (typeof events[1] === "function") {
-        data = {};
         callback = events[1];
       } else if (typeof events[1] !== "object") {
         debugSocket("data is not valid");

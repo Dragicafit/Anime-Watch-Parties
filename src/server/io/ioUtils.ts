@@ -1,4 +1,4 @@
-import { IoCallback, IoDebugSocket } from "./ioConst";
+import { Data, IoCallback, IoDebugSocket } from "./ioConst";
 import { SocketContext } from "./ioContext";
 import { IoRoom, Room } from "./ioRoom";
 
@@ -18,7 +18,7 @@ export class IoUtils {
     debugSocket: IoDebugSocket,
     roomnum: string,
     callback: IoCallback,
-    toCallback: any = {}
+    toCallback: Data = {}
   ) {
     let ioRoom = this.getIoRoomIfIn(roomnum);
     if (ioRoom == null) {
@@ -40,7 +40,7 @@ export class IoUtils {
   updateRoomUsers(
     debugSocket: IoDebugSocket,
     roomnum: string,
-    toCallback: any = {}
+    toCallback: Data = {}
   ) {
     let room = this.getRoom(roomnum);
     if (room == null) {
@@ -67,7 +67,7 @@ export class IoUtils {
   createRoom(
     debugSocket: IoDebugSocket,
     callback: IoCallback,
-    toCallback: any = {}
+    toCallback: Data = {}
   ) {
     let oldJoinedRoomnums = this.getJoinedRoomnums();
     if (oldJoinedRoomnums.length >= 10) {
@@ -94,7 +94,7 @@ export class IoUtils {
     debugSocket: IoDebugSocket,
     roomnum: string,
     callback: IoCallback,
-    toCallback: any = {}
+    toCallback: Data = {}
   ) {
     let room = this.getRoom(roomnum);
     if (room == null) {
@@ -121,7 +121,7 @@ export class IoUtils {
     roomnum: string,
     room: Room,
     callback: IoCallback,
-    toCallback: any = {}
+    toCallback: Data = {}
   ) {
     debugSocket(`connected to room-${roomnum}`);
 

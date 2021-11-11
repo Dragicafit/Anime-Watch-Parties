@@ -101,7 +101,7 @@ it.each([
   location = location2;
   changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
   if (site === "crunchyroll" || site === "funimation") {
-    location = null;
+    location = undefined;
   }
 
   expect(emit).toHaveBeenNthCalledWith(1, "changeVideoClient", {
