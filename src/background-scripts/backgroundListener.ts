@@ -51,10 +51,11 @@ export class BackgroundListener implements ClientListener {
   joinedRoomListener(clientTab: ClientTab, clientRoom: ClientRoom) {
     const tabId = clientTab.getTabId();
 
+    this.backgroundUtils!.changeIcon();
+
     browser.tabs
       .get(tabId)
       .then((tab) => {
-        this.backgroundUtils!.changeIcon(clientTab, tab);
         this.backgroundUtils!.insertScript(tab, tabId);
       })
       .catch(this.clientScript!.clientUtils.reportError);
@@ -64,14 +65,7 @@ export class BackgroundListener implements ClientListener {
   }
 
   leavedRoomListener(clientTab: ClientTab) {
-    const tabId = clientTab.getTabId();
-
-    browser.tabs
-      .get(tabId)
-      .then((tab) => {
-        this.backgroundUtils!.changeIcon(clientTab, tab);
-      })
-      .catch(this.clientScript!.clientUtils.reportError);
+    this.backgroundUtils!.changeIcon();
 
     this.backgroundEvent!.changeOnlineUsersClientTab(clientTab);
     this.backgroundEvent!.changeHostClientTab(clientTab);

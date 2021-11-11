@@ -354,39 +354,45 @@ export class BackgroundUtils {
     });
   }
 
-  changeIcon(clientTab: ClientTab | undefined, tab: browser.tabs.Tab) {
-    if (clientTab?.getClientRoom() == null) {
-      browser.browserAction.setIcon({
-        path: "src/icons/desactivate.svg",
-      });
-      return;
-    }
-    this.parseUrlTab(tab).then((url) => {
-      switch (url?.site) {
-        case "wakanim":
-          browser.browserAction.setIcon({ path: "src/icons/wakanim.svg" });
-          break;
-        case "crunchyroll":
-          browser.browserAction.setIcon({
-            path: "src/icons/crunchyroll.svg",
-          });
-          break;
-        case "funimation":
-        case "oldFunimation":
-          browser.browserAction.setIcon({
-            path: "src/icons/funimation.svg",
-          });
-          break;
-        case "adn":
-          browser.browserAction.setIcon({
-            path: "src/icons/adn.svg",
-          });
-          break;
-        default:
-          browser.browserAction.setIcon({
-            path: "src/icons/activate.svg",
-          });
+  changeIcon(): void {
+    this.getActiveTab().then((tab) => {
+      let clientTab: ClientTab | undefined;
+      if (tab.id != null) {
+        clientTab = this.clientScript.clientContext.clientTabs.get(tab.id);
       }
+      if (clientTab?.getClientRoom() == null) {
+        browser.browserAction.setIcon({
+          path: "src/icons/desactivate.svg",
+        });
+        return;
+      }
+      this.parseUrlTab(tab).then((url) => {
+        switch (url?.site) {
+          case "wakanim":
+            browser.browserAction.setIcon({ path: "src/icons/wakanim.svg" });
+            break;
+          case "crunchyroll":
+            browser.browserAction.setIcon({
+              path: "src/icons/crunchyroll.svg",
+            });
+            break;
+          case "funimation":
+          case "oldFunimation":
+            browser.browserAction.setIcon({
+              path: "src/icons/funimation.svg",
+            });
+            break;
+          case "adn":
+            browser.browserAction.setIcon({
+              path: "src/icons/adn.svg",
+            });
+            break;
+          default:
+            browser.browserAction.setIcon({
+              path: "src/icons/activate.svg",
+            });
+        }
+      });
     });
   }
 

@@ -51,18 +51,10 @@ export default {
       clientScript.clientUtils.deleteTab(tabId);
     });
     browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-      const clientTab = clientScript.clientContext.clientTabs.get(tabId);
-
-      backgroundUtils.changeIcon(clientTab, tab);
+      backgroundUtils.changeIcon();
     });
     browser.windows.onFocusChanged.addListener(() => {
-      backgroundUtils.getActiveTab().then((tab) => {
-        let clientTab: ClientTab | undefined;
-        if (tab.id != null) {
-          clientTab = clientScript.clientContext.clientTabs.get(tab.id);
-        }
-        backgroundUtils.changeIcon(clientTab, tab);
-      });
+      backgroundUtils.changeIcon();
     });
 
     browser.runtime.onMessage.addListener((message, sender) => {
