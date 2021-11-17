@@ -1,9 +1,6 @@
-import debugModule from "debug";
 import express, { Express } from "express";
 import exphbs from "express-handlebars";
 import path from "path";
-
-const debug = debugModule("httpsServerAWP");
 
 export default {
   start: function (app: Express) {

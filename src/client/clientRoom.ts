@@ -1,8 +1,8 @@
-import { ClientContext } from "./clientContext";
-import { ClientTab } from "./clientTab";
+import { ClientSimpleContext } from "./clientContext";
+import { ClientTab, ClientTabSimplier } from "./clientTab";
 
 export class ClientRoom {
-  private clientContext: ClientContext;
+  private clientContext: ClientSimpleContext;
 
   onlineUsers: number | undefined;
   clientTabs: Map<number, ClientTab>;
@@ -19,7 +19,7 @@ export class ClientRoom {
       }
     | undefined;
 
-  public constructor(roomnum: string, clientContext: ClientContext) {
+  public constructor(roomnum: string, clientContext: ClientSimpleContext) {
     this.clientContext = clientContext;
     this.roomnum = roomnum;
     this.state = false;
@@ -61,4 +61,62 @@ export class ClientRoom {
   public getState() {
     return this.state;
   }
+
+  public simplify(): ClientRoomSimplier {
+    return {
+      onlineUsers: this.onlineUsers,
+      clientTabs: new Map(
+        [...this.clientTabs].map(([number, clientTab]) => [
+          number,
+          clientTab.simplify(),
+        ])
+      ),
+      roomnum: this.roomnum,
+      host: this.host,
+      state: this.state,
+      currTime: this.currTime,
+      lastChange: this.lastChange,
+      url: this.url,
+    };
+  }
+
+  public static complexify(
+    clientRoomSimplier: ClientRoomSimplier,
+    clientContext: ClientSimpleContext
+  ) {
+    const clientRoom = new ClientRoom(
+      clientRoomSimplier.roomnum,
+      clientContext
+    );
+    clientRoom.onlineUsers = clientRoomSimplier.onlineUsers;
+    clientRoom.clientTabs = new Map(
+      [...clientRoomSimplier.clientTabs].map(([tabId, clientTab]) => [
+        tabId,
+        ClientTab.complexify(clientTab, clientRoom),
+      ])
+    );
+    clientRoom.host = clientRoomSimplier.host;
+    clientRoom.state = clientRoomSimplier.state;
+    clientRoom.currTime = clientRoomSimplier.currTime;
+    clientRoom.lastChange = clientRoomSimplier.lastChange;
+    clientRoom.url = clientRoomSimplier.url;
+    return clientRoom;
+  }
+}
+
+export interface ClientRoomSimplier {
+  onlineUsers: number | undefined;
+  clientTabs: Map<number, ClientTabSimplier>;
+  roomnum: string;
+  host: boolean | undefined;
+  state: boolean;
+  currTime: number;
+  lastChange: number;
+  url:
+    | {
+        videoId: string;
+        site: string;
+        location: string | undefined;
+      }
+    | undefined;
 }

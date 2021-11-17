@@ -1,9 +1,8 @@
 import "dotenv/config";
-
-import { Socket as SocketClient, io as ioClient } from "socket.io-client";
-import ioServerSetup from "../src/server/ioServerSetup";
 import { Server } from "socket.io";
+import { io as ioClient, Socket as SocketClient } from "socket.io-client";
 import { IoCallback, supportedEvents } from "../src/server/io/ioConst";
+import ioServerSetup from "../src/server/ioServerSetup";
 
 jest.unmock("socket.io");
 

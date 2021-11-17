@@ -9,32 +9,40 @@ import { BackgroundSync } from "./backgroundSync";
 import clientTransmission from "./backgroundTransmission";
 import { BackgroundUtils } from "./backgroundUtils";
 
-let socket = io("https://animewatchparties.com");
-let backgroundListener = new BackgroundListener();
-let clientContext = new ClientContext(socket, performance, backgroundListener);
-let clientScript = new ClientScript(clientContext);
+export class BackgroundScript {
+  clientScript: ClientScript;
 
-let backgroundUtils = new BackgroundUtils(clientScript);
-let backgroundSync = new BackgroundSync(clientScript, backgroundUtils);
-let backgroundEvent = new BackgroundEvent(clientScript, backgroundUtils);
-backgroundListener.setClientScript(clientScript);
-backgroundListener.setBackgroundEvent(backgroundEvent);
-backgroundListener.setBackgroundSync(backgroundSync);
-backgroundListener.setBackgroundUtils(backgroundUtils);
+  backgroundUtils: BackgroundUtils;
+  backgroundSync: BackgroundSync;
+  backgroundEvent: BackgroundEvent;
 
-clientTransmission.start(
-  clientScript,
-  backgroundUtils,
-  backgroundEvent,
-  backgroundSync
-);
+  public constructor() {
+    const socket = io("https://animewatchparties.com");
+    const backgroundListener = new BackgroundListener(this);
+    let clientContext = new ClientContext(
+      socket,
+      performance,
+      backgroundListener
+    );
+    this.clientScript = new ClientScript(clientContext);
+    backgroundListener.setClientScript(this.clientScript);
 
-browser.tabs
-  .query({})
-  .then((tabs) => {
-    tabs.forEach((tab) => {
-      if (tab.id == null) return;
-      clientScript.clientUtils.createTab(tab.id);
-    });
-  })
-  .catch(clientScript.clientUtils.reportError);
+    this.backgroundUtils = new BackgroundUtils(this.clientScript);
+    this.backgroundSync = new BackgroundSync(this.clientScript, this);
+    this.backgroundEvent = new BackgroundEvent(this.clientScript, this);
+
+    clientTransmission.start(this.clientScript, this);
+
+    browser.tabs
+      .query({})
+      .then((tabs) => {
+        tabs.forEach((tab) => {
+          if (tab.id == null) return;
+          this.clientScript.clientUtils.createTab(tab.id);
+        });
+      })
+      .catch(this.clientScript.clientUtils.reportError);
+  }
+}
+
+new BackgroundScript();

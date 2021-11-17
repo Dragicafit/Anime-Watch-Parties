@@ -2,40 +2,38 @@ import { ClientListener } from "../client/clientListener";
 import { ClientRoom } from "../client/clientRoom";
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
-import { BackgroundEvent } from "./backgroundEvents";
-import { BackgroundSync } from "./backgroundSync";
-import { BackgroundUtils } from "./backgroundUtils";
+import { BackgroundScript } from "./backgroundScript";
 
 export class BackgroundListener implements ClientListener {
   private clientScript: ClientScript | undefined;
-  private backgroundEvent: BackgroundEvent | undefined;
-  private backgroundSync: BackgroundSync | undefined;
-  private backgroundUtils: BackgroundUtils | undefined;
+  private backgroundScript: BackgroundScript;
 
-  constructor() {}
+  constructor(backgroundScript: BackgroundScript) {
+    this.backgroundScript = backgroundScript;
+  }
 
   askVideoListener(clientTab: ClientTab): void {
-    this.backgroundSync!.askVideo(clientTab);
+    this.backgroundScript.backgroundSync.askVideo(clientTab);
   }
 
   askStateListener(clientTab: ClientTab): void {
-    this.backgroundSync!.askState(clientTab);
+    this.backgroundScript.backgroundSync.askState(clientTab);
   }
 
   changeStateClientTabListener(clientTab: ClientTab): void {
-    this.backgroundEvent!.changeStateClientTab(clientTab);
+    this.backgroundScript.backgroundEvent.changeStateClientTab(clientTab);
   }
 
   changeVideoClientTabListener(clientTab: ClientTab) {
-    this.backgroundEvent!.changeVideoClientTab(clientTab);
+    this.backgroundScript.backgroundEvent.changeVideoClientTab(clientTab);
   }
 
   changeHostClientTabListener(clientTab: ClientTab): void {
-    this.backgroundEvent!.changeHostClientTab(clientTab);
+    this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
   changeOnlineUsersClientTabListener(clientTab: ClientTab): void {
-    this.backgroundEvent!.changeOnlineUsersClientTab(clientTab);
+    this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
   createdTabListener(clientTab: ClientTab) {}
@@ -51,39 +49,25 @@ export class BackgroundListener implements ClientListener {
   joinedRoomListener(clientTab: ClientTab, clientRoom: ClientRoom) {
     const tabId = clientTab.getTabId();
 
-    this.backgroundUtils!.changeIcon();
+    this.backgroundScript.backgroundUtils.changeIcon();
 
     browser.tabs
       .get(tabId)
       .then((tab) => {
-        this.backgroundUtils!.insertScript(tab, tabId);
+        this.backgroundScript.backgroundUtils.insertScript(tab, tabId);
       })
       .catch(this.clientScript!.clientUtils.reportError);
 
-    this.backgroundEvent!.changeOnlineUsersClientTab(clientTab);
-    this.backgroundEvent!.changeHostClientTab(clientTab);
+    this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
   leavedRoomListener(clientTab: ClientTab) {
-    this.backgroundUtils!.changeIcon();
+    this.backgroundScript.backgroundUtils.changeIcon();
 
-    this.backgroundEvent!.changeOnlineUsersClientTab(clientTab);
-    this.backgroundEvent!.changeHostClientTab(clientTab);
+    this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
   public setClientScript(value: ClientScript) {
     this.clientScript = value;
-  }
-
-  public setBackgroundEvent(value: BackgroundEvent | undefined) {
-    this.backgroundEvent = value;
-  }
-
-  public setBackgroundSync(value: BackgroundSync | undefined) {
-    this.backgroundSync = value;
-  }
-
-  public setBackgroundUtils(value: BackgroundUtils | undefined) {
-    this.backgroundUtils = value;
   }
 }

@@ -1,10 +1,7 @@
-import debugModule from "debug";
 import { Express } from "express";
 import { BurstyRateLimiter, RateLimiterRedis } from "rate-limiter-flexible";
 import { RedisClient } from "redis";
 import { Server as IoServer } from "socket.io";
-
-const debug = debugModule("rateLimiterServerAWP");
 
 export default {
   start: function (app: Express, io: IoServer, redisClient: RedisClient) {

@@ -1,3 +1,4 @@
+import { ClientRoom } from "../../client/clientRoom";
 import { TabContext } from "./tabContext";
 import { TabSync } from "./tabSync";
 
@@ -27,11 +28,12 @@ export class TabEvents {
     }, this.tabContext.tabRoom.delay);
   }
 
-  sendInfo(roomnum: string, host: boolean): void {
+  sendInfo(clientRoom: ClientRoom): void {
     console.log("send info");
 
-    if (roomnum != null) this.tabContext.tabRoom.roomnum = roomnum;
-    if (host != null) this.tabContext.tabRoom.host = host;
+    if (clientRoom.roomnum != null)
+      this.tabContext.tabRoom.roomnum = clientRoom.roomnum;
+    if (clientRoom.host != null) this.tabContext.tabRoom.host = clientRoom.host;
   }
 
   askState() {

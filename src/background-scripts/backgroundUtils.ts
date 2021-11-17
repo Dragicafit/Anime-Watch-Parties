@@ -22,7 +22,7 @@ export class BackgroundUtils {
   getActiveTab() {
     console.log("get active tab");
 
-    return new Promise<browser.tabs.Tab>((resolve) => {
+    return new Promise<browser.tabs.Tab | null>((resolve) => {
       browser.tabs
         .query({
           currentWindow: true,
@@ -30,10 +30,7 @@ export class BackgroundUtils {
         })
         .then((tabs) => {
           if (tabs.length > 0) return resolve(tabs[0]);
-          browser.tabs
-            .create({ url: "https://www.wakanim.tv/" })
-            .then((tab) => resolve(tab))
-            .catch(this.clientScript.clientUtils.reportError);
+          resolve(null);
         })
         .catch(this.clientScript.clientUtils.reportError);
     });
@@ -53,9 +50,9 @@ export class BackgroundUtils {
           let pathname = url.pathname.match(parseUrlWakanim);
           if (pathname != null) {
             return {
-              videoId: pathname.groups!.videoId,
+              videoId: pathname.groups!["videoId"],
               site: "wakanim",
-              location: pathname.groups!.location,
+              location: pathname.groups!["location"],
             };
           }
         }
@@ -66,11 +63,11 @@ export class BackgroundUtils {
           if (pathname != null) {
             return {
               videoId:
-                pathname.groups!.serie_name +
+                pathname.groups!["serie_name"] +
                 "/episode-" +
-                pathname.groups!.media_id,
+                pathname.groups!["media_id"],
               site: "crunchyroll",
-              location: pathname.groups!.location,
+              location: pathname.groups!["location"],
             };
           }
         }
@@ -80,17 +77,17 @@ export class BackgroundUtils {
           let pathname = url.pathname.match(parseUrlFunimation);
           if (pathname != null) {
             return {
-              videoId: pathname.groups!.videoId,
+              videoId: pathname.groups!["videoId"],
               site: "funimation",
-              location: pathname.groups!.location,
+              location: pathname.groups!["location"],
             };
           }
           pathname = url.pathname.match(parseUrlOldFunimation);
           if (pathname != null) {
             return {
-              videoId: pathname.groups!.videoId,
+              videoId: pathname.groups!["videoId"],
               site: "oldFunimation",
-              location: pathname.groups!.location,
+              location: pathname.groups!["location"],
             };
           }
         }
@@ -100,7 +97,7 @@ export class BackgroundUtils {
           let pathname = url.pathname.match(parseUrlAdn);
           if (pathname != null) {
             return {
-              videoId: pathname.groups!.videoId,
+              videoId: pathname.groups!["videoId"],
               site: "adn",
               location: "fr",
             };
@@ -222,11 +219,11 @@ export class BackgroundUtils {
                         );
                         if (pathnameSerie != null) {
                           let serie_etp_guid =
-                            pathnameSerie.groups!.serie_etp_guid;
+                            pathnameSerie.groups!["serie_etp_guid"];
                           if (serie_etp_guid != null) {
                             backgroundUtils
                               .crunchyrollEtpGuidToUrl(
-                                pathname!.groups!.etp_guid,
+                                pathname!.groups!["etp_guid"],
                                 serie_etp_guid
                               )
                               .then((url2) => {
@@ -378,10 +375,10 @@ export class BackgroundUtils {
   changeIcon(): void {
     this.getActiveTab().then((tab) => {
       let clientTab: ClientTab | undefined;
-      if (tab.id != null) {
+      if (tab?.id != null) {
         clientTab = this.clientScript.clientContext.clientTabs.get(tab.id);
       }
-      if (clientTab?.getClientRoom() == null) {
+      if (tab?.id == null || clientTab?.getClientRoom() == null) {
         browser.browserAction.setIcon({
           path: "src/icons/desactivate.svg",
         });

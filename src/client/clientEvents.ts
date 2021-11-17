@@ -91,7 +91,6 @@ export class ClientEvent {
       return;
     }
 
-    const roomnum = clientRoom.roomnum;
     this.clientUtils.leaveRoom(clientTab);
   }
 
@@ -106,7 +105,7 @@ export class ClientEvent {
     console.log("change video client", url);
 
     clientRoom.updateVideo(url);
-    for (const [tabId, clientTab] of clientRoom.clientTabs) {
+    for (const [, clientTab] of clientRoom.clientTabs) {
       this.clientContext.clientListener.changeVideoClientTabListener(clientTab);
     }
   }
@@ -115,7 +114,7 @@ export class ClientEvent {
     console.log("change state client", { time: time, state: state });
 
     clientRoom.updateState(state, time);
-    for (const [tabId, clientTab] of clientRoom.clientTabs) {
+    for (const [, clientTab] of clientRoom.clientTabs) {
       this.clientContext.clientListener.changeStateClientTabListener(clientTab);
     }
   }
@@ -124,7 +123,7 @@ export class ClientEvent {
     console.log("change onlineUsers:", onlineUsers);
 
     clientRoom.onlineUsers = onlineUsers;
-    for (const [tabId, clientTab] of clientRoom.clientTabs) {
+    for (const [, clientTab] of clientRoom.clientTabs) {
       this.clientContext.clientListener.changeOnlineUsersClientTabListener(
         clientTab
       );
@@ -135,7 +134,7 @@ export class ClientEvent {
     console.log("change host", host);
 
     clientRoom.host = host;
-    for (const [tabId, clientTab] of clientRoom.clientTabs) {
+    for (const [, clientTab] of clientRoom.clientTabs) {
       this.clientContext.clientListener.changeHostClientTabListener(clientTab);
     }
   }

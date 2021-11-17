@@ -16,10 +16,11 @@ const debug = debugModule("serverAWP");
 
 const debugMain = debug.extend("main");
 
-const port = process.env.PORT || 4000;
-const extensionIds = process.env
-  .EXTENSION_IDS!.split(",")
-  .map((extensionId) => extensionId.trim());
+const port = process.env["PORT"] || 4000;
+const extensionIds =
+  process.env["EXTENSION_IDS"]
+    ?.split(",")
+    .map((extensionId) => extensionId.trim()) || [];
 
 const app = express();
 const pubClient = new RedisClient({});

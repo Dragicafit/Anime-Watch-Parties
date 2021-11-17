@@ -1,14 +1,14 @@
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
-import { BackgroundUtils } from "./backgroundUtils";
+import { BackgroundScript } from "./backgroundScript";
 
 export class BackgroundSync {
   private clientScript: ClientScript;
-  private backgroundUtils: BackgroundUtils;
+  private backgroundScript: BackgroundScript;
 
-  constructor(clientScript: ClientScript, backgroundUtils: BackgroundUtils) {
+  constructor(clientScript: ClientScript, backgroundScript: BackgroundScript) {
     this.clientScript = clientScript;
-    this.backgroundUtils = backgroundUtils;
+    this.backgroundScript = backgroundScript;
   }
 
   askVideo(clientTab: ClientTab): void {
@@ -38,7 +38,7 @@ export class BackgroundSync {
   }
 
   changeVideoServer(clientTab: ClientTab, tab: browser.tabs.Tab): void {
-    this.backgroundUtils.parseUrlTab(tab).then((url) => {
+    this.backgroundScript.backgroundUtils.parseUrlTab(tab).then((url) => {
       if (url == null) return;
       this.clientScript.clientSync.changeVideoServer(clientTab, url);
     });
@@ -46,5 +46,27 @@ export class BackgroundSync {
 
   changeStateServer(clientTab: ClientTab, time: number, state: boolean) {
     this.clientScript.clientSync.changeStateServer(clientTab, time, state);
+  }
+
+  sendInfo(clientTab: ClientTab) {
+    browser.runtime
+      .sendMessage({
+        command: "sendInfo",
+        clientContext: this.clientScript.clientContext.simplify(),
+      })
+      .catch(this.clientScript.clientUtils.reportError);
+
+    const clientRoom = clientTab.getClientRoom();
+    if (clientRoom == null) {
+      return;
+    }
+
+    browser.tabs
+      .sendMessage(clientTab.getTabId(), {
+        command: "sendInfo",
+        clientRoom: clientRoom.simplify(),
+        clientTab: clientTab.simplify(),
+      })
+      .catch(this.clientScript.clientUtils.reportError);
   }
 }

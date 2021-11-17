@@ -1,7 +1,5 @@
-import { Socket } from "socket.io-client";
 import { ClientContext } from "./clientContext";
 import { ClientEvent } from "./clientEvents";
-import { ClientListener } from "./clientListener";
 import { ClientSync } from "./clientSync";
 import clientTransmission from "./clientTransmission";
 import { ClientUtils } from "./clientUtils";

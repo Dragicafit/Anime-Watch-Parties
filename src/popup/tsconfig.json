@@ -1,7 +1,8 @@
 {
-  "extends": "@tsconfig/node16/tsconfig.json",
+  "extends": "@tsconfig/recommended/tsconfig.json",
 
   "compilerOptions": {
+    "outDir": "../../built/Firefox/src/popup",
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "noImplicitAny": true,

@@ -12,7 +12,7 @@ export default {
         return;
       switch (event.data.command) {
         case "sendInfo":
-          tabEvent.sendInfo(event.data.roomnum, event.data.host);
+          tabEvent.sendInfo(event.data.clientRoom);
           break;
         case "changeStateClient":
           tabEvent.changeStateClient(event.data.time, event.data.state);

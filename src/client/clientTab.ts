@@ -56,4 +56,21 @@ export class ClientTab {
   public setTabId(value: number) {
     this.tabId = value;
   }
+
+  public simplify(): ClientTabSimplier {
+    return { tabId: this.tabId };
+  }
+
+  public static complexify(
+    clientTabSimplier: ClientTabSimplier,
+    clientRoom?: ClientRoom
+  ) {
+    const clientTab = new ClientTab(clientTabSimplier.tabId);
+    clientTab.setClientRoom(clientRoom);
+    return clientTab;
+  }
+}
+
+export interface ClientTabSimplier {
+  tabId: number;
 }
