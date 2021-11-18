@@ -27,7 +27,6 @@
     "scripts": ["src/background-scripts/background-script.js"]
   },
   "browser_action": {
-    "browser_style": true,
     "default_title": "Anime Watch Parties",
     "default_popup": "src/popup/popup.html",
     "default_icon": {

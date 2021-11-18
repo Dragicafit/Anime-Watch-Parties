@@ -1,0 +1,9 @@
+.show-with-room {
+  display: none;
+}
+
+.container {
+  width: 350px;
+  height: 250px;
+  padding: 20px 20px;
+}

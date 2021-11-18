@@ -4,10 +4,10 @@ import { ClientTab, ClientTabSimplier } from "./clientTab";
 export class ClientRoom {
   private clientContext: ClientSimpleContext;
 
-  onlineUsers: number | undefined;
-  clientTabs: Map<number, ClientTab>;
   roomnum: string;
-  host: boolean | undefined;
+  clientTabs: Map<number, ClientTab>;
+  host: boolean;
+  onlineUsers: number;
   private state: boolean;
   private currTime: number;
   private lastChange: number;
@@ -21,11 +21,14 @@ export class ClientRoom {
 
   public constructor(roomnum: string, clientContext: ClientSimpleContext) {
     this.clientContext = clientContext;
+
     this.roomnum = roomnum;
+    this.clientTabs = new Map();
+    this.host = false;
+    this.onlineUsers = 0;
     this.state = false;
     this.currTime = 0;
     this.lastChange = 0;
-    this.clientTabs = new Map();
 
     this.updateState(false, 0);
   }
@@ -88,7 +91,6 @@ export class ClientRoom {
       clientRoomSimplier.roomnum,
       clientContext
     );
-    clientRoom.onlineUsers = clientRoomSimplier.onlineUsers;
     clientRoom.clientTabs = new Map(
       [...clientRoomSimplier.clientTabs].map(([tabId, clientTab]) => [
         tabId,
@@ -96,6 +98,7 @@ export class ClientRoom {
       ])
     );
     clientRoom.host = clientRoomSimplier.host;
+    clientRoom.onlineUsers = clientRoomSimplier.onlineUsers;
     clientRoom.state = clientRoomSimplier.state;
     clientRoom.currTime = clientRoomSimplier.currTime;
     clientRoom.lastChange = clientRoomSimplier.lastChange;
@@ -105,10 +108,10 @@ export class ClientRoom {
 }
 
 export interface ClientRoomSimplier {
-  onlineUsers: number | undefined;
-  clientTabs: Map<number, ClientTabSimplier>;
   roomnum: string;
-  host: boolean | undefined;
+  clientTabs: Map<number, ClientTabSimplier>;
+  host: boolean;
+  onlineUsers: number;
   state: boolean;
   currTime: number;
   lastChange: number;

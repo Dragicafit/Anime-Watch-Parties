@@ -24,19 +24,71 @@ function scriptLoaded() {
     .catch(clientUtils.reportError);
 }
 
-new ClipboardJS(".btn");
+var btns = document.querySelectorAll(".btn");
+for (var i = 0; i < btns.length; i++) {
+  btns[i].addEventListener("mouseleave", clearTooltip);
+  btns[i].addEventListener("blur", clearTooltip);
+}
+function clearTooltip(e: any) {
+  e.currentTarget.setAttribute("class", "btn btn-sm");
+  e.currentTarget.removeAttribute("aria-label");
+}
+function showTooltip(elem: Element, msg: string) {
+  elem.setAttribute(
+    "class",
+    "btn btn-sm tooltipped tooltipped-no-delay tooltipped-n"
+  );
+  elem.setAttribute("aria-label", msg);
+}
+function fallbackMessage(action: string) {
+  var actionMsg = "";
+  var actionKey = action === "cut" ? "X" : "C";
+  if (/iPhone|iPad/i.test(navigator.userAgent)) {
+    actionMsg = "No support :(";
+  } else if (/Mac/i.test(navigator.userAgent)) {
+    actionMsg = "Press ⌘-" + actionKey + " to " + action;
+  } else {
+    actionMsg = "Press Ctrl-" + actionKey + " to " + action;
+  }
+  return actionMsg;
+}
+
+const clipboard = new ClipboardJS(".btn");
+clipboard.on("success", (e) => {
+  console.info("Action:", e.action);
+  console.info("Text:", e.text);
+  console.info("Trigger:", e.trigger);
+  showTooltip(e.trigger, "Copied!");
+});
+clipboard.on("error", (e) => {
+  console.error("Action:", e.action);
+  console.error("Trigger:", e.trigger);
+  showTooltip(e.trigger, fallbackMessage(e.action));
+});
 
 function sendInfo(clientTab: ClientTab) {
   console.log("get info");
 
-  const roomnum = clientTab.getRoomnum();
-  if (roomnum != null) {
-    $("#roomnumURL").val(`https://awp.moe/${roomnum}`);
-    $("#copyRoomnumURL").show();
+  const clientRoom = clientTab.getClientRoom();
+  if (clientRoom == null) {
+    $(".show-with-room").hide();
+    $(".show-without-room").show();
+    return;
   }
-  const onlineUsers = clientTab.getOnlineUsers();
-  if (onlineUsers != null) {
-    $("#online-users").text(onlineUsers);
+  $(".show-with-room").show();
+  $(".show-without-room").hide();
+
+  $("#roomnumURL").val(`https://awp.moe/${clientRoom.roomnum}`);
+  $("#roomnumURL").attr("aria-label", `https://awp.moe/${clientRoom.roomnum}`);
+
+  $("#online-users").text(clientRoom.onlineUsers);
+
+  if (clientRoom.host) {
+    $(".show-host").show();
+    $(".show-viewer").hide();
+  } else {
+    $(".show-host").hide();
+    $(".show-viewer").show();
   }
 }
 
@@ -47,8 +99,6 @@ browser.runtime
   .catch(clientUtils.reportError);
 
 $("#create").on("click", () => {
-  $("#roomnumURL").text("");
-  $("#copyRoomnumURL").hide();
   browser.runtime
     .sendMessage({
       command: "createRoom",
@@ -77,8 +127,13 @@ browser.runtime.onMessage.addListener((message) => {
       break;
   }
 });
+
 browser.runtime
   .sendMessage({
     command: "askInfo",
   })
   .catch(clientUtils.reportError);
+
+$("#roomnumURL").on("click", function () {
+  $(this).trigger("select");
+});

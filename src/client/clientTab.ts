@@ -20,7 +20,7 @@ export class ClientTab {
     return this.clientRoom?.onlineUsers;
   }
 
-  public setOnlineUsers(val: number | undefined) {
+  public setOnlineUsers(val: number) {
     if (this.clientRoom == null) {
       return;
     }
