@@ -9,55 +9,63 @@
 
   <body>
     <div class="container">
-      <div class="show-with-room">
-        <p class="show-host">
-          You are the host, share the URL below to your friends and watch anime
-          together.
-        </p>
-        <p class="show-viewer">
-          You are a viewer, you don't need to do anything, just enjoy the anime.
-        </p>
-      </div>
-      <div id="userFormArea">
-        <div class="show-with-room">
-          <div class="input-group">
+      <div class="Box Box--spacious">
+        <div class="Box-body">
+          <div class="show-with-room" hidden>
+            <p class="show-host">
+              You are the host, share the URL below to your friends and watch
+              anime together.
+            </p>
+            <p class="show-viewer">
+              You are a viewer, you don't need to do anything, just enjoy the
+              anime.
+            </p>
+          </div>
+          <div class="show-with-room input-group mb-4" hidden>
             <input
               type="text"
               id="roomnumURL"
-              class="form-control input-monospace input-sm color-bg-subtle"
-              data-autoselect
-              size="16"
+              class="form-control color-bg-subtle"
               readonly
             />
             <div class="input-group-button">
               <button
                 id="copy"
-                class="btn btn-sm tooltipped tooltipped-no-delay tooltipped-n"
+                class="btn tooltipped tooltipped-no-delay tooltipped-n"
                 aria-label="Click to copy"
                 data-clipboard-target="#roomnumURL"
               >
                 <img
-                  class="octicon octicon-copy d-inline-block"
+                  class="octicon octicon-copy"
                   src="/src/icons/copy.svg"
                   alt="Copy to clipboard"
                   width="16px"
+                  height="16px"
                 />
               </button>
             </div>
           </div>
-        </div>
-        <div class="show-without-room">
-          <input id="create" class="btn" type="button" value="Create a room" />
-        </div>
-      </div>
-      <div id="roomArea" class="show-with-room">
-        <hr />
-        <p class="show-host">
-          You can change the episode or the website, your viewers will be
-          following you.
-        </p>
-        <div>
-          <h5><span id="online-users"></span> online</h5>
+          <div class="show-without-room">
+            <input
+              id="create"
+              class="btn btn-primary"
+              type="button"
+              value="Create a room"
+            />
+          </div>
+          <div class="show-with-room" hidden>
+            <p class="show-host">
+              You can change the episode or the website, your viewers will be
+              following you.
+            </p>
+          </div>
+          <div class="show-with-room" hidden>
+            <h5>
+              <span class="Counter mr-1"
+                ><span id="online-users"></span> online</span
+              >
+            </h5>
+          </div>
         </div>
       </div>
     </div>

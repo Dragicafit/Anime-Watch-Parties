@@ -67,12 +67,12 @@ function sendInfo(clientTab: ClientTab) {
 
   const clientRoom = clientTab.getClientRoom();
   if (clientRoom == null) {
-    $(".show-with-room").hide();
-    $(".show-without-room").show();
+    $(".show-with-room").attr("hidden", "");
+    $(".show-without-room").removeAttr("hidden");
     return;
   }
-  $(".show-with-room").show();
-  $(".show-without-room").hide();
+  $(".show-with-room").removeAttr("hidden");
+  $(".show-without-room").attr("hidden", "");
 
   $("#roomnumURL").val(`https://awp.moe/${clientRoom.roomnum}`);
   $("#roomnumURL").attr("aria-label", `https://awp.moe/${clientRoom.roomnum}`);
