@@ -50,8 +50,12 @@ export class ClientEvent {
 
     const clientRoom = this.clientUtils.joinRoom(clientTab, data.roomnum!);
 
-    this.changeHostClient(clientRoom, data.host!);
-    this.changeOnlineUsersClient(clientRoom, data.onlineUsers!);
+    if (data.host != null) {
+      this.changeHostClient(clientRoom, data.host);
+    }
+    if (data.onlineUsers != null) {
+      this.changeOnlineUsersClient(clientRoom, data.onlineUsers);
+    }
     if (data.videoId != null) {
       this.changeVideoClient(clientRoom, {
         site: data.site!,
