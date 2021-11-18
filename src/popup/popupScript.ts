@@ -24,22 +24,18 @@ function scriptLoaded() {
     .catch(clientUtils.reportError);
 }
 
-var btns = document.querySelectorAll(".btn");
-for (var i = 0; i < btns.length; i++) {
-  btns[i].addEventListener("mouseleave", clearTooltip);
-  btns[i].addEventListener("blur", clearTooltip);
-}
-function clearTooltip(e: any) {
-  e.currentTarget.setAttribute("class", "btn btn-sm");
-  e.currentTarget.removeAttribute("aria-label");
-}
 function showTooltip(elem: Element, msg: string) {
-  elem.setAttribute(
-    "class",
-    "btn btn-sm tooltipped tooltipped-no-delay tooltipped-n"
-  );
-  elem.setAttribute("aria-label", msg);
+  const ariaLabel = $(elem).attr("aria-label");
+  $(elem).attr("aria-label", msg);
+
+  $(elem).one("blur", function name() {
+    if (ariaLabel != null) {
+      $(elem).attr("aria-label", ariaLabel);
+    }
+  });
+  $(elem).trigger("focus");
 }
+
 function fallbackMessage(action: string) {
   var actionMsg = "";
   var actionKey = action === "cut" ? "X" : "C";
@@ -53,7 +49,7 @@ function fallbackMessage(action: string) {
   return actionMsg;
 }
 
-const clipboard = new ClipboardJS(".btn");
+const clipboard = new ClipboardJS("#copy");
 clipboard.on("success", (e) => {
   console.info("Action:", e.action);
   console.info("Text:", e.text);

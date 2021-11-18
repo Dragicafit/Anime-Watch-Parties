@@ -30,7 +30,12 @@
               readonly
             />
             <div class="input-group-button">
-              <button class="btn btn-sm" data-clipboard-target="#roomnumURL">
+              <button
+                id="copy"
+                class="btn btn-sm tooltipped tooltipped-no-delay tooltipped-n"
+                aria-label="Click to copy"
+                data-clipboard-target="#roomnumURL"
+              >
                 <img
                   class="octicon octicon-copy d-inline-block"
                   src="/src/icons/copy.svg"
