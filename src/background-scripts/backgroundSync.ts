@@ -39,13 +39,25 @@ export class BackgroundSync {
 
   changeVideoServer(clientTab: ClientTab, tab: browser.tabs.Tab): void {
     this.backgroundScript.backgroundUtils.parseUrlTab(tab).then((url) => {
-      if (url == null) return;
-      this.clientScript.clientSync.changeVideoServer(clientTab, url);
+      if (url == null || url.site === "awp") return;
+      const url2: {
+        videoId: string;
+        site:
+          | "wakanim"
+          | "crunchyroll"
+          | "funimation"
+          | "oldFunimation"
+          | "adn";
+        location?: string;
+      } = { videoId: url.videoId!, site: url.site, location: url.location };
+      this.clientScript.clientSync.changeVideoServer(clientTab, url2);
+      this.backgroundScript.backgroundSync.sendInfo(clientTab);
     });
   }
 
   changeStateServer(clientTab: ClientTab, time: number, state: boolean) {
     this.clientScript.clientSync.changeStateServer(clientTab, time, state);
+    this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
   sendInfo(clientTab: ClientTab) {

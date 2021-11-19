@@ -36,7 +36,17 @@ export class BackgroundUtils {
     });
   }
 
-  parseUrl(urlString: string) {
+  parseUrl(urlString: string): {
+    videoId?: string;
+    site:
+      | "wakanim"
+      | "crunchyroll"
+      | "funimation"
+      | "oldFunimation"
+      | "adn"
+      | "awp";
+    location?: string;
+  } | null {
     console.log("parse url", urlString);
 
     const url = new URL(urlString);
@@ -110,7 +120,17 @@ export class BackgroundUtils {
     return null;
   }
 
-  parseUrlTab(tab: browser.tabs.Tab): Promise<any> {
+  parseUrlTab(tab: browser.tabs.Tab): Promise<{
+    videoId?: string;
+    site:
+      | "wakanim"
+      | "crunchyroll"
+      | "funimation"
+      | "oldFunimation"
+      | "adn"
+      | "awp";
+    location?: string;
+  } | null> {
     const url = tab?.url;
     if (url != null) {
       console.log("parse tab", url);
@@ -380,29 +400,40 @@ export class BackgroundUtils {
       }
       if (tab?.id == null || clientTab?.getClientRoom() == null) {
         browser.browserAction.setIcon({
-          path: "src/icons/desactivate.svg",
+          path: "/src/icons/desactivate.svg",
         });
         return;
       }
       this.parseUrlTab(tab).then((url) => {
-        browser.browserAction.setIcon({ path: this.getIcon(url) });
+        const site = url?.site ?? null;
+        browser.browserAction.setIcon({
+          path: this.getIcon(site === "awp" ? null : site),
+        });
       });
     });
   }
 
-  getIcon(site: string) {
+  getIcon(
+    site:
+      | "wakanim"
+      | "crunchyroll"
+      | "funimation"
+      | "oldFunimation"
+      | "adn"
+      | null
+  ) {
     switch (site) {
       case "wakanim":
-        return "src/icons/wakanim.svg";
+        return "/src/icons/wakanim.svg";
       case "crunchyroll":
-        return "src/icons/crunchyroll.svg";
+        return "/src/icons/crunchyroll.svg";
       case "funimation":
       case "oldFunimation":
-        return "src/icons/funimation.svg";
+        return "/src/icons/funimation.svg";
       case "adn":
-        return "src/icons/adn.svg";
+        return "/src/icons/adn.svg";
       default:
-        return "src/icons/activate.svg";
+        return "/src/icons/activate.svg";
     }
   }
 
@@ -470,13 +501,13 @@ export class BackgroundUtils {
   convertUrl(
     url: {
       site: string;
-      location: string | undefined;
+      location?: string;
       videoId: string;
     },
     oldUrl:
       | {
           site: string;
-          location: string | undefined;
+          location?: string;
           videoId: string;
         }
       | undefined

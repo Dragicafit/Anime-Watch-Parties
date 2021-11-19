@@ -60,21 +60,29 @@
             </p>
           </div>
           <div class="clearfix">
-            <span class="Label mr-1 show-with-room" hidden
+            <span
+              class="
+                Counter
+                mr-1
+                color-bg-accent-emphasis color-fg-on-emphasis
+                show-with-room
+              "
+              hidden
               ><span id="online-users"></span> online</span
             >
             <button
               id="advanced-button"
-              class="btn btn-outline float-right"
+              class="btn btn float-right"
               type="button"
             >
-              Advanced
+              Advanced <span class="dropdown-caret"></span>
             </button>
           </div>
-          <div class="show-with-advanced" hidden>
-            <p>Clicking a line will redirect you to the tab.</p>
-            <div id="advanced" class="Box"></div>
-          </div>
+        </div>
+      </div>
+      <div class="Box Box--spacious show-with-advanced" hidden>
+        <div class="Box-body">
+          <div id="advanced"></div>
         </div>
       </div>
     </div>

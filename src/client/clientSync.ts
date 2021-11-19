@@ -18,15 +18,12 @@ export class ClientSync {
     clientTab: ClientTab,
     url: {
       videoId: string;
-      site: string;
-      location: string | undefined;
+      site: "wakanim" | "crunchyroll" | "funimation" | "oldFunimation" | "adn";
+      location?: string;
     }
   ): void {
     const clientRoom = clientTab.getClientRoom();
     if (clientRoom == null) {
-      return;
-    }
-    if (url.site === "awp") {
       return;
     }
     console.log("change video server", url);

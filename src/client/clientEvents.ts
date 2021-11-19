@@ -101,9 +101,9 @@ export class ClientEvent {
   changeVideoClient(
     clientRoom: ClientRoom,
     url: {
-      site: string;
-      location: string | undefined;
       videoId: string;
+      site: "wakanim" | "crunchyroll" | "funimation" | "oldFunimation" | "adn";
+      location?: string;
     }
   ) {
     console.log("change video client", url);

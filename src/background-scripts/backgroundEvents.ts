@@ -37,7 +37,17 @@ export class BackgroundEvent {
         time: clientRoom.getCurrTime(),
         state: clientRoom.getState(),
       })
-      .catch(this.clientScript.clientUtils.reportError);
+      .catch(() => {
+        setTimeout(() => {
+          browser.tabs
+            .sendMessage(clientTab.getTabId(), {
+              command: "changeStateClient",
+              time: clientRoom.getCurrTime(),
+              state: clientRoom.getState(),
+            })
+            .catch(this.clientScript.clientUtils.reportError);
+        }, 50);
+      });
 
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }

@@ -95,26 +95,44 @@ function sendInfo(clientTab: ClientTab) {
 }
 
 function refreshAdvanced() {
-  $("#advanced").html("");
+  let html = "";
   for (const [tabId, clientContextTab] of clientContext.clientTabs) {
-    let html = `<div id="go-to${tabId}" class="BtnGroup d-block mb-1 ml-0">`;
     const clientContextRoom = clientContextTab.getClientRoom();
     if (clientContextRoom == null) continue;
+
+    const site = clientContextRoom.getUrl()?.site;
+    const path = backgroundUtils.getIcon(site ?? null);
+
+    const time = (clientContextRoom.getCurrTime() * 100) / (25 * 60);
+    const action = clientContextRoom.getState() ? "Pause" : "Play";
+
+    html += `<div id="go-to${tabId}" class="BtnGroup d-block ml-0">`;
     html += `<button class="BtnGroup-item btn"
       type="button"
-      >${clientContextRoom.getUrl()?.site}</button>`;
-    const site = clientContextRoom.getUrl()?.site;
-    const path =
-      site != null
-        ? backgroundUtils.getIcon(site)
-        : "src/icons/desactivate.svg";
+      ><img
+        class="octicon"
+        src="${path}"
+        alt="${site}"
+        width="16px"
+        height="16px"
+      /></button>`;
+    html += `<button class="BtnGroup-item btn"
+          type="button"
+        ><div style="width:40px">${action}</div></button>`;
     html += `<button class="BtnGroup-item btn"
         type="button"
-      >https://awp.moe/${clientContextRoom.roomnum}</button>`;
+      ><div style="width:60px">${clientContextRoom.roomnum}</div></button>`;
+    html += `<button class="BtnGroup-item btn">${clientContextRoom.onlineUsers} online</span>`;
 
     html += `</div>`;
-    $("#advanced").append(html);
+    html += `<span class="Progress Progress--small mb-1">
+        <span class="Progress-item color-bg-success-emphasis" style="width: ${time}%;"></span>
+      </span>`;
   }
+  if (html === "") {
+    html = "<p>All your tabs in a room will appear here.</p>";
+  }
+  $("#advanced").html(html);
 }
 
 browser.runtime

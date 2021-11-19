@@ -5,7 +5,7 @@ export interface IoCallback {
 export interface Data {
   roomnum?: string;
   videoId?: string;
-  site?: string;
+  site?: "wakanim" | "crunchyroll" | "funimation" | "oldFunimation" | "adn";
   location?: string;
   time?: number;
   state?: boolean;

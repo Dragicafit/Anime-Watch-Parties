@@ -1,4 +1,4 @@
-import { ClientRoom } from "../../client/clientRoom";
+import { ClientRoomSimplier } from "../../client/clientRoom";
 import { TabContext } from "./tabContext";
 import { TabSync } from "./tabSync";
 
@@ -28,7 +28,7 @@ export class TabEvents {
     }, this.tabContext.tabRoom.delay);
   }
 
-  sendInfo(clientRoom: ClientRoom): void {
+  sendInfo(clientRoom: ClientRoomSimplier): void {
     console.log("send info");
 
     if (clientRoom.roomnum != null)

@@ -14,8 +14,13 @@ export class ClientRoom {
   private url:
     | {
         videoId: string;
-        site: string;
-        location: string | undefined;
+        site:
+          | "wakanim"
+          | "crunchyroll"
+          | "funimation"
+          | "oldFunimation"
+          | "adn";
+        location?: string;
       }
     | undefined;
 
@@ -41,8 +46,8 @@ export class ClientRoom {
 
   public updateVideo(url: {
     videoId: string;
-    site: string;
-    location: string | undefined;
+    site: "wakanim" | "crunchyroll" | "funimation" | "oldFunimation" | "adn";
+    location?: string;
   }) {
     this.url = url;
     this.updateState(false, 0);
@@ -118,8 +123,13 @@ export interface ClientRoomSimplier {
   url:
     | {
         videoId: string;
-        site: string;
-        location: string | undefined;
+        site:
+          | "wakanim"
+          | "crunchyroll"
+          | "funimation"
+          | "oldFunimation"
+          | "adn";
+        location?: string;
       }
     | undefined;
 }
