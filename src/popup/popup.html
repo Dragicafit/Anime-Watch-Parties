@@ -55,16 +55,25 @@
           </div>
           <div class="show-with-room" hidden>
             <p class="show-host">
-              You can change the episode or the website, your viewers will be
-              following you.
+              You can change the episode or the website, your viewers will
+              follow you.
             </p>
           </div>
-          <div class="show-with-room" hidden>
-            <h5>
-              <span class="Counter mr-1"
-                ><span id="online-users"></span> online</span
-              >
-            </h5>
+          <div class="clearfix">
+            <span class="Label mr-1 show-with-room" hidden
+              ><span id="online-users"></span> online</span
+            >
+            <button
+              id="advanced-button"
+              class="btn btn-outline float-right"
+              type="button"
+            >
+              Advanced
+            </button>
+          </div>
+          <div class="show-with-advanced" hidden>
+            <p>Clicking a line will redirect you to the tab.</p>
+            <div id="advanced" class="Box"></div>
           </div>
         </div>
       </div>

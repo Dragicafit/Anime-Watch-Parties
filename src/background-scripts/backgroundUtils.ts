@@ -385,33 +385,25 @@ export class BackgroundUtils {
         return;
       }
       this.parseUrlTab(tab).then((url) => {
-        switch (url?.site) {
-          case "wakanim":
-            browser.browserAction.setIcon({ path: "src/icons/wakanim.svg" });
-            break;
-          case "crunchyroll":
-            browser.browserAction.setIcon({
-              path: "src/icons/crunchyroll.svg",
-            });
-            break;
-          case "funimation":
-          case "oldFunimation":
-            browser.browserAction.setIcon({
-              path: "src/icons/funimation.svg",
-            });
-            break;
-          case "adn":
-            browser.browserAction.setIcon({
-              path: "src/icons/adn.svg",
-            });
-            break;
-          default:
-            browser.browserAction.setIcon({
-              path: "src/icons/activate.svg",
-            });
-        }
+        browser.browserAction.setIcon({ path: this.getIcon(url) });
       });
     });
+  }
+
+  getIcon(site: string) {
+    switch (site) {
+      case "wakanim":
+        return "src/icons/wakanim.svg";
+      case "crunchyroll":
+        return "src/icons/crunchyroll.svg";
+      case "funimation":
+      case "oldFunimation":
+        return "src/icons/funimation.svg";
+      case "adn":
+        return "src/icons/adn.svg";
+      default:
+        return "src/icons/activate.svg";
+    }
   }
 
   insertScript(tab: browser.tabs.Tab, tabId: number) {
