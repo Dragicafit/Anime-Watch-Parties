@@ -1,3 +1,4 @@
+import { SupportedSite } from "./../server/io/ioConst";
 import { Data, IoCallback } from "../server/io/ioConst";
 import { ClientContext } from "./clientContext";
 import { ClientRoom } from "./clientRoom";
@@ -102,7 +103,7 @@ export class ClientEvent {
     clientRoom: ClientRoom,
     url: {
       videoId: string;
-      site: "wakanim" | "crunchyroll" | "funimation" | "oldFunimation" | "adn";
+      site: SupportedSite;
       location?: string;
     }
   ) {

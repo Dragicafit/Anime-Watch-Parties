@@ -1,3 +1,4 @@
+import { SupportedSite } from "./../server/io/ioConst";
 import { IoCallback } from "../server/io/ioConst";
 import { ClientContext } from "./clientContext";
 import { ClientEvent } from "./clientEvents";
@@ -18,7 +19,7 @@ export class ClientSync {
     clientTab: ClientTab,
     url: {
       videoId: string;
-      site: "wakanim" | "crunchyroll" | "funimation" | "oldFunimation" | "adn";
+      site: SupportedSite;
       location?: string;
     }
   ): void {

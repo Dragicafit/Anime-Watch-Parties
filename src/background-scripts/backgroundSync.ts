@@ -1,3 +1,4 @@
+import { SupportedSite } from "./../server/io/ioConst";
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
 import { BackgroundScript } from "./backgroundScript";
@@ -42,12 +43,7 @@ export class BackgroundSync {
       if (url == null || url.site === "awp") return;
       const url2: {
         videoId: string;
-        site:
-          | "wakanim"
-          | "crunchyroll"
-          | "funimation"
-          | "oldFunimation"
-          | "adn";
+        site: SupportedSite;
         location?: string;
       } = { videoId: url.videoId!, site: url.site, location: url.location };
       this.clientScript.clientSync.changeVideoServer(clientTab, url2);

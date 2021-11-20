@@ -5,13 +5,20 @@ export interface IoCallback {
 export interface Data {
   roomnum?: string;
   videoId?: string;
-  site?: "wakanim" | "crunchyroll" | "funimation" | "oldFunimation" | "adn";
+  site?: SupportedSite;
   location?: string;
   time?: number;
   state?: boolean;
   host?: boolean;
   onlineUsers?: number;
 }
+
+export type SupportedSite =
+  | "wakanim"
+  | "crunchyroll"
+  | "funimation"
+  | "oldFunimation"
+  | "adn";
 
 export interface IoDebugSocket {
   (...args: any[]): void;

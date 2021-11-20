@@ -1,3 +1,4 @@
+import { SupportedSite } from "./../server/io/ioConst";
 import { ClientSimpleContext } from "./clientContext";
 import { ClientTab, ClientTabSimplier } from "./clientTab";
 
@@ -14,12 +15,7 @@ export class ClientRoom {
   private url:
     | {
         videoId: string;
-        site:
-          | "wakanim"
-          | "crunchyroll"
-          | "funimation"
-          | "oldFunimation"
-          | "adn";
+        site: SupportedSite;
         location?: string;
       }
     | undefined;
@@ -46,7 +42,7 @@ export class ClientRoom {
 
   public updateVideo(url: {
     videoId: string;
-    site: "wakanim" | "crunchyroll" | "funimation" | "oldFunimation" | "adn";
+    site: SupportedSite;
     location?: string;
   }) {
     this.url = url;
@@ -123,12 +119,7 @@ export interface ClientRoomSimplier {
   url:
     | {
         videoId: string;
-        site:
-          | "wakanim"
-          | "crunchyroll"
-          | "funimation"
-          | "oldFunimation"
-          | "adn";
+        site: SupportedSite;
         location?: string;
       }
     | undefined;

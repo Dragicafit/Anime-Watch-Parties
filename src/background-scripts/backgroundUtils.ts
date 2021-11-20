@@ -1,3 +1,4 @@
+import { SupportedSite } from "./../server/io/ioConst";
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
 import {
@@ -38,13 +39,7 @@ export class BackgroundUtils {
 
   parseUrl(urlString: string): {
     videoId?: string;
-    site:
-      | "wakanim"
-      | "crunchyroll"
-      | "funimation"
-      | "oldFunimation"
-      | "adn"
-      | "awp";
+    site: SupportedSite | "awp";
     location?: string;
   } | null {
     console.log("parse url", urlString);
@@ -122,13 +117,7 @@ export class BackgroundUtils {
 
   parseUrlTab(tab: browser.tabs.Tab): Promise<{
     videoId?: string;
-    site:
-      | "wakanim"
-      | "crunchyroll"
-      | "funimation"
-      | "oldFunimation"
-      | "adn"
-      | "awp";
+    site: SupportedSite | "awp";
     location?: string;
   } | null> {
     const url = tab?.url;
@@ -413,15 +402,7 @@ export class BackgroundUtils {
     });
   }
 
-  getIcon(
-    site:
-      | "wakanim"
-      | "crunchyroll"
-      | "funimation"
-      | "oldFunimation"
-      | "adn"
-      | null
-  ) {
+  getIcon(site: SupportedSite | null) {
     switch (site) {
       case "wakanim":
         return "/src/icons/wakanim.svg";
