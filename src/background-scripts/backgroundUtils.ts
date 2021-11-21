@@ -21,8 +21,6 @@ export class BackgroundUtils {
   }
 
   getActiveTab() {
-    console.log("get active tab");
-
     return new Promise<browser.tabs.Tab | null>((resolve) => {
       browser.tabs
         .query({
@@ -42,8 +40,6 @@ export class BackgroundUtils {
     site: SupportedSite | "awp";
     location?: string;
   } | null {
-    console.log("parse url", urlString);
-
     const url = new URL(urlString);
     if (url.protocol !== "https:") {
       return null;
@@ -122,7 +118,6 @@ export class BackgroundUtils {
   } | null> {
     const url = tab?.url;
     if (url != null) {
-      console.log("parse tab", url);
       const parseUrl = this.parseUrl(url);
       if (parseUrl != null) {
         return Promise.resolve(parseUrl);
@@ -135,7 +130,6 @@ export class BackgroundUtils {
       }
       this.askUrl(tab, tab.id)
         .then((url2) => {
-          console.log("ask url", url2);
           if (url2 == null) {
             resolve(null);
             return;

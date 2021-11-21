@@ -12,7 +12,7 @@ export class TabEvents {
   }
 
   changeStateClient(time: number, state: boolean) {
-    console.log("change state client");
+    console.log("change state client", { time: time, state: state });
 
     setTimeout(() => {
       this.tabContext.playerAWP!.getTime().then((clientTime) => {
@@ -29,7 +29,7 @@ export class TabEvents {
   }
 
   sendInfo(clientRoom: ClientRoomSimplier): void {
-    console.log("send info");
+    console.log("send info", clientRoom);
 
     if (clientRoom.roomnum != null)
       this.tabContext.tabRoom.roomnum = clientRoom.roomnum;

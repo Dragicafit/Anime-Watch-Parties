@@ -37,12 +37,20 @@ export default {
 
       if (changeInfo.status === "complete") {
         console.log("updated: complete", tabId, changeInfo, tab);
-        for (let i = 0; i < 10; i++) {
-          setTimeout(
-            () => backgroundScript.backgroundUtils.insertScript(tab, tabId),
-            i * 1000
-          );
-        }
+
+        backgroundScript.backgroundUtils.insertScript(tab, tabId);
+        setTimeout(
+          () => backgroundScript.backgroundUtils.insertScript(tab, tabId),
+          1000
+        );
+        setTimeout(
+          () => backgroundScript.backgroundUtils.insertScript(tab, tabId),
+          5000
+        );
+        setTimeout(
+          () => backgroundScript.backgroundUtils.insertScript(tab, tabId),
+          10000
+        );
       }
     });
     browser.tabs.onRemoved.addListener((tabId) => {

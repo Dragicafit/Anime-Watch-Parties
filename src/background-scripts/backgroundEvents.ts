@@ -45,7 +45,7 @@ export class BackgroundEvent {
               time: clientRoom.getCurrTime(),
               state: clientRoom.getState(),
             })
-            .catch(this.clientScript.clientUtils.reportError);
+            .catch(() => {});
         }, 50);
       });
 

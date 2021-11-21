@@ -1,9 +1,11 @@
 (function () {
   if (window.hasRun) {
     console.log("already running");
-    browser.runtime.sendMessage({
-      command: "scriptLoaded",
-    });
+    browser.runtime
+      .sendMessage({
+        command: "scriptLoaded",
+      })
+      .catch(console.error);
     return;
   }
   window.hasRun = true;
@@ -20,7 +22,7 @@
       event.data?.direction !== "from-script-AWP"
     )
       return;
-    browser.runtime.sendMessage(event.data).catch(this.clientUtils.reportError);
+    browser.runtime.sendMessage(event.data).catch(console.error);
   });
 
   let s = document.createElement("script");
@@ -30,7 +32,7 @@
       .sendMessage({
         command: "scriptLoaded",
       })
-      .catch(this.clientUtils.reportError);
+      .catch(console.error);
   };
   (document.head || document.documentElement).appendChild(s);
 })();

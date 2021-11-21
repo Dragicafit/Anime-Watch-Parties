@@ -27,7 +27,7 @@ export class ClientSync {
     if (clientRoom == null) {
       return;
     }
-    console.log("change video server", url);
+    console.log("change video server", clientTab, url);
     const tabId = clientTab.getTabId();
 
     clientRoom.updateVideo(url);
@@ -50,7 +50,7 @@ export class ClientSync {
     if (clientRoom == null) {
       return;
     }
-    console.log("change state server", { time: time, state: state });
+    console.log("change state server", clientTab, { time: time, state: state });
     const tabId = clientTab.getTabId();
 
     clientRoom.updateState(state, time);
@@ -72,7 +72,7 @@ export class ClientSync {
     if (clientRoom == null) {
       return;
     }
-    console.log("sync client");
+    console.log("sync client", clientTab);
 
     this.clientContext.socket.emit(
       "syncClient",

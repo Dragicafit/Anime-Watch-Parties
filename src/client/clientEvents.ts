@@ -22,7 +22,7 @@ export class ClientEvent {
   }
 
   createRoom(clientTab: ClientTab) {
-    console.log(`create from tab ${clientTab}`);
+    console.log("create room from tab", clientTab);
 
     this.clientContext.socket.emit("createRoom", <IoCallback>(
       ((err, data) => this.joinedRoom(err, data, clientTab))
@@ -30,7 +30,7 @@ export class ClientEvent {
   }
 
   joinRoom(clientTab: ClientTab, roomnum: string) {
-    console.log(`join room ${roomnum} from tab ${clientTab.getTabId()}`);
+    console.log("join room", roomnum, "from tab", clientTab);
 
     this.clientContext.socket.emit("joinRoom", { roomnum: roomnum }, <
       IoCallback
@@ -46,6 +46,7 @@ export class ClientEvent {
       return console.log(err);
     }
     if (data == null) return;
+    console.log("joined room", data, "from tab", clientTab);
 
     this.leaveOldRoom(clientTab, data.roomnum!);
 
@@ -71,11 +72,6 @@ export class ClientEvent {
     } else if (data.host) {
       this.clientContext.clientListener.askStateListener(clientTab);
     }
-
-    if (clientTab.getHost()) {
-      console.log("You are the new host!");
-    }
-    console.log(`send room number after joinRoom ${clientTab.getRoomnum()}`);
   }
 
   private leaveOldRoom(clientTab: ClientTab, roomnum: string) {
@@ -125,7 +121,7 @@ export class ClientEvent {
   }
 
   changeOnlineUsersClient(clientRoom: ClientRoom, onlineUsers: number) {
-    console.log("change onlineUsers:", onlineUsers);
+    console.log("change online users client", onlineUsers);
 
     clientRoom.onlineUsers = onlineUsers;
     for (const [, clientTab] of clientRoom.clientTabs) {
@@ -136,7 +132,7 @@ export class ClientEvent {
   }
 
   changeHostClient(clientRoom: ClientRoom, host: boolean) {
-    console.log("change host", host);
+    console.log("change host client", host);
 
     clientRoom.host = host;
     for (const [, clientTab] of clientRoom.clientTabs) {

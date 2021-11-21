@@ -64,7 +64,7 @@ clipboard.on("error", (e) => {
 
 let clientTab: ClientTab | undefined;
 function sendInfo(clientTab: ClientTab) {
-  console.log("get info");
+  console.log("get info", clientTab);
 
   const clientRoom = clientTab.getClientRoom();
   if (clientRoom == null) {
@@ -104,7 +104,7 @@ function refreshAdvanced() {
     const path = backgroundUtils.getIcon(site ?? null);
 
     const time = (clientContextRoom.getCurrTime() * 100) / (25 * 60);
-    const action = clientContextRoom.getState() ? "Pause" : "Play";
+    const action = clientContextRoom.getState() ? "Play" : "Pause";
 
     html += `<div id="go-to${tabId}" class="BtnGroup d-block ml-0">`;
     html += `<button class="BtnGroup-item btn"
@@ -174,6 +174,7 @@ browser.runtime.onMessage.addListener((message) => {
   }
 });
 
+console.log("ask info");
 browser.runtime
   .sendMessage({
     command: "askInfo",

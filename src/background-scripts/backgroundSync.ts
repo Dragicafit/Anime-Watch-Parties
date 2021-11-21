@@ -13,7 +13,7 @@ export class BackgroundSync {
   }
 
   askVideo(clientTab: ClientTab): void {
-    console.log("ask video");
+    console.log("ask video", clientTab);
 
     const clientRoom = clientTab.getClientRoom();
     if (clientRoom == null) return;
@@ -25,20 +25,22 @@ export class BackgroundSync {
       .then((tab) => {
         this.changeVideoServer(clientTab, tab);
       })
-      .catch(this.clientScript!.clientUtils.reportError);
+      .catch(() => {});
   }
 
   askState(clientTab: ClientTab): void {
-    console.log("ask state");
+    console.log("ask state", clientTab);
 
     browser.tabs
       .sendMessage(clientTab.getTabId(), {
         command: "askState",
       })
-      .catch(this.clientScript.clientUtils.reportError);
+      .catch(() => {});
   }
 
   changeVideoServer(clientTab: ClientTab, tab: browser.tabs.Tab): void {
+    console.log("change video server", clientTab, tab);
+
     this.backgroundScript.backgroundUtils.parseUrlTab(tab).then((url) => {
       if (url == null || url.site === "awp") return;
       const url2: {
@@ -52,17 +54,21 @@ export class BackgroundSync {
   }
 
   changeStateServer(clientTab: ClientTab, time: number, state: boolean) {
+    console.log("change state server", clientTab, { time: time, state: state });
+
     this.clientScript.clientSync.changeStateServer(clientTab, time, state);
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
   sendInfo(clientTab: ClientTab) {
+    console.log("send info", clientTab);
+
     browser.runtime
       .sendMessage({
         command: "sendInfo",
         clientContext: this.clientScript.clientContext.simplify(),
       })
-      .catch(this.clientScript.clientUtils.reportError);
+      .catch(() => {});
 
     const clientRoom = clientTab.getClientRoom();
     if (clientRoom == null) {
@@ -75,6 +81,6 @@ export class BackgroundSync {
         clientRoom: clientRoom.simplify(),
         clientTab: clientTab.simplify(),
       })
-      .catch(this.clientScript.clientUtils.reportError);
+      .catch(() => {});
   }
 }
