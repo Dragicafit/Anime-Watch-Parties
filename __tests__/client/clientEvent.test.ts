@@ -5,7 +5,6 @@ import { io as ioClient, Socket as SocketClient } from "socket.io-client";
 import { ClientContext } from "../../src/client/clientContext";
 import { ClientListener } from "../../src/client/clientListener";
 import { ClientScript } from "../../src/client/clientScript";
-import { ClientTab } from "../../src/client/clientTab";
 import { IoCallback, IoDebugSocket } from "../../src/server/io/ioConst";
 import { IoUtils } from "../../src/server/io/ioUtils";
 import ioServerSetup from "../../src/server/ioServerSetup";
@@ -88,7 +87,7 @@ afterEach(() => {
   ioServerSetup.close(io);
 });
 
-it("cool", (done) => {
+it("test createRoom", (done) => {
   expect(clientScript.clientContext.clientRooms.size).toEqual(0);
   clientListenerMock.joinedRoomListener = () => {
     const clientRooms = clientScript.clientContext.clientRooms;
