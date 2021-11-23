@@ -9,6 +9,7 @@ const supportedEventsTest = {
   CHANGE_STATE_SERVER: "changeStateServer",
   CHANGE_VIDEO_SERVER: "changeVideoServer",
   SYNC_CLIENT: "syncClient",
+  REPORT_BUG: "reportBug",
 };
 
 function emit([event, data, callback]: any[], next: any) {

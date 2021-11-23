@@ -21,7 +21,7 @@ function scriptLoaded() {
     .sendMessage({
       command: "askInfo",
     })
-    .catch(clientUtils.reportError);
+    .catch(console.error);
 }
 
 function showTooltip(elem: Element, msg: string) {
@@ -139,14 +139,14 @@ browser.runtime
   .sendMessage({
     command: "joinTab",
   })
-  .catch(clientUtils.reportError);
+  .catch(console.error);
 
 $("#create").on("click", () => {
   browser.runtime
     .sendMessage({
       command: "createRoom",
     })
-    .catch(clientUtils.reportError);
+    .catch(console.error);
 });
 
 browser.runtime.onMessage.addListener((message) => {
@@ -179,7 +179,7 @@ browser.runtime
   .sendMessage({
     command: "askInfo",
   })
-  .catch(clientUtils.reportError);
+  .catch(console.error);
 
 $("#roomnumURL").on("click", function () {
   $(this).trigger("select");
@@ -193,4 +193,12 @@ $("#advanced-button").on("click", function () {
     $(this).attr("aria-selected", "true");
     $(".show-with-advanced").prop("hidden", false);
   }
+});
+
+$("#report-bug").on("click", function () {
+  browser.runtime
+    .sendMessage({
+      command: "reportBug",
+    })
+    .catch(console.error);
 });

@@ -15,6 +15,7 @@ const LEAVE_ROOM = supportedEvents.LEAVE_ROOM;
 const CHANGE_STATE_SERVER = supportedEvents.CHANGE_STATE_SERVER;
 const CHANGE_VIDEO_SERVER = supportedEvents.CHANGE_VIDEO_SERVER;
 const SYNC_CLIENT = supportedEvents.SYNC_CLIENT;
+const REPORT_BUG = supportedEvents.REPORT_BUG;
 
 const debugArgument = debug.extend("argument");
 const debugCreateRoom = debug.extend(CREATE_ROOM);
@@ -23,6 +24,7 @@ const debugLeaveRoom = debug.extend(LEAVE_ROOM);
 const debugChangeStateServer = debug.extend(CHANGE_STATE_SERVER);
 const debugChangeVideoServer = debug.extend(CHANGE_VIDEO_SERVER);
 const debugSyncClient = debug.extend(SYNC_CLIENT);
+const debugReportBug = debug.extend(REPORT_BUG);
 
 export default {
   start: (socket: Socket) => {
@@ -50,7 +52,8 @@ export default {
       } else if (typeof events[1] !== "object") {
         debugSocket("data is not valid");
         if (typeof events[2] === "function") {
-          events[2]("data is not valid");
+          callback = events[2];
+          callback("data is not valid");
         }
         return;
       } else {
@@ -105,6 +108,13 @@ export default {
             debugSyncClient(`${socket.id}:`, ...args);
           });
           events[2] = data.roomnum;
+          events[3] = callback;
+          break;
+        case REPORT_BUG:
+          events[1] = <IoDebugSocket>((...args) => {
+            debugReportBug(`${socket.id}:`, ...args);
+          });
+          events[2] = data.logs;
           events[3] = callback;
           break;
         default:

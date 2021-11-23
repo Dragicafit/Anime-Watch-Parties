@@ -11,18 +11,18 @@ let socket: Socket;
 let ioUtils: IoUtils;
 let changeVideoServer: (
   debugSocket: IoDebugSocket,
-  roomnum: any,
-  videoId: any,
-  site: any,
-  location: any,
+  roomnum: string,
+  videoId: string,
+  site: string,
+  location: string | null | undefined,
   callback: IoCallback
 ) => void;
 
 let debugSocket: jest.Mock;
-let roomnum: any;
-let videoId: any;
-let site: any;
-let location: any;
+let roomnum: string;
+let videoId: string;
+let site: string;
+let location: string | null | undefined;
 let callback: jest.Mock;
 
 let emit: jest.Mock;
@@ -140,7 +140,7 @@ it.each([
   [true],
   () => {},
   function a() {},
-])("With invalid roomnum", (roomnum2) => {
+])("With invalid roomnum", (roomnum2: any) => {
   roomnum = roomnum2;
   changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
 
@@ -167,7 +167,7 @@ it.each([
   [""],
   () => {},
   function a() {},
-])("With invalid videoId", (videoId2) => {
+])("With invalid videoId", (videoId2: any) => {
   videoId = videoId2;
   changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
 
@@ -206,7 +206,7 @@ it.each([
   [""],
   () => {},
   function a() {},
-])("With invalid site", (site2) => {
+])("With invalid site", (site2: any) => {
   site = site2;
   changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
 
@@ -243,7 +243,7 @@ it.each([
   [""],
   () => {},
   function a() {},
-])("With invalid time", (location2) => {
+])("With invalid time", (location2: any) => {
   location = location2;
   changeVideoServer(debugSocket, roomnum, videoId, site, location, callback);
 

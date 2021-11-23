@@ -11,6 +11,7 @@ export interface Data {
   state?: boolean;
   host?: boolean;
   onlineUsers?: number;
+  logs?: string[];
 }
 
 export type SupportedSite =
@@ -31,4 +32,5 @@ export enum supportedEvents {
   CHANGE_STATE_SERVER = "changeStateServer",
   CHANGE_VIDEO_SERVER = "changeVideoServer",
   SYNC_CLIENT = "syncClient",
+  REPORT_BUG = "reportBug",
 }

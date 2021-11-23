@@ -13,7 +13,7 @@ export class BackgroundSync {
   }
 
   askVideo(clientTab: ClientTab): void {
-    console.log("ask video", clientTab);
+    console.log(...this.saveLog("ask video", clientTab));
 
     const clientRoom = clientTab.getClientRoom();
     if (clientRoom == null) return;
@@ -29,7 +29,7 @@ export class BackgroundSync {
   }
 
   askState(clientTab: ClientTab): void {
-    console.log("ask state", clientTab);
+    console.log(...this.saveLog("ask state", clientTab));
 
     browser.tabs
       .sendMessage(clientTab.getTabId(), {
@@ -39,7 +39,7 @@ export class BackgroundSync {
   }
 
   changeVideoServer(clientTab: ClientTab, tab: browser.tabs.Tab): void {
-    console.log("change video server", clientTab, tab);
+    console.log(...this.saveLog("change video server", clientTab, tab));
 
     this.backgroundScript.backgroundUtils.parseUrlTab(tab).then((url) => {
       if (url == null || url.site === "awp") return;
@@ -54,14 +54,19 @@ export class BackgroundSync {
   }
 
   changeStateServer(clientTab: ClientTab, time: number, state: boolean) {
-    console.log("change state server", clientTab, { time: time, state: state });
+    console.log(
+      ...this.saveLog("change state server", clientTab, {
+        time: time,
+        state: state,
+      })
+    );
 
     this.clientScript.clientSync.changeStateServer(clientTab, time, state);
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
   sendInfo(clientTab: ClientTab) {
-    console.log("send info", clientTab);
+    console.log(...this.saveLog("send info", clientTab));
 
     browser.runtime
       .sendMessage({
@@ -82,5 +87,9 @@ export class BackgroundSync {
         clientTab: clientTab.simplify(),
       })
       .catch(() => {});
+  }
+
+  private saveLog(...logs: any[]) {
+    return this.clientScript.clientUtils.saveLog(...logs);
   }
 }

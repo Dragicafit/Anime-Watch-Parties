@@ -3,10 +3,12 @@ import { ClientRoom } from "./clientRoom";
 import { ClientTab } from "./clientTab";
 
 export class ClientUtils {
-  clientContext: ClientContext;
+  private clientContext: ClientContext;
+  private logs: string[];
 
   constructor(clientContext: ClientContext) {
     this.clientContext = clientContext;
+    this.logs = [];
   }
 
   createTab(tabId: number): ClientTab {
@@ -86,7 +88,31 @@ export class ClientUtils {
     }, 100);
   }
 
-  reportError(error: any) {
-    console.error("error:", error);
+  saveLog(...logs: any[]) {
+    this.logs.push(
+      "log: " +
+        logs.map((log) => {
+          return typeof log?.simplify === "function"
+            ? JSON.stringify(log.simplify())
+            : JSON.stringify(log);
+        })
+    );
+    return logs;
+  }
+
+  saveError(...errors: any[]) {
+    this.logs.push(
+      "error: " +
+        errors.map((error) => {
+          return typeof error?.simplify === "function"
+            ? JSON.stringify(error.simplify())
+            : JSON.stringify(error);
+        })
+    );
+    return errors;
+  }
+
+  getLogs() {
+    return this.logs;
   }
 }

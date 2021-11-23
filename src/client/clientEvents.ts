@@ -22,7 +22,7 @@ export class ClientEvent {
   }
 
   createRoom(clientTab: ClientTab) {
-    console.log("create room from tab", clientTab);
+    console.log(...this.saveLog("create room from tab", clientTab));
 
     this.clientContext.socket.emit("createRoom", <IoCallback>(
       ((err, data) => this.joinedRoom(err, data, clientTab))
@@ -30,7 +30,7 @@ export class ClientEvent {
   }
 
   joinRoom(clientTab: ClientTab, roomnum: string) {
-    console.log("join room", roomnum, "from tab", clientTab);
+    console.log(...this.saveLog("join room", roomnum, "from tab", clientTab));
 
     this.clientContext.socket.emit("joinRoom", { roomnum: roomnum }, <
       IoCallback
@@ -43,10 +43,10 @@ export class ClientEvent {
     clientTab: ClientTab
   ): void {
     if (err != null) {
-      return console.log(err);
+      return console.log(...this.saveLog(err));
     }
     if (data == null) return;
-    console.log("joined room", data, "from tab", clientTab);
+    console.log(...this.saveLog("joined room", data, "from tab", clientTab));
 
     this.leaveOldRoom(clientTab, data.roomnum!);
 
@@ -85,7 +85,7 @@ export class ClientEvent {
   }
 
   leaveRoom(clientTab: ClientTab): void {
-    console.log(`leave room`);
+    console.log(...this.saveLog(`leave room`));
 
     const clientRoom = clientTab.getClientRoom();
     if (clientRoom == null) {
@@ -103,7 +103,7 @@ export class ClientEvent {
       location?: string;
     }
   ) {
-    console.log("change video client", url);
+    console.log(...this.saveLog("change video client", url));
 
     clientRoom.updateVideo(url);
     for (const [, clientTab] of clientRoom.clientTabs) {
@@ -112,7 +112,12 @@ export class ClientEvent {
   }
 
   changeStateClient(clientRoom: ClientRoom, time: number, state: boolean) {
-    console.log("change state client", { time: time, state: state });
+    console.log(
+      ...this.saveLog("change state client", {
+        time: time,
+        state: state,
+      })
+    );
 
     clientRoom.updateState(state, time);
     for (const [, clientTab] of clientRoom.clientTabs) {
@@ -121,7 +126,7 @@ export class ClientEvent {
   }
 
   changeOnlineUsersClient(clientRoom: ClientRoom, onlineUsers: number) {
-    console.log("change online users client", onlineUsers);
+    console.log(...this.saveLog("change online users client", onlineUsers));
 
     clientRoom.onlineUsers = onlineUsers;
     for (const [, clientTab] of clientRoom.clientTabs) {
@@ -132,11 +137,15 @@ export class ClientEvent {
   }
 
   changeHostClient(clientRoom: ClientRoom, host: boolean) {
-    console.log("change host client", host);
+    console.log(...this.saveLog("change host client", host));
 
     clientRoom.host = host;
     for (const [, clientTab] of clientRoom.clientTabs) {
       this.clientContext.clientListener.changeHostClientTabListener(clientTab);
     }
+  }
+
+  private saveLog(...logs: any[]) {
+    return this.clientUtils.saveLog(...logs);
   }
 }

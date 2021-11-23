@@ -9,6 +9,7 @@ import ioCreateRoom from "./io/ioCreateRoom";
 import ioDisconnecting from "./io/ioDisconnecting";
 import ioJoinRoom from "./io/ioJoinRoom";
 import ioLeaveRoom from "./io/ioLeaveRoom";
+import ioReportBug from "./io/ioReportBug";
 import { IoRoom } from "./io/ioRoom";
 import ioSyncClient from "./io/ioSyncClient";
 import { IoUtils } from "./io/ioUtils";
@@ -40,6 +41,7 @@ export default {
       ioChangeStateServer.start(socketContext, ioUtils);
       ioChangeVideoServer.start(socketContext, ioUtils);
       ioSyncClient.start(socketContext, ioUtils);
+      ioReportBug.start(socketContext, ioUtils);
     });
   },
   close: function (io: IoServer) {

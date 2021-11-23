@@ -20,6 +20,10 @@ export default {
 
     app.use(express.static(path.join(__dirname, "public/")));
 
+    app.get("/reportBug", function (req, res) {
+      res.render("reportBug");
+    });
+
     app.get("/*", function (req, res) {
       res.render("home");
     });

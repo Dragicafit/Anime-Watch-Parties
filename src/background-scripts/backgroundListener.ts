@@ -56,7 +56,7 @@ export class BackgroundListener implements ClientListener {
       .then((tab) => {
         this.backgroundScript.backgroundUtils.insertScript(tab, tabId);
       })
-      .catch(this.clientScript!.clientUtils.reportError);
+      .catch((error) => console.error(...this.saveError(error)));
 
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
@@ -69,5 +69,9 @@ export class BackgroundListener implements ClientListener {
 
   public setClientScript(value: ClientScript) {
     this.clientScript = value;
+  }
+
+  private saveError(...errors: any[]) {
+    return this.clientScript!.clientUtils.saveError(...errors);
   }
 }

@@ -27,7 +27,7 @@ export class ClientSync {
     if (clientRoom == null) {
       return;
     }
-    console.log("change video server", clientTab, url);
+    console.log(...this.saveLog("change video server", clientTab, url));
     const tabId = clientTab.getTabId();
 
     clientRoom.updateVideo(url);
@@ -50,7 +50,12 @@ export class ClientSync {
     if (clientRoom == null) {
       return;
     }
-    console.log("change state server", clientTab, { time: time, state: state });
+    console.log(
+      ...this.saveLog("change state server", clientTab, {
+        time: time,
+        state: state,
+      })
+    );
     const tabId = clientTab.getTabId();
 
     clientRoom.updateState(state, time);
@@ -72,7 +77,7 @@ export class ClientSync {
     if (clientRoom == null) {
       return;
     }
-    console.log("sync client", clientTab);
+    console.log(...this.saveLog("sync client", clientTab));
 
     this.clientContext.socket.emit(
       "syncClient",
@@ -81,7 +86,7 @@ export class ClientSync {
       },
       <IoCallback>((err, data) => {
         if (err) {
-          return console.log(err);
+          return console.log(...this.saveLog(err));
         }
         if (data == null) return;
 
@@ -101,5 +106,17 @@ export class ClientSync {
         }
       })
     );
+  }
+
+  reportBug() {
+    console.log(...this.saveLog("report a bug"));
+
+    this.clientContext.socket.emit("reportBug", {
+      logs: this.clientUtils.getLogs(),
+    });
+  }
+
+  private saveLog(...logs: any[]) {
+    return this.clientUtils.saveLog(...logs);
   }
 }

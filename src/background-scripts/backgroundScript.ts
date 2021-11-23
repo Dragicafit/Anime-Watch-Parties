@@ -41,7 +41,11 @@ export class BackgroundScript {
           this.clientScript.clientUtils.createTab(tab.id);
         });
       })
-      .catch(this.clientScript.clientUtils.reportError);
+      .catch((error) => console.error(...this.saveError(error)));
+  }
+
+  private saveError(...errors: any[]) {
+    return this.clientScript.clientUtils.saveError(...errors);
   }
 }
 

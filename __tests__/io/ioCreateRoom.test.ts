@@ -12,7 +12,7 @@ let ioUtils: IoUtils;
 let createRoom: (debugSocket: IoDebugSocket, callback: IoCallback) => void;
 
 let debugSocket: jest.Mock;
-let roomnum: any;
+let roomnum: string;
 let callback: jest.Mock;
 
 let performance: Performance;

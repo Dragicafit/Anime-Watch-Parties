@@ -17,16 +17,16 @@ let clientScript: ClientScript;
 let ioUtils: IoUtils;
 let changeStateServer: (
   debugSocket: IoDebugSocket,
-  roomnum: any,
-  state: any,
-  time: any,
+  roomnum: string,
+  state: boolean,
+  time: number,
   callback: IoCallback
 ) => void;
 
 let debugSocket: jest.Mock;
-let roomnum: any;
-let state: any;
-let time: any;
+let roomnum: string;
+let state: boolean;
+let time: number;
 let callback: jest.Mock;
 
 let emit: jest.Mock;

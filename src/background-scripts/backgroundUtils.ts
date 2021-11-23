@@ -31,7 +31,7 @@ export class BackgroundUtils {
           if (tabs.length > 0) return resolve(tabs[0]);
           resolve(null);
         })
-        .catch(this.clientScript.clientUtils.reportError);
+        .catch((error) => console.error(...this.saveError(error)));
     });
   }
 
@@ -137,7 +137,7 @@ export class BackgroundUtils {
           resolve(this.parseUrl(url2));
         })
         .catch((error) => {
-          this.clientScript.clientUtils.reportError(error);
+          console.error(...this.saveError(error));
           resolve(null);
         });
     });
@@ -175,16 +175,14 @@ export class BackgroundUtils {
                 url.host === "www.crunchyroll.com" &&
                 url.pathname === "/affiliate_iframeplayer"
               ) {
-                console.log("ask url", url);
+                console.log(...backgroundUtils.saveLog("ask url", url));
                 let media_id = url.searchParams.get("media_id");
                 if (media_id != null) {
                   backgroundUtils
                     .crunchyrollMediaIdToUrl(media_id)
                     .then((url2) => resolve(url2))
                     .catch((error) => {
-                      backgroundUtils.clientScript.clientUtils.reportError(
-                        error
-                      );
+                      console.error(...backgroundUtils.saveError(error));
                       resolve(null);
                     });
                   return;
@@ -201,7 +199,7 @@ export class BackgroundUtils {
                 if (crunchyUrl != null) {
                   return resolve(crunchyUrl);
                 }
-                console.log("ask url", url);
+                console.log(...backgroundUtils.saveLog("ask url", url));
                 let pathname = url.pathname.match(parseUrlNewCrunchyroll);
                 if (pathname != null) {
                   browser.tabs
@@ -239,8 +237,8 @@ export class BackgroundUtils {
                                 resolve(url2);
                               })
                               .catch((error) => {
-                                backgroundUtils.clientScript.clientUtils.reportError(
-                                  error
+                                console.error(
+                                  ...backgroundUtils.saveError(error)
                                 );
                                 resolve(null);
                               });
@@ -251,9 +249,7 @@ export class BackgroundUtils {
                       resolve(null);
                     })
                     .catch((error) => {
-                      backgroundUtils.clientScript.clientUtils.reportError(
-                        error
-                      );
+                      console.error(...backgroundUtils.saveError(error));
                       setTimeout(action, 500);
                     });
                   return;
@@ -262,7 +258,7 @@ export class BackgroundUtils {
                 url.host === "www.wakanim.tv" &&
                 url.pathname.includes("/v2/catalogue/embeddedplayer/")
               ) {
-                console.log("ask url", url);
+                console.log(...backgroundUtils.saveLog("ask url", url));
                 resolve(detail.url.replace("embeddedplayer", "episode"));
                 return;
               }
@@ -270,7 +266,7 @@ export class BackgroundUtils {
             resolve(null);
           })
           .catch((error) => {
-            backgroundUtils.clientScript.clientUtils.reportError(error);
+            console.error(...backgroundUtils.saveError(error));
             resolve(null);
           });
       }
@@ -295,12 +291,12 @@ export class BackgroundUtils {
               resolve(json.data.url);
             })
             .catch((error) => {
-              this.clientScript.clientUtils.reportError(error);
+              console.error(...this.saveError(error));
               resolve(null);
             });
         })
         .catch((error) => {
-          this.clientScript.clientUtils.reportError(error);
+          console.error(...this.saveError(error));
           resolve(null);
         });
     });
@@ -340,7 +336,7 @@ export class BackgroundUtils {
                       resolve(null);
                     })
                     .catch((error) => {
-                      this.clientScript.clientUtils.reportError(error);
+                      console.error(...this.saveError(error));
                       resolve(null);
                     });
                   return;
@@ -349,12 +345,12 @@ export class BackgroundUtils {
               resolve(null);
             })
             .catch((error) => {
-              this.clientScript.clientUtils.reportError(error);
+              console.error(...this.saveError(error));
               resolve(null);
             });
         })
         .catch((error) => {
-          this.clientScript.clientUtils.reportError(error);
+          console.error(...this.saveError(error));
           resolve(null);
         });
     });
@@ -369,7 +365,7 @@ export class BackgroundUtils {
         })
         .then((cookie) => resolve(cookie?.value))
         .catch((error) => {
-          this.clientScript.clientUtils.reportError(error);
+          console.error(...this.saveError(error));
           resolve(null);
         });
     });
@@ -413,7 +409,7 @@ export class BackgroundUtils {
   }
 
   insertScript(tab: browser.tabs.Tab, tabId: number) {
-    console.log("insert script");
+    console.log(...this.saveLog("insert script"));
 
     browser.webNavigation
       .getAllFrames({ tabId: tabId })
@@ -439,7 +435,7 @@ export class BackgroundUtils {
                 file: "/src/content-scripts/listener.js",
                 frameId: detail.frameId,
               })
-              .catch(this.clientScript.clientUtils.reportError);
+              .catch((error) => console.error(...this.saveError(error)));
           }
           if (
             url.host === "beta.crunchyroll.com" &&
@@ -452,7 +448,7 @@ export class BackgroundUtils {
                 file: "/src/content-scripts/listener2.js",
                 frameId: detail.frameId,
               })
-              .catch(this.clientScript.clientUtils.reportError);
+              .catch((error) => console.error(...this.saveError(error)));
           }
           if (
             this.clientScript.clientContext.clientTabs.get(tabId)?.getHost() !==
@@ -465,12 +461,12 @@ export class BackgroundUtils {
                   file: "/src/content-scripts/listener3.js",
                   frameId: detail.frameId,
                 })
-                .catch(this.clientScript.clientUtils.reportError);
+                .catch((error) => console.error(...this.saveError(error)));
             }
           }
         }
       })
-      .catch(this.clientScript.clientUtils.reportError);
+      .catch((error) => console.error(...this.saveError(error)));
   }
 
   convertUrl(
@@ -487,7 +483,7 @@ export class BackgroundUtils {
         }
       | undefined
   ): void {
-    console.log("old url is", oldUrl);
+    console.log(...this.saveLog("old url is", oldUrl));
     if (oldUrl?.site === url.site && oldUrl?.videoId === url.videoId) {
       return;
     }
@@ -506,5 +502,13 @@ export class BackgroundUtils {
       default:
         return;
     }
+  }
+
+  private saveLog(...logs: any[]) {
+    return this.clientScript.clientUtils.saveLog(...logs);
+  }
+
+  private saveError(...errors: any[]) {
+    return this.clientScript.clientUtils.saveError(...errors);
   }
 }

@@ -12,19 +12,19 @@ export class BackgroundEvent {
   }
 
   askInfo(clientTab: ClientTab) {
-    console.log("ask info", clientTab);
+    console.log(...this.saveLog("ask info", clientTab));
 
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
   scriptLoaded(clientTab: ClientTab) {
-    console.log("script loaded", clientTab);
+    console.log(...this.saveLog("script loaded", clientTab));
 
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
   changeStateClientTab(clientTab: ClientTab): void {
-    console.log("change state client tab", clientTab);
+    console.log(...this.saveLog("change state client tab", clientTab));
 
     const clientRoom = clientTab.getClientRoom();
     if (clientRoom == null) {
@@ -53,7 +53,7 @@ export class BackgroundEvent {
   }
 
   changeVideoClientTab(clientTab: ClientTab) {
-    console.log("change video client tab", clientTab);
+    console.log(...this.saveLog("change video client tab", clientTab));
 
     const clientRoom = clientTab.getClientRoom();
     if (clientRoom == null) return;
@@ -68,7 +68,7 @@ export class BackgroundEvent {
         this.backgroundScript.backgroundUtils
           .parseUrlTab(tab)
           .then((oldUrl) => {
-            console.log("old url is", oldUrl);
+            console.log(...this.saveLog("old url is", oldUrl));
             if (oldUrl?.site === url.site && oldUrl?.videoId === url.videoId) {
               return;
             }
@@ -101,27 +101,46 @@ export class BackgroundEvent {
               default:
                 return;
             }
-            console.log("change video client to", newUrl);
+            console.log(...this.saveLog("change video client to", newUrl));
             browser.tabs.update(tabId, {
               active: true,
               url: newUrl,
             });
           });
       })
-      .catch(this.clientScript.clientUtils.reportError);
+      .catch((error) => console.error(...this.saveError(error)));
 
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
   changeHostClientTab(clientTab: ClientTab): void {
-    console.log("change host client tab", clientTab);
+    console.log(...this.saveLog("change host client tab", clientTab));
 
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
   changeOnlineUsersClientTab(clientTab: ClientTab): void {
-    console.log("change online users client tab", clientTab);
+    console.log(...this.saveLog("change online users client tab", clientTab));
 
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
+  }
+
+  reportEventTab() {
+    console.log(...this.saveLog("report a bug tab"));
+
+    this.clientScript.clientSync.reportBug();
+
+    browser.tabs.create({
+      active: true,
+      url: "https://animewatchparties.com/reportBug",
+    });
+  }
+
+  private saveLog(...logs: any[]) {
+    return this.clientScript.clientUtils.saveLog(...logs);
+  }
+
+  private saveError(...errors: any[]) {
+    return this.clientScript.clientUtils.saveError(...errors);
   }
 }

@@ -11,12 +11,12 @@ let socket: Socket;
 let ioUtils: IoUtils;
 let joinRoom: (
   debugSocket: IoDebugSocket,
-  roomnum: any,
+  roomnum: string,
   callback: IoCallback
 ) => void;
 
 let debugSocket: jest.Mock;
-let roomnum: any;
+let roomnum: string;
 let callback: jest.Mock;
 
 let performance: Performance;
@@ -257,7 +257,7 @@ it.each([
   [true],
   () => {},
   function a() {},
-])("With invalid roomnum", (roomnum2) => {
+])("With invalid roomnum", (roomnum2: any) => {
   roomnum = roomnum2;
   joinRoom(debugSocket, roomnum, callback);
 

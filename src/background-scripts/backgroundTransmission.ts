@@ -15,7 +15,9 @@ export default {
         if (url.host == "awp.moe") {
           const roomnum = url.pathname.match(parseUrlAwp)?.groups!["roomnum"];
           if (roomnum == null) {
-            console.log("invalid roomnum", url.pathname.substring(1));
+            console.log(
+              ...saveLog("invalid roomnum", url.pathname.substring(1))
+            );
           } else {
             clientScript.clientEvent.joinRoom(clientTab, roomnum);
           }
@@ -26,7 +28,7 @@ export default {
       if (clientRoom == null) return;
 
       if (changeInfo.url != null) {
-        console.log("updated: change url", tabId, changeInfo, tab);
+        console.log(...saveLog("updated: change url", tabId, changeInfo, tab));
 
         if (clientRoom.host) {
           backgroundScript.backgroundSync.changeVideoServer(clientTab, tab);
@@ -36,7 +38,7 @@ export default {
       }
 
       if (changeInfo.status === "complete") {
-        console.log("updated: complete", tabId, changeInfo, tab);
+        console.log(...saveLog("updated: complete", tabId, changeInfo, tab));
 
         backgroundScript.backgroundUtils.insertScript(tab, tabId);
         setTimeout(
@@ -107,10 +109,17 @@ export default {
           case "syncClient":
             clientScript.clientSync.syncClient(clientTab);
             break;
+          case "reportBug":
+            backgroundScript.backgroundEvent.reportEventTab();
+            break;
           default:
             break;
         }
       }
     });
+
+    function saveLog(...logs: any[]) {
+      return clientScript.clientUtils.saveLog(...logs);
+    }
   },
 };

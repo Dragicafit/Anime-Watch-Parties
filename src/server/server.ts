@@ -1,3 +1,4 @@
+import { createAdapter } from "@socket.io/redis-adapter";
 import debugModule from "debug";
 import "dotenv/config";
 import express from "express";
@@ -5,7 +6,6 @@ import fs from "fs";
 import https from "https";
 import { RedisClient } from "redis";
 import { Server as IoServer } from "socket.io";
-import { createAdapter } from "@socket.io/redis-adapter";
 import httpsServerSetup from "./httpsServerSetup";
 import ioServerSetup from "./ioServerSetup";
 import rateLimiter from "./middleware/rateLimiter";
