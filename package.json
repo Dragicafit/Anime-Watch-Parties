@@ -1,6 +1,6 @@
 {
   "name": "anime-watch-parties",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "A cross-platform extension that synchronizes videos on major anime websites.",
   "scripts": {
     "start": "ts-node --project src/server/tsconfig.json src/server/server.ts",
