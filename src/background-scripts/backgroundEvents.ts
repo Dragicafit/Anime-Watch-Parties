@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill";
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
 import { BackgroundScript } from "./backgroundScript";

@@ -1,6 +1,7 @@
 "use strict";
 
 import io from "socket.io-client";
+import browser from "webextension-polyfill";
 import { ClientContext } from "../client/clientContext";
 import { ClientScript } from "../client/clientScript";
 import { BackgroundEvent } from "./backgroundEvents";

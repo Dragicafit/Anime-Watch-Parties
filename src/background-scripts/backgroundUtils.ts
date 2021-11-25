@@ -1,6 +1,7 @@
-import { SupportedSite } from "./../server/io/ioConst";
+import browser from "webextension-polyfill";
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
+import { SupportedSite } from "./../server/io/ioConst";
 import {
   parseUrlAdn,
   parseUrlCrunchyroll,
@@ -21,7 +22,7 @@ export class BackgroundUtils {
   }
 
   getActiveTab() {
-    return new Promise<browser.tabs.Tab | null>((resolve) => {
+    return new Promise<browser.Tabs.Tab | null>((resolve) => {
       browser.tabs
         .query({
           currentWindow: true,
@@ -111,7 +112,7 @@ export class BackgroundUtils {
     return null;
   }
 
-  parseUrlTab(tab: browser.tabs.Tab): Promise<{
+  parseUrlTab(tab: browser.Tabs.Tab): Promise<{
     videoId?: string;
     site: SupportedSite | "awp";
     location?: string;
@@ -144,7 +145,7 @@ export class BackgroundUtils {
   }
 
   askUrl(
-    tab: browser.tabs.Tab,
+    tab: browser.Tabs.Tab,
     tabId: number
   ): Promise<string | null | undefined> {
     return new Promise((resolve) => {
@@ -156,7 +157,7 @@ export class BackgroundUtils {
       browser.tabs.onUpdated.addListener(listener);
       function listener(
         tabId2: number,
-        changeInfo: browser.tabs._OnUpdatedChangeInfo
+        changeInfo: browser.Tabs.OnUpdatedChangeInfoType
       ) {
         if (tabId != tabId2 || changeInfo?.status !== "complete") {
           return;
@@ -408,7 +409,7 @@ export class BackgroundUtils {
     }
   }
 
-  insertScript(tab: browser.tabs.Tab, tabId: number) {
+  insertScript(tab: browser.Tabs.Tab, tabId: number) {
     console.log(...this.saveLog("insert script"));
 
     browser.webNavigation

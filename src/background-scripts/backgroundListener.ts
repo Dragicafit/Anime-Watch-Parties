@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill";
 import { ClientListener } from "../client/clientListener";
 import { ClientRoom } from "../client/clientRoom";
 import { ClientScript } from "../client/clientScript";

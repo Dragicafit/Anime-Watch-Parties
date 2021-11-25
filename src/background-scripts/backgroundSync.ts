@@ -1,6 +1,7 @@
-import { SupportedSite } from "./../server/io/ioConst";
+import browser from "webextension-polyfill";
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
+import { SupportedSite } from "./../server/io/ioConst";
 import { BackgroundScript } from "./backgroundScript";
 
 export class BackgroundSync {
@@ -38,7 +39,7 @@ export class BackgroundSync {
       .catch(() => {});
   }
 
-  changeVideoServer(clientTab: ClientTab, tab: browser.tabs.Tab): void {
+  changeVideoServer(clientTab: ClientTab, tab: browser.Tabs.Tab): void {
     console.log(...this.saveLog("change video server", clientTab, tab));
 
     this.backgroundScript.backgroundUtils.parseUrlTab(tab).then((url) => {

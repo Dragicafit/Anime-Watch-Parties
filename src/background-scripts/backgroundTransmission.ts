@@ -1,3 +1,4 @@
+import browser from "webextension-polyfill";
 import { ClientScript } from "../client/clientScript";
 import { parseUrlAwp } from "./backgroundConst";
 import { BackgroundScript } from "./backgroundScript";
@@ -72,7 +73,7 @@ export default {
       }
       func(sender.tab);
 
-      function func(tab: browser.tabs.Tab | null) {
+      function func(tab: browser.Tabs.Tab | null) {
         if (tab?.id == null) return;
         const tabId = tab.id;
         const clientTab = clientScript.clientContext.clientTabs.get(tabId);

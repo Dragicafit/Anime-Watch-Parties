@@ -1,11 +1,12 @@
-import { ClientScript } from "./../client/clientScript";
-import { BackgroundUtils } from "./../background-scripts/backgroundUtils";
 import ClipboardJS from "clipboard";
 import $ from "jquery";
+import browser from "webextension-polyfill";
 import { ClientSimpleContext } from "../client/clientContext";
-import { ClientContext } from "./../client/clientContext";
-import { ClientTab } from "./../client/clientTab";
 import { ClientUtils } from "../client/clientUtils";
+import { BackgroundUtils } from "./../background-scripts/backgroundUtils";
+import { ClientContext } from "./../client/clientContext";
+import { ClientScript } from "./../client/clientScript";
+import { ClientTab } from "./../client/clientTab";
 
 const clientContext = new ClientSimpleContext(performance);
 const clientUtils = new ClientUtils(<ClientContext>clientContext);

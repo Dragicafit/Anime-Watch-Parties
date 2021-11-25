@@ -1,5 +1,5 @@
-import { SupportedSite } from "./../server/io/ioConst";
 import { IoCallback } from "../server/io/ioConst";
+import { SupportedSite } from "./../server/io/ioConst";
 import { ClientContext } from "./clientContext";
 import { ClientEvent } from "./clientEvents";
 import { ClientTab } from "./clientTab";
