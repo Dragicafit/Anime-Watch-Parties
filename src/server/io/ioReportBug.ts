@@ -15,6 +15,8 @@ export default {
           return callback("wrong input");
         }
 
+        debugSocket(logs.slice(-100));
+
         callback(null, {});
       }
     );

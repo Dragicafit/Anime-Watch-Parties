@@ -54,10 +54,11 @@ it.each([[[]], [["log1", "log2"]]])("Valid", (logs2) => {
   logs = logs2;
   reportBug(debugSocket, logs, callback);
 
+  expect(debugSocket).toHaveBeenNthCalledWith(1, logs);
   expect(callback).toHaveBeenNthCalledWith(1, null, {});
 
   expect(emit).toHaveBeenCalledTimes(0);
-  expect(debugSocket).toHaveBeenCalledTimes(0);
+  expect(debugSocket).toHaveBeenCalledTimes(1);
   expect(callback).toHaveBeenCalledTimes(1);
   expect(performance.now).toHaveBeenCalledTimes(0);
 });
