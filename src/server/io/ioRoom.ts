@@ -12,12 +12,14 @@ export class IoRoom {
   currVideo: string | undefined;
   site: string | undefined;
   location: string | undefined;
+  messages: { sender: SocketId; message: string }[];
 
   constructor(roomnum: string) {
     this.roomnum = roomnum;
     this.state = false;
     this.currTime = 0;
     this.lastChange = 0;
+    this.messages = [];
 
     this.updateState(false, 0);
   }
