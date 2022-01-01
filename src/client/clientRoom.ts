@@ -19,6 +19,7 @@ export class ClientRoom {
         location?: string;
       }
     | undefined;
+  messages: { sender: string; message: string }[];
 
   public constructor(roomnum: string, clientContext: ClientSimpleContext) {
     this.clientContext = clientContext;
@@ -30,6 +31,7 @@ export class ClientRoom {
     this.state = false;
     this.currTime = 0;
     this.lastChange = 0;
+    this.messages = [];
 
     this.updateState(false, 0);
   }
@@ -81,6 +83,7 @@ export class ClientRoom {
       currTime: this.currTime,
       lastChange: this.lastChange,
       url: this.url,
+      messages: this.messages,
     };
   }
 
@@ -104,6 +107,7 @@ export class ClientRoom {
     clientRoom.currTime = clientRoomSimplier.currTime;
     clientRoom.lastChange = clientRoomSimplier.lastChange;
     clientRoom.url = clientRoomSimplier.url;
+    clientRoom.messages = clientRoomSimplier.messages;
     return clientRoom;
   }
 }
@@ -123,4 +127,5 @@ export interface ClientRoomSimplier {
         location?: string;
       }
     | undefined;
+  messages: { sender: string; message: string }[];
 }

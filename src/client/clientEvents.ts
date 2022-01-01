@@ -145,6 +145,20 @@ export class ClientEvent {
     }
   }
 
+  createMessageClient(clientRoom: ClientRoom, sender: string, message: string) {
+    console.log(...this.saveLog("create message client", sender, message));
+
+    clientRoom.messages.push({
+      sender: sender,
+      message: message,
+    });
+    for (const [, clientTab] of clientRoom.clientTabs) {
+      this.clientContext.clientListener.createMessageClientTabListener(
+        clientTab
+      );
+    }
+  }
+
   private saveLog(...logs: any[]) {
     return this.clientUtils.saveLog(...logs);
   }

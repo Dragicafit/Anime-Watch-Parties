@@ -72,6 +72,50 @@ export class ClientSync {
     }
   }
 
+  changeNameServer(clientTab: ClientTab, name: string): void {
+    console.log(
+      ...this.saveLog("change name server", clientTab, {
+        name: name,
+      })
+    );
+
+    this.clientContext.name = name;
+    this.clientContext.socket.emit("changeNameServer", {
+      name: name,
+    });
+  }
+
+  createMessageServer(clientTab: ClientTab, message: string): void {
+    if (this.clientContext.name == null) {
+      return;
+    }
+    const clientRoom = clientTab.getClientRoom();
+    if (clientRoom == null) {
+      return;
+    }
+    console.log(
+      ...this.saveLog("create message server", clientTab, {
+        time: message,
+      })
+    );
+    const tabId = clientTab.getTabId();
+
+    clientRoom.messages.push({
+      sender: this.clientContext.name,
+      message: message,
+    });
+    this.clientContext.socket.emit("createMessageServer", {
+      roomnum: clientRoom.roomnum,
+      message: message,
+    });
+    for (const [tabId2, clientTab2] of clientRoom.clientTabs) {
+      if (tabId2 === tabId) continue;
+      this.clientContext.clientListener.createMessageClientTabListener(
+        clientTab2
+      );
+    }
+  }
+
   syncClient(clientTab: ClientTab): void {
     const clientRoom = clientTab.getClientRoom();
     if (clientRoom == null) {

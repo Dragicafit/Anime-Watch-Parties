@@ -31,5 +31,11 @@ export default {
         videoId: data.videoId,
       });
     });
+    clientContext.socket.on("createMessageClient", (data) => {
+      const clientRoom = clientContext.clientRooms.get(data.roomnum);
+      if (clientRoom == null) return;
+
+      clientEvent.createMessageClient(clientRoom, data.sender, data.message);
+    });
   },
 };
