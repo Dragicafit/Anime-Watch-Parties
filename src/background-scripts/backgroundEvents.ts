@@ -114,6 +114,33 @@ export class BackgroundEvent {
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
+  sendMessagesClientTab(clientTab: ClientTab): void {
+    console.log(...this.saveLog("create message client tab", clientTab));
+
+    const clientRoom = clientTab.getClientRoom();
+    if (clientRoom == null) {
+      return;
+    }
+
+    browser.tabs
+      .sendMessage(clientTab.getTabId(), {
+        command: "sendMessagesClient",
+        messages: clientRoom.messages,
+      })
+      .catch(() => {
+        setTimeout(() => {
+          browser.tabs
+            .sendMessage(clientTab.getTabId(), {
+              command: "sendMessagesClient",
+              messages: clientRoom.messages,
+            })
+            .catch(() => {});
+        }, 50);
+      });
+
+    this.backgroundScript.backgroundSync.sendInfo(clientTab);
+  }
+
   changeHostClientTab(clientTab: ClientTab): void {
     console.log(...this.saveLog("change host client tab", clientTab));
 

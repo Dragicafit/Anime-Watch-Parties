@@ -104,6 +104,18 @@ export default {
               message.state
             );
             break;
+          case "changeName":
+            backgroundScript.backgroundSync.changeNameServer(
+              clientTab,
+              message.name
+            );
+            break;
+          case "createMessage":
+            backgroundScript.backgroundSync.createMessageServer(
+              clientTab,
+              message.message
+            );
+            break;
           case "restartSocket":
             clientScript.clientUtils.restartSocket(clientTab, message.roomnum);
             break;

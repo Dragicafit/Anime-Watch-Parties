@@ -25,8 +25,12 @@ export class BackgroundListener implements ClientListener {
     this.backgroundScript.backgroundEvent.changeStateClientTab(clientTab);
   }
 
-  changeVideoClientTabListener(clientTab: ClientTab) {
+  changeVideoClientTabListener(clientTab: ClientTab): void {
     this.backgroundScript.backgroundEvent.changeVideoClientTab(clientTab);
+  }
+
+  createMessageClientTabListener(clientTab: ClientTab): void {
+    this.backgroundScript.backgroundEvent.sendMessagesClientTab(clientTab);
   }
 
   changeHostClientTabListener(clientTab: ClientTab): void {
