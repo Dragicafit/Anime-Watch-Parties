@@ -1,13 +1,13 @@
-import { TabContext } from "./tabContext";
+import { PlayerContext } from "./playerContext";
 
-export class TabSync {
-  tabContext: TabContext;
+export class PlayerSync {
+  tabContext: PlayerContext;
 
-  constructor(tabContext: TabContext) {
+  constructor(tabContext: PlayerContext) {
     this.tabContext = tabContext;
   }
 
-  syncClient() {
+  syncClient(): void {
     console.log("sync client");
 
     this.tabContext.window.postMessage(
@@ -19,8 +19,8 @@ export class TabSync {
     );
   }
 
-  sendState(time: number, state: boolean) {
-    console.log("send state");
+  sendState(time: number, state: boolean): void {
+    console.log("send state", time, state);
 
     this.tabContext.window.postMessage(
       {

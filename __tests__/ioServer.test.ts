@@ -410,6 +410,7 @@ describe("test connection", function () {
             onlineUsers: 1,
             state: false,
             time: 0,
+            messages: [],
           });
           expect(
             io.sockets.adapter.rooms.get(`room-${data!.roomnum}`)
@@ -433,6 +434,7 @@ describe("test connection", function () {
             onlineUsers: 1,
             state: false,
             time: 0,
+            messages: [],
           });
           resolve();
         }));
@@ -497,6 +499,7 @@ describe("test connection", function () {
             onlineUsers: 1,
             state: false,
             time: 0,
+            messages: [],
           });
           socket2.emit("joinRoom", { roomnum: data!.roomnum }, <IoCallback>((
             err2,
@@ -509,6 +512,7 @@ describe("test connection", function () {
               onlineUsers: 2,
               state: false,
               time: 0,
+              messages: [],
             });
             expect(
               io.sockets.adapter.rooms.get(`room-${data!.roomnum}`)

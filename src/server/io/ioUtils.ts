@@ -35,6 +35,12 @@ export class IoUtils {
       debugSocket("change state client");
       Object.assign(toCallback, ioRoom.stateObject);
     }
+    Object.assign(toCallback, {
+      messages: ioRoom.messages.map((value) => ({
+        sender: value.sender.name,
+        message: value.message,
+      })),
+    });
   }
 
   updateRoomUsers(

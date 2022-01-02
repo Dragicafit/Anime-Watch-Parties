@@ -1,9 +1,9 @@
-import { TabContext } from "../tabContext";
-import { TabSync } from "../tabSync";
+import { PlayerContext } from "../playerContext";
+import { PlayerSync } from "../playerSync";
 import { Html5Player } from "./html5Player";
 
 export class FunimationPlayerSetup extends Html5Player {
-  public constructor(tabContext: TabContext, tabSync: TabSync) {
+  public constructor(tabContext: PlayerContext, tabSync: PlayerSync) {
     super("Funimation Player", tabContext, tabSync);
   }
 

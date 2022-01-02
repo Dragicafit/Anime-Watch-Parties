@@ -1,9 +1,9 @@
 import { PlayerAWP } from "./player/playerAWP";
-import { TabRoom } from "./tabRoom";
+import { PlayerRoom } from "./playerRoom";
 
-export class TabContext {
+export class PlayerContext {
   server: string;
-  tabRoom: TabRoom;
+  tabRoom: PlayerRoom;
   $: JQueryStatic;
   window: Window;
   performance: Performance;
@@ -11,7 +11,7 @@ export class TabContext {
 
   constructor(
     server: string,
-    tabRoom: TabRoom,
+    tabRoom: PlayerRoom,
     $: JQueryStatic,
     window: Window,
     performance: Performance

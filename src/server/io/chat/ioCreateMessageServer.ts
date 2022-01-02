@@ -37,7 +37,7 @@ export default {
         debugSocket(`applied to room-${roomnum}`);
 
         ioRoom.messages.push({
-          sender: socketContext.socket.id,
+          sender: socketContext,
           message: message,
         });
         socketContext.socket.to(`room-${roomnum}`).emit("createMessageClient", {

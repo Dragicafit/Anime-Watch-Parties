@@ -106,6 +106,7 @@ export class BackgroundSync {
     browser.tabs
       .sendMessage(clientTab.getTabId(), {
         command: "sendInfo",
+        clientContext: this.clientScript.clientContext.simplify(),
         clientRoom: clientRoom.simplify(),
         clientTab: clientTab.simplify(),
       })

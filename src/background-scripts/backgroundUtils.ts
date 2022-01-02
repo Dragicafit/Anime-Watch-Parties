@@ -418,6 +418,15 @@ export class BackgroundUtils {
         for (const detail of details) {
           const url = new URL(detail.url);
           let site = this.parseUrl(detail.url)?.site;
+          if (site != "awp" && site != null && detail.frameId === 0) {
+            browser.tabs
+              .executeScript(tabId, {
+                runAt: "document_end",
+                file: "/src/content-scripts/tab/tab-script.js",
+                frameId: detail.frameId,
+              })
+              .catch((error) => console.error(...this.saveError(error)));
+          }
           if (
             (site === "wakanim" && detail.frameId === 0) ||
             (url.host === "www.wakanim.tv" &&

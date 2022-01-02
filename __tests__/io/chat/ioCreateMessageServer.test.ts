@@ -86,7 +86,7 @@ it.each([" ", "‎", "a", Array(201).join("x")])("Valid", (message2) => {
       state: false,
       currTime: 0,
       lastChange: 5,
-      messages: [{ sender: socket.id, message: message }],
+      messages: [{ sender: socketContext, message: message }],
     },
   });
 });
@@ -226,7 +226,7 @@ it("Not host", () => {
       state: false,
       currTime: 0,
       lastChange: 5,
-      messages: [{ sender: socket.id, message: message }],
+      messages: [{ sender: socketContext, message: message }],
     },
   });
 });

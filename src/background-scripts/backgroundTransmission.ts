@@ -104,7 +104,7 @@ export default {
               message.state
             );
             break;
-          case "changeName":
+          case "sendName":
             backgroundScript.backgroundSync.changeNameServer(
               clientTab,
               message.name

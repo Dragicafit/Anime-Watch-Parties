@@ -14,6 +14,7 @@ export interface Data {
   logs?: string[];
   name?: string;
   message?: string;
+  messages?: { sender: string; message: string }[];
 }
 
 export type SupportedSite =

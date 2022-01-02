@@ -80,7 +80,7 @@ export class ClientSync {
     );
 
     this.clientContext.name = name;
-    this.clientContext.socket.emit("changeNameServer", {
+    this.clientContext.socket.emit("changeName", {
       name: name,
     });
   }
@@ -98,7 +98,6 @@ export class ClientSync {
         time: message,
       })
     );
-    const tabId = clientTab.getTabId();
 
     clientRoom.messages.push({
       sender: this.clientContext.name,
@@ -108,8 +107,7 @@ export class ClientSync {
       roomnum: clientRoom.roomnum,
       message: message,
     });
-    for (const [tabId2, clientTab2] of clientRoom.clientTabs) {
-      if (tabId2 === tabId) continue;
+    for (const [, clientTab2] of clientRoom.clientTabs) {
       this.clientContext.clientListener.createMessageClientTabListener(
         clientTab2
       );
@@ -147,6 +145,9 @@ export class ClientSync {
             data.time,
             data.state
           );
+        }
+        if (data.messages != null) {
+          this.clientEvent!.changeMessagesClient(clientRoom, data.messages);
         }
       })
     );

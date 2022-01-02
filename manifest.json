@@ -34,5 +34,9 @@
       "32": "src/icons/desactivate.svg"
     }
   },
-  "web_accessible_resources": ["src/web-accessible-resources/js/script.js"]
+  "web_accessible_resources": [
+    "src/web-accessible-resources/js/player-script.js",
+    "src/web-accessible-resources/css/embed.css",
+    "src/dependencies/primer.css"
+  ]
 }

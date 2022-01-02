@@ -1,0 +1,19 @@
+#twitchEmbed {
+  width: 300px;
+  z-index: 99;
+}
+body.awp-inserted {
+  margin-right: 300px !important;
+}
+.jw-icon-studio .jw-svg-icon-studio-on {
+  display: block;
+}
+.jw-icon-studio .jw-svg-icon-studio-off {
+  display: none;
+}
+.jw-off.jw-icon-studio .jw-svg-icon-studio-off {
+  display: block;
+}
+.jw-off.jw-icon-studio .jw-svg-icon-studio-on {
+  display: none;
+}

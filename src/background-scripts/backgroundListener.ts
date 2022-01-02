@@ -30,7 +30,7 @@ export class BackgroundListener implements ClientListener {
   }
 
   createMessageClientTabListener(clientTab: ClientTab): void {
-    this.backgroundScript.backgroundEvent.sendMessagesClientTab(clientTab);
+    this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
   changeHostClientTabListener(clientTab: ClientTab): void {
