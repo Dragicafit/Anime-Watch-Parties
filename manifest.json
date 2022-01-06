@@ -36,7 +36,6 @@
   },
   "web_accessible_resources": [
     "src/web-accessible-resources/js/player-script.js",
-    "src/web-accessible-resources/css/embed.css",
-    "src/dependencies/primer.css"
+    "src/web-accessible-resources/css/index.css"
   ]
 }

@@ -18,14 +18,8 @@ export class TwitchEmbed {
     css.rel = "stylesheet";
     css.type = "text/css";
     css.href = browser.runtime.getURL(
-      "/src/web-accessible-resources/css/embed.css"
+      "/src/web-accessible-resources/css/index.css"
     );
-    (document.head || document.documentElement).appendChild(css);
-
-    css = document.createElement("link");
-    css.rel = "stylesheet";
-    css.type = "text/css";
-    css.href = browser.runtime.getURL("/src/dependencies/primer.css");
     (document.head || document.documentElement).appendChild(css);
 
     this.tabContext.$("body").addClass("awp-inserted");
