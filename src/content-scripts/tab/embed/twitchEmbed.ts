@@ -14,6 +14,8 @@ export class TwitchEmbed {
   startEmbed() {
     console.log("start embed");
 
+    const $ = this.tabContext.$;
+
     let css = document.createElement("link");
     css.rel = "stylesheet";
     css.type = "text/css";
@@ -22,11 +24,12 @@ export class TwitchEmbed {
     );
     (document.head || document.documentElement).appendChild(css);
 
-    this.tabContext.$("body").addClass("awp-inserted");
-    if (!this.tabContext.$("#fullscreenTest").length) {
-      this.tabContext.$("body").append(`<div
-      id="twitchEmbed"
+    $("body").addClass("awp-inserted");
+    if (!$("#fullscreenTest").length) {
+      $("body").append(`<div id="twitchEmbed"><div
+      id="twitchChatEmbed"
       class="Box d-flex flex-column position-fixed right-0 bottom-0 top-0"
+      data-color-mode="dark" data-dark-theme="dark"
     >
       <div
         id="twitchVideoChatEmbed"
@@ -46,13 +49,32 @@ export class TwitchEmbed {
           </div>
         </form>
       </div>
-    </div>`);
-      this.tabContext.$("#form").on("submit", (e) => {
+    </div>
+    <button id="display-chat" class="btn position-fixed"
+    data-color-mode="dark" data-dark-theme="dark">
+      <img
+        class="octicon"
+        src="${browser.runtime.getURL("/src/icons/message.svg")}"
+        alt="Copy to clipboard"
+        width="24px"
+        height="24px"
+      />
+    </button></div>`);
+      $("#form").on("submit", (e) => {
         e.preventDefault();
         this.onChat();
       });
+      $("#display-chat").on("click", function () {
+        if ($("body").hasClass("awp-inserted")) {
+          $("body").removeClass("awp-inserted");
+          $("#twitchChatEmbed").prop("hidden", true);
+        } else {
+          $("body").addClass("awp-inserted");
+          $("#twitchChatEmbed").prop("hidden", false);
+        }
+      });
     }
-    // if (!this.tabContext.$(".jw-icon-studio").length) {
+    // if (!$(".jw-icon-studio").length) {
     //   this.tabContext
     //     .$(".jw-icon-fullscreen")
     //     .clone()
@@ -86,7 +108,9 @@ export class TwitchEmbed {
   }
 
   onChat() {
-    let input = this.tabContext.$("#input1").val();
+    const $ = this.tabContext.$;
+
+    let input = $("#input1").val();
     if (input == null || input == "") {
       return;
     }
@@ -95,13 +119,15 @@ export class TwitchEmbed {
     } else {
       this.tabSync.createMessage(input + "");
     }
-    this.tabContext.$("#input1").val("");
+    $("#input1").val("");
   }
 
   update() {
-    this.tabContext.$("#twitchVideoChatEmbed").empty();
+    const $ = this.tabContext.$;
+
+    $("#twitchVideoChatEmbed").empty();
     for (const message of this.tabContext.tabRoom.messages) {
-      this.tabContext.$("#twitchVideoChatEmbed").append(`<div class="my-0">
+      $("#twitchVideoChatEmbed").append(`<div class="my-0">
       <div class="ml-n1">
         <span class="text-bold">${message.sender}</span><span>:</span>
         <span>${message.message}</span>
@@ -113,17 +139,19 @@ export class TwitchEmbed {
   studio() {
     console.log("mode studio");
 
-    if (this.tabContext.$(".jw-icon-studio.jw-off").length) {
-      this.tabContext.$(".jw-icon-studio").removeClass("jw-off");
-      this.tabContext.$("#jwplayer-container").detach().appendTo(".flex-video");
+    const $ = this.tabContext.$;
+
+    if ($(".jw-icon-studio.jw-off").length) {
+      $(".jw-icon-studio").removeClass("jw-off");
+      $("#jwplayer-container").detach().appendTo(".flex-video");
       this.tabContext
         .$("#twitchVideoChatEmbed")
         .detach()
-        .appendTo("#twitchEmbed");
-      this.tabContext.$("#fullscreenTest").remove();
+        .appendTo("#twitchChatEmbed");
+      $("#fullscreenTest").remove();
     } else {
-      this.tabContext.$(".jw-icon-studio").addClass("jw-off");
-      this.tabContext.$("body").append(`<div id="fullscreenTest"></div>`);
+      $(".jw-icon-studio").addClass("jw-off");
+      $("body").append(`<div id="fullscreenTest"></div>`);
       this.tabContext
         .$("#jwplayer-container")
         .detach()

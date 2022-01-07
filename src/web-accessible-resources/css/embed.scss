@@ -1,5 +1,11 @@
-#twitchEmbed {
+#twitchChatEmbed {
   width: 300px;
+  z-index: 200;
+}
+
+#display-chat {
+  right: 150px;
+  bottom: 12px;
   z-index: 200;
 }
 

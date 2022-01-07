@@ -1,21 +1,6 @@
-@import "@primer/css/color-modes/index.scss";
-
-@import "@primer/css/support/index.scss";
-
 #twitchEmbed {
-  @import "@primer/css/base/index.scss";
-}
+  @import "@primer/css/index.scss";
 
-@import "@primer/css/box/index.scss";
-@import "@primer/css/buttons/index.scss";
-@import "@primer/css/forms/index.scss";
-
-@import "@primer/css/utilities/index.scss";
-
-@import "@primer/css/product/index.scss";
-@import "@primer/css/marketing/index.scss";
-
-#twitchEmbed {
   font-family: $body-font;
   font-size: $body-font-size;
   line-height: $body-line-height;
