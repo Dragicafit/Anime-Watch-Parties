@@ -1,10 +1,45 @@
 #twitchEmbed {
   width: 300px;
-  z-index: 99;
+  z-index: 200;
 }
+
+.awp-inserted {
+  #headerFreeTrial,
+  .header-main.js-header-main,
+  .sc-qYFre.hnJKGH,
+  #funimation-main-site-header,
+  .vjs-control-bar,
+  .vjs-text-track-display,
+  .v-dialog__content,
+  .container.header-wrapper,
+  #searchform {
+    width: auto !important;
+  }
+
+  #headerFreeTrial,
+  .header-main.js-header-main,
+  #qc-cmp2-persistent-link,
+  .sc-qYFre.hnJKGH,
+  #funimation-main-site-header,
+  #_evidon_banner,
+  .vjs-control-bar,
+  .vjs-text-track-display,
+  .v-dialog__content,
+  .container.header-wrapper,
+  #searchform {
+    right: 300px !important;
+  }
+
+  #searchform {
+    left: 0px !important;
+  }
+}
+
 body.awp-inserted {
   margin-right: 300px !important;
+  width: auto !important;
 }
+
 .jw-icon-studio .jw-svg-icon-studio-on {
   display: block;
 }
