@@ -418,7 +418,7 @@ export class BackgroundUtils {
         for (const detail of details) {
           const url = new URL(detail.url);
           let site = this.parseUrl(detail.url)?.site;
-          if (site != "awp" && site != null && detail.frameId === 0) {
+          if (detail.frameId === 0) {
             browser.tabs
               .executeScript(tabId, {
                 runAt: "document_end",
