@@ -421,7 +421,7 @@ export class BackgroundUtils {
           if (detail.frameId === 0) {
             browser.tabs
               .executeScript(tabId, {
-                runAt: "document_end",
+                runAt: "document_start",
                 file: "/src/content-scripts/tab/tab-script.js",
                 frameId: detail.frameId,
               })

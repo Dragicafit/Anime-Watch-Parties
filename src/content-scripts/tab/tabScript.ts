@@ -7,10 +7,8 @@ import { TabRoom } from "./tabRoom";
 import { TabSync } from "./tabSync";
 import tabTransmission from "./tabTransmission";
 
-if ((<any>window).hasRun) {
-  console.log("already running");
-} else {
-  (<any>window).hasRun = true;
+if (!(<any>window).AWPHasRun) {
+  (<any>window).AWPHasRun = true;
 
   let tabContext = new TabContext(new TabRoom(), $, window, window.performance);
 
@@ -19,11 +17,14 @@ if ((<any>window).hasRun) {
   tabTransmission.start(tabContext, tabEvents);
   let twitchEmbed = new TwitchEmbed(tabContext, tabSync);
   tabContext.embed = twitchEmbed;
-  twitchEmbed.startEmbed();
 
-  browser.runtime
-    .sendMessage({
-      command: "askInfo",
-    })
-    .catch(console.error);
+  $(() => {
+    twitchEmbed.startEmbed();
+
+    browser.runtime
+      .sendMessage({
+        command: "askInfo",
+      })
+      .catch(console.error);
+  });
 }
