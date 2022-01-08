@@ -37,7 +37,6 @@
   },
   "web_accessible_resources": [
     "src/web-accessible-resources/js/player-script.js",
-    "src/web-accessible-resources/css/index.css",
-    "src/icons/message.svg"
+    "src/web-accessible-resources/css/index.css"
   ]
 }
