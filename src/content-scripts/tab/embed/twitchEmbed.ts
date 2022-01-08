@@ -133,6 +133,16 @@ export class TwitchEmbed {
       </div>
     </div>`);
     }
+
+    if (this.tabContext.name == null) {
+      $("#input1")
+        .attr("placeholder", "Choose a username")
+        .attr("aria-label", "Choose a username");
+    } else {
+      $("#input1")
+        .attr("placeholder", "Send a message")
+        .attr("aria-label", "Send a message");
+    }
   }
 
   studio() {
