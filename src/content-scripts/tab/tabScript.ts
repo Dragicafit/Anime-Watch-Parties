@@ -19,12 +19,12 @@ if (!(<any>window).AWPHasRun) {
   tabContext.embed = twitchEmbed;
 
   $(() => {
-    twitchEmbed.startEmbed();
-
-    browser.runtime
-      .sendMessage({
-        command: "askInfo",
-      })
-      .catch(console.error);
+    twitchEmbed.startEmbed().then(() => {
+      browser.runtime
+        .sendMessage({
+          command: "askInfo",
+        })
+        .catch(console.error);
+    });
   });
 }

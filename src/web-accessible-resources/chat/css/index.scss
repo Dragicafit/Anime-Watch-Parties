@@ -1,0 +1,13 @@
+@import "@primer/css/index.scss";
+
+html,
+body,
+body > div {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+html,
+body {
+  background-color: transparent !important;
+}

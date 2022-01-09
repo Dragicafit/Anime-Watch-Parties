@@ -37,6 +37,8 @@
   },
   "web_accessible_resources": [
     "src/web-accessible-resources/js/player-script.js",
-    "src/web-accessible-resources/css/index.css"
+    "src/web-accessible-resources/chat/css/index.css",
+    "src/web-accessible-resources/chat/js/chat-script.js",
+    "src/web-accessible-resources/tab/css/index.css"
   ]
 }

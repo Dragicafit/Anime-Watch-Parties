@@ -1,6 +1,12 @@
+#twitchEmbed {
+  @import "@primer/css/index.scss";
+}
+
 #twitchChatEmbed {
   width: 300px;
+  height: 100%;
   z-index: 200;
+  background-color: transparent;
 }
 
 #display-chat {
