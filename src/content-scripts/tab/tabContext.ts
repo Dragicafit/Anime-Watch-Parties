@@ -1,4 +1,4 @@
-import { TwitchEmbed } from "./embed/twitchEmbed";
+import { ChatEmbed } from "./embed/chatEmbed";
 import { TabRoom } from "./tabRoom";
 
 export class TabContext {
@@ -7,7 +7,7 @@ export class TabContext {
   window: Window;
   performance: Performance;
   name: string | undefined;
-  embed: TwitchEmbed | undefined;
+  embed: ChatEmbed | undefined;
 
   constructor(
     tabRoom: TabRoom,

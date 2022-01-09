@@ -1,8 +1,8 @@
 import browser from "webextension-polyfill";
 import { TabContext } from "../tabContext";
-import { TabSync } from "./../tabSync";
+import { TabSync } from "../tabSync";
 
-export class TwitchEmbed {
+export class ChatEmbed {
   private tabContext: TabContext;
   private tabSync: TabSync;
 
@@ -26,9 +26,9 @@ export class TwitchEmbed {
 
     $("body").addClass("awp-inserted");
 
-    $("body").append(`<div id="twitchEmbed">
+    $("body").append(`<div id="awp-embed">
       <iframe
-        id="twitchChatEmbed"
+        id="awp-chat-embed"
         class="position-fixed right-0 bottom-0 top-0"
         allowTransparency="true"
         frameBorder = "0"
@@ -75,10 +75,10 @@ export class TwitchEmbed {
               </div>
             </div>
             <div
-              id='twitchVideoChatEmbed'
+              id='awp-chat-content'
               class='Box-body flex-1 wb-break-word overflow-x-hidden overflow-y-auto'
             ></div>
-            <div id='twitchVideoChatEmbed2' class='Box-body'>
+            <div class='Box-body'>
               <form id='form'>
                 <input
                   id='input1'
@@ -114,63 +114,31 @@ export class TwitchEmbed {
     </div>`);
 
     return new Promise<void>((resolve) => {
-      $("#twitchChatEmbed").one("load", () => {
-        let twitchChatEmbed = $("#twitchChatEmbed").contents();
-        twitchChatEmbed.find("#form").on("submit", (e) => {
+      $("#awp-chat-embed").one("load", () => {
+        let awpChatEmbed = $("#awp-chat-embed").contents();
+        awpChatEmbed.find("#form").on("submit", (e) => {
           e.preventDefault();
           this.onChat();
         });
         $("#display-chat").on("click", function () {
           if ($("body").hasClass("awp-inserted")) {
             $("body").removeClass("awp-inserted");
-            $("#twitchChatEmbed").prop("hidden", true);
+            $("#awp-chat-embed").prop("hidden", true);
           } else {
             $("body").addClass("awp-inserted");
-            $("#twitchChatEmbed").prop("hidden", false);
+            $("#awp-chat-embed").prop("hidden", false);
           }
         });
         resolve();
       });
     });
-
-    // if (!$(".jw-icon-studio").length) {
-    //   this.tabContext
-    //     .$(".jw-icon-fullscreen")
-    //     .clone()
-    //     .toggleClass("jw-icon-fullscreen jw-icon-studio")
-    //     .attr("aria-label", "Mode Studio")
-    //     .insertBefore(".jw-icon-fullscreen")
-    //     .click(() => {
-    //       this.studio();
-    //     });
-    //   this.tabContext
-    //     .$(".jw-icon-studio > .jw-svg-icon-fullscreen-on")
-    //     .toggleClass("jw-svg-icon-fullscreen-on jw-svg-icon-studio-on")
-    //     .attr("viewBox", "0 0 20 20")
-    //     .children("path")
-    //     .attr("fill-rule", "evenodd")
-    //     .attr("clip-rule", "evenodd")
-    //     .attr(
-    //       "d",
-    //       "M2 15V5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2zm2 0V5h7v10H4zm9 0h3V5h-3v10z"
-    //     );
-    //   this.tabContext
-    //     .$(".jw-icon-studio > .jw-svg-icon-fullscreen-off")
-    //     .toggleClass("jw-svg-icon-fullscreen-off jw-svg-icon-studio-off")
-    //     .attr("viewBox", "0 0 20 20")
-    //     .children("path")
-    //     .attr(
-    //       "d",
-    //       "M4 3a2 2 0 00-2 2v10a2 2 0 002 2h7V3H4zM16 3h-3v14h3a2 2 0 002-2V5a2 2 0 00-2-2z"
-    //     );
-    // }
   }
 
   onChat() {
     const $ = this.tabContext.$;
 
-    let twitchChatEmbed = $("#twitchChatEmbed").contents();
-    let input = twitchChatEmbed.find("#input1").val();
+    let awpChatEmbed = $("#awp-chat-embed").contents();
+    let input = awpChatEmbed.find("#input1").val();
     if (input == null || input == "") {
       return;
     }
@@ -179,17 +147,17 @@ export class TwitchEmbed {
     } else {
       this.tabSync.createMessage(input + "");
     }
-    twitchChatEmbed.find("#input1").val("");
+    awpChatEmbed.find("#input1").val("");
   }
 
   update() {
     const $ = this.tabContext.$;
 
-    let twitchChatEmbed = $("#twitchChatEmbed").contents();
+    let awpChatEmbed = $("#awp-chat-embed").contents();
 
-    twitchChatEmbed.find("#twitchVideoChatEmbed").empty();
+    awpChatEmbed.find("#awp-chat-content").empty();
     for (const message of this.tabContext.tabRoom.messages) {
-      twitchChatEmbed.find("#twitchVideoChatEmbed").append(`<div class="my-0">
+      awpChatEmbed.find("#awp-chat-content").append(`<div class="my-0">
       <div class="ml-n1">
         <span class="text-bold">${message.sender}</span><span>:</span>
         <span>${message.message}</span>
@@ -198,49 +166,22 @@ export class TwitchEmbed {
     }
 
     if (this.tabContext.name == null) {
-      twitchChatEmbed
+      awpChatEmbed
         .find("#input1")
         .attr("placeholder", "Choose a username")
         .attr("aria-label", "Choose a username");
     } else {
-      twitchChatEmbed
+      awpChatEmbed
         .find("#input1")
         .attr("placeholder", "Send a message")
         .attr("aria-label", "Send a message");
     }
 
-    twitchChatEmbed
+    awpChatEmbed
       .find("#roomnumURL")
       .val(`https://awp.moe/${this.tabContext.tabRoom.roomnum}`);
-    twitchChatEmbed
+    awpChatEmbed
       .find("#roomnumURL")
       .attr("aria-label", `https://awp.moe/${this.tabContext.tabRoom.roomnum}`);
-  }
-
-  studio() {
-    console.log("mode studio");
-
-    const $ = this.tabContext.$;
-
-    if ($(".jw-icon-studio.jw-off").length) {
-      $(".jw-icon-studio").removeClass("jw-off");
-      $("#jwplayer-container").detach().appendTo(".flex-video");
-      this.tabContext
-        .$("#twitchVideoChatEmbed")
-        .detach()
-        .appendTo("#twitchChatEmbed");
-      $("#fullscreenTest").remove();
-    } else {
-      $(".jw-icon-studio").addClass("jw-off");
-      $("body").append(`<div id="fullscreenTest"></div>`);
-      this.tabContext
-        .$("#jwplayer-container")
-        .detach()
-        .appendTo("#fullscreenTest");
-      this.tabContext
-        .$("#twitchVideoChatEmbed")
-        .detach()
-        .appendTo("#fullscreenTest");
-    }
   }
 }

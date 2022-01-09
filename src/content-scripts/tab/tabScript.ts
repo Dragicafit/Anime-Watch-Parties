@@ -1,6 +1,6 @@
 import browser from "webextension-polyfill";
 import $ from "jquery";
-import { TwitchEmbed } from "./embed/twitchEmbed";
+import { ChatEmbed } from "./embed/chatEmbed";
 import { TabContext } from "./tabContext";
 import { TabEvents } from "./tabEvents";
 import { TabRoom } from "./tabRoom";
@@ -15,11 +15,11 @@ if (!(<any>window).AWPHasRun) {
   let tabSync = new TabSync(tabContext);
   let tabEvents = new TabEvents(tabContext, tabSync);
   tabTransmission.start(tabContext, tabEvents);
-  let twitchEmbed = new TwitchEmbed(tabContext, tabSync);
-  tabContext.embed = twitchEmbed;
+  let chatEmbed = new ChatEmbed(tabContext, tabSync);
+  tabContext.embed = chatEmbed;
 
   $(() => {
-    twitchEmbed.startEmbed().then(() => {
+    chatEmbed.startEmbed().then(() => {
       browser.runtime
         .sendMessage({
           command: "askInfo",
