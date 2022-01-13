@@ -40,7 +40,7 @@ export default {
           sender: socketContext,
           message: message,
         });
-        socketContext.socket.to(`room-${roomnum}`).emit("createMessageClient", {
+        socketContext.io.to(`room-${roomnum}`).emit("createMessageClient", {
           roomnum: roomnum,
           sender: socketContext.name,
           message: message,
