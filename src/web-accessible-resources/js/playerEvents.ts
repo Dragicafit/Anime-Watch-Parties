@@ -31,9 +31,7 @@ export class PlayerEvents {
   sendInfo(clientRoom: ClientRoomSimplier): void {
     console.log("send info", clientRoom);
 
-    if (clientRoom.host != null) {
-      this.tabContext.tabRoom.host = clientRoom.host;
-    }
+    this.tabContext.tabRoom.host = clientRoom.host;
   }
 
   askState() {

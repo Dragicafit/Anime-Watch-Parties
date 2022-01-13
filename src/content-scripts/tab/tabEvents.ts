@@ -18,20 +18,13 @@ export class TabEvents {
   ): void {
     console.log("send info", clientRoom, clientContext);
 
-    if (clientRoom.roomnum != null) {
-      this.tabContext.tabRoom.roomnum = clientRoom.roomnum;
-    }
-    if (clientRoom.host != null) {
-      this.tabContext.tabRoom.host = clientRoom.host;
-    }
-    if (clientRoom.onlineUsers != null) {
-      this.tabContext.tabRoom.onlineUsers = clientRoom.onlineUsers;
-    }
+    this.tabContext.tabRoom.roomnum = clientRoom.roomnum;
+    this.tabContext.tabRoom.host = clientRoom.host;
+    this.tabContext.tabRoom.onlineUsers = clientRoom.onlineUsers;
     this.tabContext.tabRoom.messages = clientRoom.messages;
-    
-    if (clientContext.name != null) {
-      this.tabContext.name = clientContext.name;
-    }
+
+    this.tabContext.name = clientContext.name;
+
     this.tabContext.embed!.update();
   }
 }
