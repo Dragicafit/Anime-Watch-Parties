@@ -50,31 +50,44 @@ export class ChatEmbed {
             data-color-mode='dark'
             data-dark-theme='dark'
           >
-            <div class='Box-body input-group'>
-              <input
-                type='text'
-                id='roomnumURL'
-                class='form-control color-bg-subtle'
-                readonly
-              />
-              <div class='input-group-button'>
-                <button
-                  id='copy'
-                  class='btn tooltipped tooltipped-no-delay tooltipped-s'
-                  aria-label='Click to copy'
-                  data-clipboard-target='#roomnumURL'
-                >
-                  <svg
-                    class='octicon octicon-copy'
-                    viewBox='-40 0 512 512'
-                    width='16px'
-                    height='16px'
+            <div class='Box-body'>
+              <div class='input-group mb-2'>
+                <input
+                  type='text'
+                  id='roomnumURL'
+                  class='form-control color-bg-subtle'
+                  readonly
+                />
+                <div class='input-group-button'>
+                  <button
+                    id='copy'
+                    class='btn tooltipped tooltipped-no-delay tooltipped-s'
+                    aria-label='Click to copy'
+                    data-clipboard-target='#roomnumURL'
                   >
-                    <path
-                      d='M271 512H80c-44.113 0-80-35.887-80-80V161c0-44.113 35.887-80 80-80h191c44.113 0 80 35.887 80 80v271c0 44.113-35.887 80-80 80zM80 121c-22.055 0-40 17.945-40 40v271c0 22.055 17.945 40 40 40h191c22.055 0 40-17.945 40-40V161c0-22.055-17.945-40-40-40zm351 261V80c0-44.113-35.887-80-80-80H129c-11.047 0-20 8.953-20 20s8.953 20 20 20h222c22.055 0 40 17.945 40 40v302c0 11.047 8.953 20 20 20s20-8.953 20-20zm0 0'
-                    />
-                  </svg>
-                </button>
+                    <svg
+                      class='octicon octicon-copy'
+                      viewBox='-40 0 512 512'
+                      width='16px'
+                      height='16px'
+                    >
+                      <path
+                        d='M271 512H80c-44.113 0-80-35.887-80-80V161c0-44.113 35.887-80 80-80h191c44.113 0 80 35.887 80 80v271c0 44.113-35.887 80-80 80zM80 121c-22.055 0-40 17.945-40 40v271c0 22.055 17.945 40 40 40h191c22.055 0 40-17.945 40-40V161c0-22.055-17.945-40-40-40zm351 261V80c0-44.113-35.887-80-80-80H129c-11.047 0-20 8.953-20 20s8.953 20 20 20h222c22.055 0 40 17.945 40 40v302c0 11.047 8.953 20 20 20s20-8.953 20-20zm0 0'
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class='d-flex flex-justify-between flex-items-baseline'>
+                <span
+                  class='Counter Counter--secondary mr-1'
+                  ><span id='online-users'></span> online</span
+                >
+                <span
+                  id='host'
+                  class='Label Label--accent'
+                  >host</span
+                >
               </div>
             </div>
             <div
@@ -222,9 +235,18 @@ export class ChatEmbed {
 
     awpChatEmbed
       .find("#roomnumURL")
+      .attr("aria-label", `https://awp.moe/${this.tabContext.tabRoom.roomnum}`)
       .val(`https://awp.moe/${this.tabContext.tabRoom.roomnum}`);
-    awpChatEmbed
-      .find("#roomnumURL")
-      .attr("aria-label", `https://awp.moe/${this.tabContext.tabRoom.roomnum}`);
+
+    if (this.tabContext.tabRoom.onlineUsers != null) {
+      awpChatEmbed
+        .find("#online-users")
+        .text(this.tabContext.tabRoom.onlineUsers);
+    }
+    if (this.tabContext.tabRoom.host != null) {
+      awpChatEmbed
+        .find("#host")
+        .text(this.tabContext.tabRoom.host ? "host" : "viewer");
+    }
   }
 }

@@ -24,10 +24,14 @@ export class TabEvents {
     if (clientRoom.host != null) {
       this.tabContext.tabRoom.host = clientRoom.host;
     }
+    if (clientRoom.onlineUsers != null) {
+      this.tabContext.tabRoom.onlineUsers = clientRoom.onlineUsers;
+    }
+    this.tabContext.tabRoom.messages = clientRoom.messages;
+    
     if (clientContext.name != null) {
       this.tabContext.name = clientContext.name;
     }
-    this.tabContext.tabRoom.messages = clientRoom.messages;
     this.tabContext.embed!.update();
   }
 }
