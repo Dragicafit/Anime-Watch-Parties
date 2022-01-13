@@ -6,6 +6,9 @@ export class ChatEmbed {
   private tabContext: TabContext;
   private tabSync: TabSync;
 
+  regexRoom = /^\w{1,30}$/;
+  regexMessage = /^.{1,200}$/;
+
   constructor(tabContext: TabContext, tabSync: TabSync) {
     this.tabContext = tabContext;
     this.tabSync = tabSync;
@@ -86,6 +89,7 @@ export class ChatEmbed {
                   type='text'
                   placeholder='Send a message'
                   aria-label='Send a message'
+                  autocomplete='off'
                 />
                 <div class='text-right'>
                   <button class='btn btn-primary'>Chat</button>
@@ -116,6 +120,7 @@ export class ChatEmbed {
     return new Promise<void>((resolve) => {
       $("#awp-chat-embed").one("load", () => {
         let awpChatEmbed = $("#awp-chat-embed").contents();
+        this.check();
         awpChatEmbed.find("#form").on("submit", (e) => {
           e.preventDefault();
           this.onChat();
@@ -131,6 +136,42 @@ export class ChatEmbed {
         });
         resolve();
       });
+    });
+  }
+
+  check() {
+    const $ = this.tabContext.$;
+    let awpChatEmbed = $("#awp-chat-embed").contents();
+
+    awpChatEmbed.find("#input1").on("input", () => {
+      let input = <HTMLInputElement>awpChatEmbed.find("#input1").get(0);
+      input.setCustomValidity("");
+
+      let value = input.value;
+
+      if (value === "") {
+        input.setCustomValidity("Enter a value");
+        return;
+      }
+      if (value.length < 1) {
+        input.setCustomValidity("1 character min");
+        return;
+      }
+      if (this.tabContext.name) {
+        if (value.length > 200) {
+          input.setCustomValidity("200 characters max");
+          return;
+        }
+      } else {
+        if (value.length > 30) {
+          input.setCustomValidity("30 characters max");
+          return;
+        }
+        if (!this.regexRoom.test(value)) {
+          input.setCustomValidity("0-9, a-Z and _ only");
+          return;
+        }
+      }
     });
   }
 
@@ -169,12 +210,14 @@ export class ChatEmbed {
       awpChatEmbed
         .find("#input1")
         .attr("placeholder", "Choose a username")
-        .attr("aria-label", "Choose a username");
+        .attr("aria-label", "Choose a username")
+        .attr("autocomplete", "on");
     } else {
       awpChatEmbed
         .find("#input1")
         .attr("placeholder", "Send a message")
-        .attr("aria-label", "Send a message");
+        .attr("aria-label", "Send a message")
+        .attr("autocomplete", "off");
     }
 
     awpChatEmbed
