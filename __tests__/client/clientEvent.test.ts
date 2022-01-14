@@ -52,6 +52,7 @@ beforeEach(() => {
       changeVideoClientTabListener: jest.fn(),
       changeHostClientTabListener: jest.fn(),
       changeOnlineUsersClientTabListener: jest.fn(),
+      changeNameClientTabListener: jest.fn(),
       createMessageClientTabListener: jest.fn(),
 
       createdTabListener: jest.fn(),
