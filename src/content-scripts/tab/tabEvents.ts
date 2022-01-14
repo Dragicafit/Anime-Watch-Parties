@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { ClientRoomSimplier } from "../../client/clientRoom";
 import { ClientContextSimplier } from "./../../client/clientContext";
 import { TabContext } from "./tabContext";
@@ -21,10 +22,16 @@ export class TabEvents {
     this.tabContext.tabRoom.roomnum = clientRoom.roomnum;
     this.tabContext.tabRoom.host = clientRoom.host;
     this.tabContext.tabRoom.onlineUsers = clientRoom.onlineUsers;
-    this.tabContext.tabRoom.messages = clientRoom.messages;
+    let scroll = !_.isEqual(
+      this.tabContext.tabRoom.messages,
+      clientRoom.messages
+    );
+    if (scroll) {
+      this.tabContext.tabRoom.messages = clientRoom.messages;
+    }
 
     this.tabContext.name = clientContext.name;
 
-    this.tabContext.embed!.update();
+    this.tabContext.embed!.update(scroll);
   }
 }

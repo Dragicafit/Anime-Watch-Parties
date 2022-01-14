@@ -32,9 +32,9 @@ export class ChatEmbed {
     $("body").append(`<div id="awp-embed">
       <iframe
         id="awp-chat-embed"
-        class="position-fixed right-0 bottom-0 top-0"
+        class="position-fixed bottom-0 top-0"
         allowTransparency="true"
-        frameBorder = "0"
+        frameBorder="0"
         srcdoc="${`<html>
         <head>
           <link rel='stylesheet' href='${browser.runtime.getURL(
@@ -141,10 +141,15 @@ export class ChatEmbed {
         $("#display-chat").on("click", function () {
           if ($("body").hasClass("awp-inserted")) {
             $("body").removeClass("awp-inserted");
-            $("#awp-chat-embed").prop("hidden", true);
+            $("#awp-chat-embed").animate({ right: "-300" }, 100, () => {
+              $("#awp-chat-embed").hide();
+            });
           } else {
             $("body").addClass("awp-inserted");
-            $("#awp-chat-embed").prop("hidden", false);
+            $("#awp-chat-embed").show();
+            $("#awp-chat-embed").animate({ right: "0" }, 100, () => {
+              $("#awp-chat-embed").show();
+            });
           }
         });
         resolve();
@@ -204,7 +209,7 @@ export class ChatEmbed {
     awpChatEmbed.find("#input1").val("");
   }
 
-  update() {
+  update(scroll: boolean) {
     const $ = this.tabContext.$;
 
     let awpChatEmbed = $("#awp-chat-embed").contents();
@@ -217,6 +222,14 @@ export class ChatEmbed {
         <span>${message.message}</span>
       </div>
     </div>`);
+    }
+    if (scroll) {
+      awpChatEmbed.find("#awp-chat-content").animate(
+        {
+          scrollTop: awpChatEmbed.find("#awp-chat-content").get(0).scrollHeight,
+        },
+        200
+      );
     }
 
     if (this.tabContext.name == null) {

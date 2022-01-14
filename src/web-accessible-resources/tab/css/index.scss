@@ -7,6 +7,7 @@
   height: 100%;
   z-index: 200;
   background-color: transparent;
+  right: 0px;
 }
 
 #display-chat {
@@ -24,9 +25,11 @@
   .vjs-funi-theme .vjs-text-track-display, // Funimation
   .v-dialog__content, // Funimation
   .container.header-wrapper, // Funimation
+  #marketing_banner > div,
   #searchform {
     // Google
     width: auto !important;
+    min-width: auto !important;
   }
 
   #headerFreeTrial, // Wakanim
