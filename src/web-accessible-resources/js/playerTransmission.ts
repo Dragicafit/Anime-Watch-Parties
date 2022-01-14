@@ -1,8 +1,8 @@
-import { TabContext } from "./tabContext";
-import { TabEvents } from "./tabEvents";
+import { PlayerContext } from "./playerContext";
+import { PlayerEvents } from "./playerEvents";
 
 export default {
-  start: function (tabContext: TabContext, tabEvent: TabEvents) {
+  start: function (tabContext: PlayerContext, tabEvent: PlayerEvents) {
     tabContext.window.addEventListener("message", (event) => {
       if (
         event.source !== tabContext.window ||

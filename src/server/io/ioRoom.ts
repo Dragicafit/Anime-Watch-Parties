@@ -1,5 +1,5 @@
 import { SocketId } from "socket.io-adapter";
-import { IoContext } from "./ioContext";
+import { IoContext, SocketContext } from "./ioContext";
 
 export class IoRoom {
   static ioContext: IoContext;
@@ -12,12 +12,14 @@ export class IoRoom {
   currVideo: string | undefined;
   site: string | undefined;
   location: string | undefined;
+  messages: { sender: SocketContext; message: string }[];
 
   constructor(roomnum: string) {
     this.roomnum = roomnum;
     this.state = false;
     this.currTime = 0;
     this.lastChange = 0;
+    this.messages = [];
 
     this.updateState(false, 0);
   }

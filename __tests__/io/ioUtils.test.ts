@@ -63,6 +63,7 @@ describe("syncClient", () => {
       videoId: "videoId",
       time: 0.003,
       state: true,
+      messages: [],
     });
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
@@ -99,6 +100,7 @@ describe("syncClient", () => {
       videoId: "videoId",
       time: 0,
       state: false,
+      messages: [],
     });
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
@@ -132,6 +134,7 @@ describe("syncClient", () => {
       roomnum: roomnum,
       time: 0.003,
       state: true,
+      messages: [],
     });
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,
@@ -166,6 +169,7 @@ describe("syncClient", () => {
       site: undefined,
       videoId: "videoId",
       location: undefined,
+      messages: [],
     });
     expect(debugSocket).toHaveBeenNthCalledWith(
       1,

@@ -1,11 +1,15 @@
-import { TabContext } from "../tabContext";
-import { TabSync } from "../tabSync";
+import { PlayerContext } from "../playerContext";
+import { PlayerSync } from "../playerSync";
 import { AwpplayerSetup } from "./awpplayerSetup";
 
 export class VideoJsSetup extends AwpplayerSetup {
   private previousSeek: number;
 
-  public constructor(name: string, tabContext: TabContext, tabSync: TabSync) {
+  public constructor(
+    name: string,
+    tabContext: PlayerContext,
+    tabSync: PlayerSync
+  ) {
     super(name, tabContext, tabSync);
     this.previousSeek = 0;
   }

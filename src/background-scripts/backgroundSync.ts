@@ -66,6 +66,28 @@ export class BackgroundSync {
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
+  changeNameServer(clientTab: ClientTab, name: string) {
+    console.log(
+      ...this.saveLog("change name server", clientTab, {
+        name: name,
+      })
+    );
+
+    this.clientScript.clientSync.changeNameServer(clientTab, name);
+    this.backgroundScript.backgroundSync.sendInfo(clientTab);
+  }
+
+  createMessageServer(clientTab: ClientTab, message: string) {
+    console.log(
+      ...this.saveLog("create message server", clientTab, {
+        message: message,
+      })
+    );
+
+    this.clientScript.clientSync.createMessageServer(clientTab, message);
+    this.backgroundScript.backgroundSync.sendInfo(clientTab);
+  }
+
   sendInfo(clientTab: ClientTab) {
     console.log(...this.saveLog("send info", clientTab));
 
@@ -84,6 +106,7 @@ export class BackgroundSync {
     browser.tabs
       .sendMessage(clientTab.getTabId(), {
         command: "sendInfo",
+        clientContext: this.clientScript.clientContext.simplify(),
         clientRoom: clientRoom.simplify(),
         clientTab: clientTab.simplify(),
       })

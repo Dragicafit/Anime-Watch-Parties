@@ -1,6 +1,8 @@
 import debugModule from "debug";
 import { performance } from "perf_hooks";
 import { Server as IoServer, Socket } from "socket.io";
+import ioChangeName from "./io/chat/ioChangeName";
+import ioCreateMessageServer from "./io/chat/ioCreateMessageServer";
 import ioChangeStateServer from "./io/ioChangeStateServer";
 import ioChangeVideoServer from "./io/ioChangeVideoServer";
 import { IoDebugSocket } from "./io/ioConst";
@@ -42,6 +44,8 @@ export default {
       ioChangeVideoServer.start(socketContext, ioUtils);
       ioSyncClient.start(socketContext, ioUtils);
       ioReportBug.start(socketContext, ioUtils);
+      ioChangeName.start(socketContext, ioUtils);
+      ioCreateMessageServer.start(socketContext, ioUtils);
     });
   },
   close: function (io: IoServer) {

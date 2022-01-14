@@ -9,6 +9,8 @@ export interface ClientListener {
   changeVideoClientTabListener(clientTab: ClientTab): void;
   changeHostClientTabListener(clientTab: ClientTab): void;
   changeOnlineUsersClientTabListener(clientTab: ClientTab): void;
+  changeNameClientTabListener(clientTab: ClientTab): void;
+  createMessageClientTabListener(clientTab: ClientTab): void;
 
   createdTabListener(clientTab: ClientTab): void;
   deletedTabListener(tabId: number): void;

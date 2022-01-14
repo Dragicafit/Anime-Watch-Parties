@@ -31,16 +31,6 @@ export default {
       if (changeInfo.url != null) {
         console.log(...saveLog("updated: change url", tabId, changeInfo, tab));
 
-        if (clientRoom.host) {
-          backgroundScript.backgroundSync.changeVideoServer(clientTab, tab);
-        } else {
-          clientScript.clientSync.syncClient(clientTab);
-        }
-      }
-
-      if (changeInfo.status === "complete") {
-        console.log(...saveLog("updated: complete", tabId, changeInfo, tab));
-
         backgroundScript.backgroundUtils.insertScript(tab, tabId);
         setTimeout(
           () => backgroundScript.backgroundUtils.insertScript(tab, tabId),
@@ -54,6 +44,16 @@ export default {
           () => backgroundScript.backgroundUtils.insertScript(tab, tabId),
           10000
         );
+
+        if (clientRoom.host) {
+          backgroundScript.backgroundSync.changeVideoServer(clientTab, tab);
+        } else {
+          clientScript.clientSync.syncClient(clientTab);
+        }
+      }
+
+      if (changeInfo.status === "complete") {
+        console.log(...saveLog("updated: complete", tabId, changeInfo, tab));
       }
     });
     browser.tabs.onRemoved.addListener((tabId) => {
@@ -102,6 +102,18 @@ export default {
               clientTab,
               message.time,
               message.state
+            );
+            break;
+          case "sendName":
+            backgroundScript.backgroundSync.changeNameServer(
+              clientTab,
+              message.name
+            );
+            break;
+          case "createMessage":
+            backgroundScript.backgroundSync.createMessageServer(
+              clientTab,
+              message.message
             );
             break;
           case "restartSocket":

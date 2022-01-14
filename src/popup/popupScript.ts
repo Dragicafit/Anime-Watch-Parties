@@ -69,11 +69,11 @@ function sendInfo(clientTab: ClientTab) {
 
   const clientRoom = clientTab.getClientRoom();
   if (clientRoom == null) {
-    $(".show-with-room").prop("hidden", true);
-    $(".show-without-room").prop("hidden", false);
+    $(".show-with-room").hide();
+    $(".show-without-room").show();
   } else {
-    $(".show-with-room").prop("hidden", false);
-    $(".show-without-room").prop("hidden", true);
+    $(".show-with-room").show();
+    $(".show-without-room").hide();
 
     $("#roomnumURL").val(`https://awp.moe/${clientRoom.roomnum}`);
     $("#roomnumURL").attr(
@@ -189,10 +189,10 @@ $("#roomnumURL").on("click", function () {
 $("#advanced-button").on("click", function () {
   if ($(this).attr("aria-selected") === "true") {
     $(this).removeAttr("aria-selected");
-    $(".show-with-advanced").prop("hidden", true);
+    $(".show-with-advanced").hide();
   } else {
     $(this).attr("aria-selected", "true");
-    $(".show-with-advanced").prop("hidden", false);
+    $(".show-with-advanced").show();
   }
 });
 

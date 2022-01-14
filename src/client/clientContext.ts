@@ -7,6 +7,7 @@ export class ClientSimpleContext {
   performance: any;
   clientTabs: Map<number, ClientTab>;
   clientRooms: Map<string, ClientRoom>;
+  name: string | undefined;
 
   constructor(performance: any) {
     this.performance = performance;
@@ -43,6 +44,7 @@ export class ClientContext extends ClientSimpleContext {
           clientTab.simplify(),
         ])
       ),
+      name: this.name,
     };
   }
 
@@ -68,6 +70,7 @@ export class ClientContext extends ClientSimpleContext {
         clientContext.clientTabs.set(number, clientTab);
       }
     }
+    clientContext.name = clientContextSimplier.name;
     return clientContext;
   }
 }
@@ -75,4 +78,5 @@ export class ClientContext extends ClientSimpleContext {
 export interface ClientContextSimplier {
   clientTabs: Map<number, ClientTabSimplier>;
   clientRooms: Map<string, ClientRoomSimplier>;
+  name: string | undefined;
 }

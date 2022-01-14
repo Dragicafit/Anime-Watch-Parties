@@ -1,0 +1,72 @@
+#awp-embed {
+  @import "@primer/css/index.scss";
+}
+
+#awp-chat-embed {
+  width: 300px;
+  height: 100%;
+  z-index: 200;
+  background-color: transparent;
+  right: 0px;
+}
+
+#display-chat {
+  right: 150px;
+  bottom: 12px;
+  z-index: 300;
+}
+
+.awp-inserted {
+  #headerFreeTrial, // Wakanim
+  .header-main.js-header-main, // Wakanim
+  .sc-qYFre.hnJKGH, // ADN
+  #funimation-main-site-header, // Funimation
+  .vjs-funi-theme .vjs-control-bar, // Funimation
+  .vjs-funi-theme .vjs-text-track-display, // Funimation
+  .v-dialog__content, // Funimation
+  .container.header-wrapper, // Funimation
+  #marketing_banner > div,
+  #searchform {
+    // Google
+    width: auto !important;
+    min-width: auto !important;
+  }
+
+  #headerFreeTrial, // Wakanim
+  .header-main.js-header-main, // Wakanim
+  #qc-cmp2-persistent-link, // Wakanim
+  .sc-qYFre.hnJKGH, // ADN
+  #funimation-main-site-header, // Funimation
+  #_evidon_banner, // Funimation
+  .vjs-funi-theme .vjs-control-bar, // Funimation
+  .vjs-funi-theme .vjs-text-track-display, // Funimation
+  .v-dialog__content, // Funimation
+  .container.header-wrapper, // Funimation
+  .header-content, // Crunchyroll
+  #searchform {
+    // Google
+    right: 300px !important;
+  }
+
+  #searchform {
+    left: 0px !important;
+  }
+}
+
+body.awp-inserted {
+  margin-right: 300px !important;
+  width: auto !important;
+}
+
+.jw-icon-studio .jw-svg-icon-studio-on {
+  display: block;
+}
+.jw-icon-studio .jw-svg-icon-studio-off {
+  display: none;
+}
+.jw-off.jw-icon-studio .jw-svg-icon-studio-off {
+  display: block;
+}
+.jw-off.jw-icon-studio .jw-svg-icon-studio-on {
+  display: none;
+}

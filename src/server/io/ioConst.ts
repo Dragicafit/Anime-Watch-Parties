@@ -12,6 +12,9 @@ export interface Data {
   host?: boolean;
   onlineUsers?: number;
   logs?: string[];
+  name?: string;
+  message?: string;
+  messages?: { sender: string; message: string }[];
 }
 
 export type SupportedSite =
@@ -33,4 +36,6 @@ export enum supportedEvents {
   CHANGE_VIDEO_SERVER = "changeVideoServer",
   SYNC_CLIENT = "syncClient",
   REPORT_BUG = "reportBug",
+  CHANGE_NAME = "changeName",
+  CREATE_MESSAGE_SERVER = "createMessageServer",
 }

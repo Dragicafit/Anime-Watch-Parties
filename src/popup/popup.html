@@ -3,15 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <title>Popup</title>
-    <link rel="stylesheet" href="popup.css" />
-    <link rel="stylesheet" href="primer.css" />
+    <link rel="stylesheet" href="index.css" />
   </head>
 
   <body>
     <div class="container">
       <div class="Box Box--spacious">
         <div class="Box-body">
-          <div class="show-with-room" hidden>
+          <div class="show-with-room">
             <p class="show-host">
               You are the host, share the URL below to your friends and watch
               anime together.
@@ -24,28 +23,33 @@
           <div class="show-without-room">
             <p>You can create a room or ask your friend to send you his URL.</p>
           </div>
-          <div class="show-with-room input-group mb-4" hidden>
-            <input
-              type="text"
-              id="roomnumURL"
-              class="form-control color-bg-subtle"
-              readonly
-            />
-            <div class="input-group-button">
-              <button
-                id="copy"
-                class="btn tooltipped tooltipped-no-delay tooltipped-n"
-                aria-label="Click to copy"
-                data-clipboard-target="#roomnumURL"
-              >
-                <img
-                  class="octicon octicon-copy"
-                  src="/src/icons/copy.svg"
-                  alt="Copy to clipboard"
-                  width="16px"
-                  height="16px"
-                />
-              </button>
+          <div class="show-with-room">
+            <div class="input-group mb-4">
+              <input
+                type="text"
+                id="roomnumURL"
+                class="form-control color-bg-subtle"
+                readonly
+              />
+              <div class="input-group-button">
+                <button
+                  id="copy"
+                  class="btn tooltipped tooltipped-no-delay tooltipped-n"
+                  aria-label="Click to copy"
+                  data-clipboard-target="#roomnumURL"
+                >
+                  <svg
+                    class="octicon octicon-copy"
+                    viewBox="-40 0 512 512"
+                    width="16px"
+                    height="16px"
+                  >
+                    <path
+                      d="M271 512H80c-44.113 0-80-35.887-80-80V161c0-44.113 35.887-80 80-80h191c44.113 0 80 35.887 80 80v271c0 44.113-35.887 80-80 80zM80 121c-22.055 0-40 17.945-40 40v271c0 22.055 17.945 40 40 40h191c22.055 0 40-17.945 40-40V161c0-22.055-17.945-40-40-40zm351 261V80c0-44.113-35.887-80-80-80H129c-11.047 0-20 8.953-20 20s8.953 20 20 20h222c22.055 0 40 17.945 40 40v302c0 11.047 8.953 20 20 20s20-8.953 20-20zm0 0"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
           <div class="show-without-room">
@@ -56,7 +60,7 @@
               value="Create a room"
             />
           </div>
-          <div class="show-with-room" hidden>
+          <div class="show-with-room">
             <p class="show-host">
               You can change the episode or the website, your viewers will
               follow you.
@@ -64,13 +68,7 @@
           </div>
           <div class="clearfix">
             <span
-              class="
-                Counter
-                mr-1
-                color-bg-accent-emphasis color-fg-on-emphasis
-                show-with-room
-              "
-              hidden
+              class="Counter mr-1 color-bg-accent-emphasis color-fg-on-emphasis show-with-room"
               ><span id="online-users"></span> online</span
             >
             <button
@@ -83,7 +81,7 @@
           </div>
         </div>
       </div>
-      <div class="Box Box--spacious show-with-advanced" hidden>
+      <div class="Box Box--spacious show-with-advanced">
         <div class="Box-body">
           <div id="advanced"></div>
           <div class="clearfix">

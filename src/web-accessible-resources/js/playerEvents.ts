@@ -1,12 +1,12 @@
 import { ClientRoomSimplier } from "../../client/clientRoom";
-import { TabContext } from "./tabContext";
-import { TabSync } from "./tabSync";
+import { PlayerContext } from "./playerContext";
+import { PlayerSync } from "./playerSync";
 
-export class TabEvents {
-  tabContext: TabContext;
-  tabSync: TabSync;
+export class PlayerEvents {
+  tabContext: PlayerContext;
+  tabSync: PlayerSync;
 
-  constructor(tabContext: TabContext, tabSync: TabSync) {
+  constructor(tabContext: PlayerContext, tabSync: PlayerSync) {
     this.tabContext = tabContext;
     this.tabSync = tabSync;
   }
@@ -31,9 +31,7 @@ export class TabEvents {
   sendInfo(clientRoom: ClientRoomSimplier): void {
     console.log("send info", clientRoom);
 
-    if (clientRoom.roomnum != null)
-      this.tabContext.tabRoom.roomnum = clientRoom.roomnum;
-    if (clientRoom.host != null) this.tabContext.tabRoom.host = clientRoom.host;
+    this.tabContext.tabRoom.host = clientRoom.host;
   }
 
   askState() {

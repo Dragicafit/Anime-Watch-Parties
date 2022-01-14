@@ -72,6 +72,9 @@ export class ClientEvent {
     } else if (data.host) {
       this.clientContext.clientListener.askStateListener(clientTab);
     }
+    if (data.messages != null) {
+      this.changeMessagesClient(clientRoom, data.messages);
+    }
   }
 
   private leaveOldRoom(clientTab: ClientTab, roomnum: string) {
@@ -142,6 +145,34 @@ export class ClientEvent {
     clientRoom.host = host;
     for (const [, clientTab] of clientRoom.clientTabs) {
       this.clientContext.clientListener.changeHostClientTabListener(clientTab);
+    }
+  }
+
+  createMessageClient(clientRoom: ClientRoom, sender: string, message: string) {
+    console.log(...this.saveLog("create message client", sender, message));
+
+    clientRoom.messages.push({
+      sender: sender,
+      message: message,
+    });
+    for (const [, clientTab] of clientRoom.clientTabs) {
+      this.clientContext.clientListener.createMessageClientTabListener(
+        clientTab
+      );
+    }
+  }
+
+  changeMessagesClient(
+    clientRoom: ClientRoom,
+    messages: { sender: string; message: string }[]
+  ) {
+    console.log(...this.saveLog("change message client", messages));
+
+    clientRoom.messages = messages;
+    for (const [, clientTab] of clientRoom.clientTabs) {
+      this.clientContext.clientListener.createMessageClientTabListener(
+        clientTab
+      );
     }
   }
 

@@ -17,6 +17,8 @@ const supportedEventsTest = {
   CHANGE_VIDEO_SERVER: "changeVideoServer",
   SYNC_CLIENT: "syncClient",
   REPORT_BUG: "reportBug",
+  CHANGE_NAME: "changeName",
+  CREATE_MESSAGE_SERVER: "createMessageServer",
 };
 
 let io: Server;
@@ -408,6 +410,7 @@ describe("test connection", function () {
             onlineUsers: 1,
             state: false,
             time: 0,
+            messages: [],
           });
           expect(
             io.sockets.adapter.rooms.get(`room-${data!.roomnum}`)
@@ -431,6 +434,7 @@ describe("test connection", function () {
             onlineUsers: 1,
             state: false,
             time: 0,
+            messages: [],
           });
           resolve();
         }));
@@ -495,6 +499,7 @@ describe("test connection", function () {
             onlineUsers: 1,
             state: false,
             time: 0,
+            messages: [],
           });
           socket2.emit("joinRoom", { roomnum: data!.roomnum }, <IoCallback>((
             err2,
@@ -507,6 +512,7 @@ describe("test connection", function () {
               onlineUsers: 2,
               state: false,
               time: 0,
+              messages: [],
             });
             expect(
               io.sockets.adapter.rooms.get(`room-${data!.roomnum}`)

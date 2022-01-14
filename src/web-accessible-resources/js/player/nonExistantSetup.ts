@@ -1,9 +1,9 @@
-import { TabContext } from "../tabContext";
-import { TabSync } from "../tabSync";
+import { PlayerContext } from "../playerContext";
+import { PlayerSync } from "../playerSync";
 import { AwpplayerSetup } from "./awpplayerSetup";
 
 export class NonExistantSetup extends AwpplayerSetup {
-  public constructor(tabContext: TabContext, tabSync: TabSync) {
+  public constructor(tabContext: PlayerContext, tabSync: PlayerSync) {
     super("non existant", tabContext, tabSync);
   }
 

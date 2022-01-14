@@ -13,6 +13,7 @@ export class IoContext {
 
 export class SocketContext extends IoContext {
   socket: Socket;
+  name: string | undefined;
 
   constructor(io: Server, socket: Socket, performance: Performance) {
     super(io, performance);

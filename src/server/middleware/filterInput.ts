@@ -16,6 +16,8 @@ const CHANGE_STATE_SERVER = supportedEvents.CHANGE_STATE_SERVER;
 const CHANGE_VIDEO_SERVER = supportedEvents.CHANGE_VIDEO_SERVER;
 const SYNC_CLIENT = supportedEvents.SYNC_CLIENT;
 const REPORT_BUG = supportedEvents.REPORT_BUG;
+const CHANGE_NAME = supportedEvents.CHANGE_NAME;
+const CREATE_MESSAGE_SERVER = supportedEvents.CREATE_MESSAGE_SERVER;
 
 const debugArgument = debug.extend("argument");
 const debugCreateRoom = debug.extend(CREATE_ROOM);
@@ -25,6 +27,8 @@ const debugChangeStateServer = debug.extend(CHANGE_STATE_SERVER);
 const debugChangeVideoServer = debug.extend(CHANGE_VIDEO_SERVER);
 const debugSyncClient = debug.extend(SYNC_CLIENT);
 const debugReportBug = debug.extend(REPORT_BUG);
+const debugChangeName = debug.extend(CHANGE_NAME);
+const debugCreateMessageServer = debug.extend(CREATE_MESSAGE_SERVER);
 
 export default {
   start: (socket: Socket) => {
@@ -116,6 +120,21 @@ export default {
           });
           events[2] = data.logs;
           events[3] = callback;
+          break;
+        case CHANGE_NAME:
+          events[1] = <IoDebugSocket>((...args) => {
+            debugChangeName(`${socket.id}:`, ...args);
+          });
+          events[2] = data.name;
+          events[3] = callback;
+          break;
+        case CREATE_MESSAGE_SERVER:
+          events[1] = <IoDebugSocket>((...args) => {
+            debugCreateMessageServer(`${socket.id}:`, ...args);
+          });
+          events[2] = data.roomnum;
+          events[3] = data.message;
+          events[4] = callback;
           break;
         default:
           debugSocket("event is not valid");

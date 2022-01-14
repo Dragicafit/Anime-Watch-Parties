@@ -1,15 +1,19 @@
-import { TabContext } from "../tabContext";
-import { TabSync } from "../tabSync";
+import { PlayerContext } from "../playerContext";
+import { PlayerSync } from "../playerSync";
 import { AwpPlayerInterface } from "./awpPlayerInterface";
 
 export abstract class AwpplayerSetup implements AwpPlayerInterface {
   private name: string;
-  protected tabContext: TabContext;
-  protected tabSync: TabSync;
+  protected tabContext: PlayerContext;
+  protected tabSync: PlayerSync;
 
   private preventCallIfTriggered: Map<string, number>;
 
-  public constructor(name: string, tabContext: TabContext, tabSync: TabSync) {
+  public constructor(
+    name: string,
+    tabContext: PlayerContext,
+    tabSync: PlayerSync
+  ) {
     this.name = name;
     this.tabContext = tabContext;
     this.tabSync = tabSync;
