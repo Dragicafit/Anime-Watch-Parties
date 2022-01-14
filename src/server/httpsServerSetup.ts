@@ -1,12 +1,12 @@
 import express, { Express } from "express";
-import exphbs from "express-handlebars";
+import { engine } from "express-handlebars";
 import path from "path";
 
 export default {
   start: function (app: Express) {
-    app.engine("handlebars", exphbs());
-
+    app.engine("handlebars", engine());
     app.set("view engine", "handlebars");
+    app.set("views", "./views");
 
     app.use(
       "/favicon.ico",

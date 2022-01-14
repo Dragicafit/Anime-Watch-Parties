@@ -40,7 +40,7 @@ beforeEach((done) => {
     <any>{ conn: { protocol: 3, readyState: "open" }, id: "socket-1" },
     null,
     () => {
-      socket.to = <any>((roomKey: string) => {
+      io.to = <any>((roomKey: string) => {
         if (roomKey === `room-${roomnum}`) {
           return { emit: emit };
         }

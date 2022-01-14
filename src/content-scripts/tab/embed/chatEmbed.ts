@@ -226,7 +226,7 @@ export class ChatEmbed {
     if (scroll) {
       awpChatEmbed.find("#awp-chat-content").animate(
         {
-          scrollTop: awpChatEmbed.find("#awp-chat-content").get(0).scrollHeight,
+          scrollTop: awpChatEmbed.find("#awp-chat-content").height(),
         },
         200
       );

@@ -4,7 +4,7 @@ import "dotenv/config";
 import express from "express";
 import fs from "fs";
 import https from "https";
-import { RedisClient } from "redis";
+import { createClient } from "redis";
 import { Server as IoServer } from "socket.io";
 import httpsServerSetup from "./httpsServerSetup";
 import ioServerSetup from "./ioServerSetup";
@@ -23,8 +23,9 @@ const extensionIds =
     .map((extensionId) => extensionId.trim()) || [];
 
 const app = express();
-const pubClient = new RedisClient({});
+const pubClient = createClient();
 const subClient = pubClient.duplicate();
+export type RedisClientType = typeof pubClient;
 const httpsServer = https.createServer(
   {
     key: fs.readFileSync("key.pem"),

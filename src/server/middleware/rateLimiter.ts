@@ -1,10 +1,12 @@
 import { Express } from "express";
 import { BurstyRateLimiter, RateLimiterRedis } from "rate-limiter-flexible";
-import { RedisClient } from "redis";
 import { Server as IoServer } from "socket.io";
+import { RedisClientType } from "../server";
 
 export default {
-  start: function (app: Express, io: IoServer, redisClient: RedisClient) {
+  start: function (app: Express, io: IoServer, redisClient: RedisClientType) {
+    redisClient.on("error", () => {});
+
     const rateLimiter = new BurstyRateLimiter(
       new RateLimiterRedis({
         storeClient: redisClient,

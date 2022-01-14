@@ -45,7 +45,7 @@ export interface EventEmitterReservedEventsMap {
 
 export const RESERVED_EVENTS: ReadonlySet<string | Symbol> = new Set<
   | ClientReservedEvents
-  | keyof NamespaceReservedEventsMap<never, never, never>
+  | keyof NamespaceReservedEventsMap<never, never, never, never>
   | keyof SocketReservedEventsMap
   | keyof EventEmitterReservedEventsMap
 >(<const>[
@@ -107,10 +107,13 @@ export interface Handshake {
   auth: { [key: string]: any };
 }
 
+export type Event = [eventName: string, ...args: any[]];
+
 export class Socket<
   ListenEvents extends EventsMap = DefaultEventsMap,
   EmitEvents extends EventsMap = ListenEvents,
-  ServerSideEvents extends EventsMap = DefaultEventsMap
+  ServerSideEvents extends EventsMap = DefaultEventsMap,
+  SocketData = any
 > extends StrictEventEmitter<
   ListenEvents,
   EmitEvents,
@@ -121,17 +124,20 @@ export class Socket<
   /**
    * Additional information that can be attached to the Socket instance and which will be used in the fetchSockets method
    */
-  public data: any = {};
+  public data: Partial<SocketData> = {};
 
-  public connected: boolean;
-  public disconnected: boolean;
+  public connected: boolean = false;
 
-  private readonly server: Server<ListenEvents, EmitEvents, ServerSideEvents>;
+  private readonly server: Server<
+    ListenEvents,
+    EmitEvents,
+    ServerSideEvents,
+    SocketData
+  >;
   private readonly adapter: Adapter;
   private acks: Map<number, () => void> = new Map();
-  private fns: Array<(event: Array<any>, next: (err?: Error) => void) => void> =
-    [];
-  private flags: BroadcastFlags = {};
+  private fns: Array<(event: Event, next: (err?: Error) => void) => void> = [];
+  private flags: BroadcastFlags & { timeout?: number } = {};
   private _anyListeners?: Array<(...args: any[]) => void>;
 
   public events: any;
@@ -159,8 +165,6 @@ export class Socket<
     } else {
       this.id = base64id.generateId(); // don't reuse the Engine.IO id because it's sensitive information
     }
-    this.connected = true;
-    this.disconnected = false;
     this.handshake = this.buildHandshake(auth);
   }
 
@@ -192,13 +196,35 @@ export class Socket<
   }
 
   /**
+   * @private
+   */
+  private registerAckCallback(id: number, ack: (...args: any[]) => void): void {
+    const timeout = this.flags.timeout;
+    if (timeout === undefined) {
+      this.acks.set(id, ack);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      debug("event with ack id %d has timed out after %d ms", id, timeout);
+      this.acks.delete(id);
+      ack.call(this, new Error("operation has timed out"));
+    }, timeout);
+
+    this.acks.set(id, (...args) => {
+      clearTimeout(timer);
+      ack.apply(this, [null, ...args]);
+    });
+  }
+
+  /**
    * Targets a room when broadcasting.
    *
    * @param room
    * @return self
    * @public
    */
-  public to(room: Room | Room[]): BroadcastOperator<EmitEvents> {
+  public to(room: Room | Room[]): BroadcastOperator<EmitEvents, SocketData> {
     return <any>jest.fn();
   }
 
@@ -209,7 +235,7 @@ export class Socket<
    * @return self
    * @public
    */
-  public in(room: Room | Room[]): BroadcastOperator<EmitEvents> {
+  public in(room: Room | Room[]): BroadcastOperator<EmitEvents, SocketData> {
     return <any>jest.fn();
   }
 
@@ -220,7 +246,9 @@ export class Socket<
    * @return self
    * @public
    */
-  public except(room: Room | Room[]): BroadcastOperator<EmitEvents> {
+  public except(
+    room: Room | Room[]
+  ): BroadcastOperator<EmitEvents, SocketData> {
     return <any>jest.fn();
   }
 
@@ -308,6 +336,7 @@ export class Socket<
    */
   _onconnect(): void {
     debug("socket connected - writing packet");
+    this.connected = true;
     this.join(this.id);
     if (this.conn.protocol === 3) {
       this.packet({ type: PacketType.CONNECT });
@@ -455,7 +484,6 @@ export class Socket<
     this.nsp._remove(this);
     this.client._remove(<any>this);
     this.connected = false;
-    this.disconnected = true;
     this.emitReserved("disconnect", reason);
     return;
   }
@@ -522,7 +550,7 @@ export class Socket<
    * @return {Socket} self
    * @public
    */
-  public get broadcast(): BroadcastOperator<EmitEvents> {
+  public get broadcast(): BroadcastOperator<EmitEvents, SocketData> {
     return <any>jest.fn();
   }
 
@@ -532,8 +560,28 @@ export class Socket<
    * @return {Socket} self
    * @public
    */
-  public get local(): BroadcastOperator<EmitEvents> {
+  public get local(): BroadcastOperator<EmitEvents, SocketData> {
     return <any>jest.fn();
+  }
+
+  /**
+   * Sets a modifier for a subsequent event emission that the callback will be called with an error when the
+   * given number of milliseconds have elapsed without an acknowledgement from the client:
+   *
+   * ```
+   * socket.timeout(5000).emit("my-event", (err) => {
+   *   if (err) {
+   *     // the client did not acknowledge the event in the given delay
+   *   }
+   * });
+   * ```
+   *
+   * @returns self
+   * @public
+   */
+  public timeout(timeout: number): this {
+    this.flags.timeout = timeout;
+    return this;
   }
 
   /**
@@ -542,7 +590,7 @@ export class Socket<
    * @param {Array} event - event that will get emitted
    * @private
    */
-  private dispatch(event: [eventName: string, ...args: any[]]): void {
+  private dispatch(event: Event): void {
     debug("dispatching an event %j", event);
     this.run(event, (err) => {
       process.nextTick(() => {
@@ -565,9 +613,7 @@ export class Socket<
    * @return {Socket} self
    * @public
    */
-  public use(
-    fn: (event: Array<any>, next: (err?: Error) => void) => void
-  ): this {
+  public use(fn: (event: Event, next: (err?: Error) => void) => void): this {
     this.fns.push(fn);
     return this;
   }
@@ -579,10 +625,7 @@ export class Socket<
    * @param {Function} fn - last fn call in the middleware
    * @private
    */
-  private run(
-    event: [eventName: string, ...args: any[]],
-    fn: (err: Error | null) => void
-  ): void {
+  private run(event: Event, fn: (err: Error | null) => void): void {
     const fns = this.fns.slice(0);
     if (!fns.length) return fn(null);
 
@@ -600,6 +643,13 @@ export class Socket<
     }
 
     run(0);
+  }
+
+  /**
+   * Whether the socket is currently disconnected
+   */
+  public get disconnected() {
+    return !this.connected;
   }
 
   /**
@@ -687,7 +737,7 @@ export class Socket<
     return this._anyListeners || [];
   }
 
-  private newBroadcastOperator(): BroadcastOperator<EmitEvents> {
+  private newBroadcastOperator(): BroadcastOperator<EmitEvents, SocketData> {
     return <any>jest.fn();
   }
 }

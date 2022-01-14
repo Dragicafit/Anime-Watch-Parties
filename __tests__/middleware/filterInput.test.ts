@@ -1,4 +1,4 @@
-import { Socket } from "socket.io";
+import { Event, Socket } from "socket.io";
 import { IoCallback, supportedEvents } from "../../src/server/io/ioConst";
 import filterInput from "../../src/server/middleware/filterInput";
 
@@ -17,7 +17,7 @@ const supportedEventsTest = {
 function emit([event, data, callback]: any[], next: any) {
   let socket: Socket = <Socket>{};
   socket.use = (
-    fn: (event: any[], next: (err?: Error) => void) => void
+    fn: (event: Event, next: (err?: Error) => void) => void
   ): Socket => {
     fn([event, data, callback], next);
     return socket;

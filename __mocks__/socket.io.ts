@@ -1,4 +1,11 @@
 import http = require("http");
+import {
+  attach,
+  Server as Engine,
+  ServerOptions as EngineOptions,
+  AttachOptions,
+  uServer,
+} from "engine.io";
 import { EventEmitter } from "events";
 import { ExtendedError, Namespace, ServerReservedEventsMap } from "./namespace";
 import { ParentNamespace } from "socket.io/dist/parent-namespace";
@@ -7,8 +14,6 @@ import * as parser from "socket.io-parser";
 import type { Encoder } from "socket.io-parser";
 import debugModule from "debug";
 import { Socket } from "./socket";
-import type { CookieSerializeOptions } from "cookie";
-import type { CorsOptions } from "cors";
 import type {
   BroadcastOperator,
   RemoteSocket,
@@ -26,7 +31,6 @@ const debug = debugModule("socket.io:server");
 const clientVersion = require("../package.json").version;
 const dotMapRegex = /\.map/;
 
-type Transport = "polling" | "websocket";
 type ParentNspNameMatchFn = (
   name: string,
   auth: { [key: string]: any },
@@ -35,107 +39,7 @@ type ParentNspNameMatchFn = (
 
 type AdapterConstructor = typeof Adapter | ((nsp: Namespace) => Adapter);
 
-interface EngineOptions {
-  /**
-   * how many ms without a pong packet to consider the connection closed
-   * @default 20000
-   */
-  pingTimeout: number;
-  /**
-   * how many ms before sending a new ping packet
-   * @default 25000
-   */
-  pingInterval: number;
-  /**
-   * how many ms before an uncompleted transport upgrade is cancelled
-   * @default 10000
-   */
-  upgradeTimeout: number;
-  /**
-   * how many bytes or characters a message can be, before closing the session (to avoid DoS).
-   * @default 1e5 (100 KB)
-   */
-  maxHttpBufferSize: number;
-  /**
-   * A function that receives a given handshake or upgrade request as its first parameter,
-   * and can decide whether to continue or not. The second argument is a function that needs
-   * to be called with the decided information: fn(err, success), where success is a boolean
-   * value where false means that the request is rejected, and err is an error code.
-   */
-  allowRequest: (
-    req: http.IncomingMessage,
-    fn: (err: string | null | undefined, success: boolean) => void
-  ) => void;
-  /**
-   * the low-level transports that are enabled
-   * @default ["polling", "websocket"]
-   */
-  transports: Transport[];
-  /**
-   * whether to allow transport upgrades
-   * @default true
-   */
-  allowUpgrades: boolean;
-  /**
-   * parameters of the WebSocket permessage-deflate extension (see ws module api docs). Set to false to disable.
-   * @default false
-   */
-  perMessageDeflate: boolean | object;
-  /**
-   * parameters of the http compression for the polling transports (see zlib api docs). Set to false to disable.
-   * @default true
-   */
-  httpCompression: boolean | object;
-  /**
-   * what WebSocket server implementation to use. Specified module must
-   * conform to the ws interface (see ws module api docs).
-   * An alternative c++ addon is also available by installing eiows module.
-   *
-   * @default `require("ws").Server`
-   */
-  wsEngine: Function;
-  /**
-   * an optional packet which will be concatenated to the handshake packet emitted by Engine.IO.
-   */
-  initialPacket: any;
-  /**
-   * configuration of the cookie that contains the client sid to send as part of handshake response headers. This cookie
-   * might be used for sticky-session. Defaults to not sending any cookie.
-   * @default false
-   */
-  cookie: CookieSerializeOptions | boolean;
-  /**
-   * the options that will be forwarded to the cors module
-   */
-  cors: CorsOptions;
-  /**
-   * whether to enable compatibility with Socket.IO v2 clients
-   * @default false
-   */
-  allowEIO3: boolean;
-}
-
-interface AttachOptions {
-  /**
-   * name of the path to capture
-   * @default "/engine.io"
-   */
-  path: string;
-  /**
-   * destroy unhandled upgrade requests
-   * @default true
-   */
-  destroyUpgrade: boolean;
-  /**
-   * milliseconds after which unhandled requests are ended
-   * @default 1000
-   */
-  destroyUpgradeTimeout: number;
-}
-
-interface EngineAttachOptions extends EngineOptions, AttachOptions {}
-
-interface ServerOptions extends EngineAttachOptions {
+interface ServerOptions extends EngineOptions, AttachOptions {
   /**
    * name of the path to capture
    * @default "/socket.io"
@@ -166,16 +70,23 @@ interface ServerOptions extends EngineAttachOptions {
 export class Server<
   ListenEvents extends EventsMap = DefaultEventsMap,
   EmitEvents extends EventsMap = ListenEvents,
-  ServerSideEvents extends EventsMap = DefaultEventsMap
+  ServerSideEvents extends EventsMap = DefaultEventsMap,
+  SocketData = any
 > extends StrictEventEmitter<
   ServerSideEvents,
   EmitEvents,
-  ServerReservedEventsMap<ListenEvents, EmitEvents, ServerSideEvents>
+  ServerReservedEventsMap<
+    ListenEvents,
+    EmitEvents,
+    ServerSideEvents,
+    SocketData
+  >
 > {
   public readonly sockets: Namespace<
     ListenEvents,
     EmitEvents,
-    ServerSideEvents
+    ServerSideEvents,
+    SocketData
   >;
   /**
    * A reference to the underlying Engine.IO server.
@@ -197,11 +108,13 @@ export class Server<
   /**
    * @private
    */
-  _nsps: Map<string, Namespace<ListenEvents, EmitEvents, ServerSideEvents>> =
-    new Map();
+  _nsps: Map<
+    string,
+    Namespace<ListenEvents, EmitEvents, ServerSideEvents, SocketData>
+  > = new Map();
   private parentNsps: Map<
     ParentNspNameMatchFn,
-    ParentNamespace<ListenEvents, EmitEvents, ServerSideEvents>
+    ParentNamespace<ListenEvents, EmitEvents, ServerSideEvents, SocketData>
   > = new Map();
   private _adapter?: AdapterConstructor;
   private _serveClient: boolean;
@@ -255,7 +168,7 @@ export class Server<
     this.adapter(opts.adapter || Adapter);
     this.sockets = this.of("/");
     this.opts = opts;
-    if (srv) this.attach(srv as http.Server);
+    if (srv || typeof srv == "number") this.attach(srv as http.Server | number);
   }
 
   /**
@@ -287,7 +200,9 @@ export class Server<
     name: string,
     auth: { [key: string]: any },
     fn: (
-      nsp: Namespace<ListenEvents, EmitEvents, ServerSideEvents> | false
+      nsp:
+        | Namespace<ListenEvents, EmitEvents, ServerSideEvents, SocketData>
+        | false
     ) => void
   ): void {
     if (this.parentNsps.size === 0) return fn(false);
@@ -301,15 +216,18 @@ export class Server<
       }
       nextFn.value(name, auth, (err, allow) => {
         if (err || !allow) {
-          run();
-        } else {
-          const namespace = this.parentNsps
-            .get(nextFn.value)!
-            .createChild(name);
-          // @ts-ignore
-          this.sockets.emitReserved("new_namespace", namespace);
-          fn(<any>namespace);
+          return run();
         }
+        if (this._nsps.has(name)) {
+          // the namespace was created in the meantime
+          debug("dynamic namespace %s already exists", name);
+          return fn(this._nsps.get(name) as Namespace);
+        }
+        const namespace = this.parentNsps.get(nextFn.value)!.createChild(name);
+        debug("dynamic namespace %s was created", name);
+        // @ts-ignore
+        this.sockets.emitReserved("new_namespace", namespace);
+        fn(<any>namespace);
       });
     };
 
@@ -335,7 +253,7 @@ export class Server<
     this.clientPathRegex = new RegExp(
       "^" +
         escapedPath +
-        "/socket\\.io(\\.min|\\.msgpack\\.min)?\\.js(\\.map)?$"
+        "/socket\\.io(\\.msgpack|\\.esm)?(\\.min)?\\.js(\\.map)?(?:\\?|$)"
     );
     return this;
   }
@@ -413,7 +331,7 @@ export class Server<
    */
   private initEngine(
     srv: http.Server,
-    opts: Partial<EngineAttachOptions>
+    opts: EngineOptions & AttachOptions
   ): void {
     return <any>jest.fn();
   }
@@ -465,17 +383,6 @@ export class Server<
   }
 
   /**
-   * Called with each incoming transport connection.
-   *
-   * @param {engine.Socket} conn
-   * @return self
-   * @private
-   */
-  private onconnection(conn: any): this {
-    return <any>jest.fn(() => this);
-  }
-
-  /**
    * Looks up a namespace.
    *
    * @param {String|RegExp|Function} name nsp name
@@ -484,8 +391,10 @@ export class Server<
    */
   public of(
     name: string | RegExp | ParentNspNameMatchFn,
-    fn?: (socket: Socket<ListenEvents, EmitEvents, ServerSideEvents>) => void
-  ): Namespace<ListenEvents, EmitEvents, ServerSideEvents> {
+    fn?: (
+      socket: Socket<ListenEvents, EmitEvents, ServerSideEvents, SocketData>
+    ) => void
+  ): Namespace<ListenEvents, EmitEvents, ServerSideEvents, SocketData> {
     if (typeof name === "function" || name instanceof RegExp) {
       const parentNsp = new ParentNamespace(<any>this);
       debug("initializing parent namespace %s", parentNsp.name);
@@ -531,7 +440,10 @@ export class Server<
       socket._onclose("server shutting down");
     }
 
-    //this.engine.close();
+    // this.engine.close();
+
+    // restore the Adapter prototype
+    // restoreAdapter();
 
     if (this.httpServer) {
       this.httpServer.close(fn);
@@ -548,7 +460,7 @@ export class Server<
    */
   public use(
     fn: (
-      socket: Socket<ListenEvents, EmitEvents, ServerSideEvents>,
+      socket: Socket<ListenEvents, EmitEvents, ServerSideEvents, SocketData>,
       next: (err?: ExtendedError) => void
     ) => void
   ): this {
@@ -563,7 +475,7 @@ export class Server<
    * @return self
    * @public
    */
-  public to(room: Room | Room[]): BroadcastOperator<EmitEvents> {
+  public to(room: Room | Room[]): BroadcastOperator<EmitEvents, SocketData> {
     return this.sockets.to(room);
   }
 
@@ -574,7 +486,7 @@ export class Server<
    * @return self
    * @public
    */
-  public in(room: Room | Room[]): BroadcastOperator<EmitEvents> {
+  public in(room: Room | Room[]): BroadcastOperator<EmitEvents, SocketData> {
     return this.sockets.in(room);
   }
 
@@ -585,7 +497,9 @@ export class Server<
    * @return self
    * @public
    */
-  public except(name: Room | Room[]): BroadcastOperator<EmitEvents> {
+  public except(
+    name: Room | Room[]
+  ): BroadcastOperator<EmitEvents, SocketData> {
     return this.sockets.except(name);
   }
 
@@ -612,6 +526,20 @@ export class Server<
   }
 
   /**
+   * Emit a packet to other Socket.IO servers
+   *
+   * @param ev - the event name
+   * @param args - an array of arguments, which may include an acknowledgement callback at the end
+   * @public
+   */
+  public serverSideEmit<Ev extends EventNames<ServerSideEvents>>(
+    ev: Ev,
+    ...args: EventParams<ServerSideEvents, Ev>
+  ): boolean {
+    return this.sockets.serverSideEmit(ev, ...args);
+  }
+
+  /**
    * Gets a list of socket ids.
    *
    * @public
@@ -627,7 +555,9 @@ export class Server<
    * @return self
    * @public
    */
-  public compress(compress: boolean): BroadcastOperator<EmitEvents> {
+  public compress(
+    compress: boolean
+  ): BroadcastOperator<EmitEvents, SocketData> {
     return this.sockets.compress(compress);
   }
 
@@ -639,7 +569,7 @@ export class Server<
    * @return self
    * @public
    */
-  public get volatile(): BroadcastOperator<EmitEvents> {
+  public get volatile(): BroadcastOperator<EmitEvents, SocketData> {
     return this.sockets.volatile;
   }
 
@@ -649,7 +579,7 @@ export class Server<
    * @return self
    * @public
    */
-  public get local(): BroadcastOperator<EmitEvents> {
+  public get local(): BroadcastOperator<EmitEvents, SocketData> {
     return this.sockets.local;
   }
 
@@ -658,7 +588,7 @@ export class Server<
    *
    * @public
    */
-  public fetchSockets(): Promise<RemoteSocket<EmitEvents>[]> {
+  public fetchSockets(): Promise<RemoteSocket<EmitEvents, SocketData>[]> {
     return this.sockets.fetchSockets();
   }
 
@@ -712,4 +642,5 @@ emitterMethods.forEach(function (fn) {
 module.exports = (srv?: any, opts?: any) => new Server(srv, opts);
 module.exports.Server = Server;
 
-export { ServerOptions, BroadcastOperator, RemoteSocket };
+export { Socket, ServerOptions, Namespace, BroadcastOperator, RemoteSocket };
+export { Event } from "./socket";
