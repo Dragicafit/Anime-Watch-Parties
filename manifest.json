@@ -19,7 +19,7 @@
     "https://www.funimation.com/v/*",
     "https://animedigitalnetwork.fr/video/*",
     "https://awp.moe/*",
-    "<all_urls>",
+    "activeTab",
     "tabs",
     "webNavigation",
     "cookies"
