@@ -11,9 +11,9 @@
     "browserify-background-scripts": "rimraf built/Firefox/src/background-scripts/ && mkdirp built/Firefox/src/background-scripts/ && cd src/background-scripts/ && browserify --debug --plugin [ tsify ] backgroundScript.ts -o ../../built/Firefox/src/background-scripts/background-script.js",
     "browserify-content-scripts": "rimraf built/Firefox/src/content-scripts/tab && mkdirp built/Firefox/src/content-scripts/tab && cd src/content-scripts/tab && browserify --debug --plugin [ tsify ] tabScript.ts -o ../../../built/Firefox/src/content-scripts/tab/tab-script.js && echo \";undefined\" >> ../../../built/Firefox/src/content-scripts/tab/tab-script.js",
     "browserify-web-accessible-resources": "rimraf built/Firefox/src/web-accessible-resources/ && npm run browserify-web-accessible-resources-chat && npm run browserify-web-accessible-resources-tab && mkdirp built/Firefox/src/web-accessible-resources/js/ && cd src/web-accessible-resources/js/ && browserify --debug --plugin [ tsify ] playerScript.ts -o ../../../built/Firefox/src/web-accessible-resources/js/player-script.js",
-    "browserify-web-accessible-resources-chat": "rimraf built/Firefox/src/web-accessible-resources/chat && mkdirp built/Firefox/src/web-accessible-resources/chat/css/ && node-sass --source-map-embed --include-path node_modules/ src/web-accessible-resources/chat/css/index.scss built/Firefox/src/web-accessible-resources/chat/css/index.css && mkdirp built/Firefox/src/web-accessible-resources/chat/js/ && cd src/web-accessible-resources/chat/js/ && browserify --debug --plugin [ tsify ] chatScript.ts -o ../../../../built/Firefox/src/web-accessible-resources/chat/js/chat-script.js",
-    "browserify-web-accessible-resources-tab": "rimraf built/Firefox/src/web-accessible-resources/tab && mkdirp built/Firefox/src/web-accessible-resources/tab/css/ && node-sass --source-map-embed --include-path node_modules/ src/web-accessible-resources/tab/css/index.scss built/Firefox/src/web-accessible-resources/tab/css/index.css",
-    "browserify-popup": "rimraf built/Firefox/src/popup/ && mkdirp built/Firefox/src/popup/ && cpy --parents src/popup/popup.html built/Firefox/ && node-sass --source-map-embed --include-path node_modules/ src/popup/index.scss built/Firefox/src/popup/index.css && cd src/popup/ && browserify --debug --plugin [ tsify ] popupScript.ts -o ../../built/Firefox/src/popup/popup.js",
+    "browserify-web-accessible-resources-chat": "rimraf built/Firefox/src/web-accessible-resources/chat && mkdirp built/Firefox/src/web-accessible-resources/chat/css/ && node-sass --output-style compressed --source-map-contents --source-map-embed --include-path node_modules/ src/web-accessible-resources/chat/css/index.scss built/Firefox/src/web-accessible-resources/chat/css/index.css && mkdirp built/Firefox/src/web-accessible-resources/chat/js/ && cd src/web-accessible-resources/chat/js/ && browserify --debug --plugin [ tsify ] chatScript.ts -o ../../../../built/Firefox/src/web-accessible-resources/chat/js/chat-script.js",
+    "browserify-web-accessible-resources-tab": "rimraf built/Firefox/src/web-accessible-resources/tab && mkdirp built/Firefox/src/web-accessible-resources/tab/css/ && node-sass --output-style compressed --source-map-contents --source-map-embed --include-path node_modules/ src/web-accessible-resources/tab/css/index.scss built/Firefox/src/web-accessible-resources/tab/css/index.css",
+    "browserify-popup": "rimraf built/Firefox/src/popup/ && mkdirp built/Firefox/src/popup/ && cpy --parents src/popup/popup.html built/Firefox/ && node-sass --output-style compressed --source-map-contents --source-map-embed --include-path node_modules/ src/popup/index.scss built/Firefox/src/popup/index.css && cd src/popup/ && browserify --debug --plugin [ tsify ] popupScript.ts -o ../../built/Firefox/src/popup/popup.js",
     "cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj \"/CN=localhost\" -sha256"
   },
   "repository": {
@@ -40,7 +40,7 @@
   "homepage": "https://github.com/Dragicafit/Anime-Watch-Parties#readme",
   "devDependencies": {
     "@ffflorian/jszip-cli": "^3.1.6",
-    "@primer/css": "^19.1.1",
+    "@primer/css": "19.1.1",
     "@tsconfig/node16": "^1.0.2",
     "@tsconfig/recommended": "^1.0.1",
     "@types/base64id": "^2.0.0",
