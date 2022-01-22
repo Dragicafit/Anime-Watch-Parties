@@ -27,7 +27,7 @@ export class ChatEmbed {
     );
     (document.head || document.documentElement).appendChild(css);
 
-    $("body").addClass("awp-inserted");
+    $("body").addClass("awp-chat");
 
     $("body").append(`<div id="awp-embed">
       <iframe
@@ -114,7 +114,7 @@ export class ChatEmbed {
       </html>`}"
     ></iframe>
     <button
-      id="display-chat"
+      id="awp-display-chat"
       class="btn position-fixed"
       data-color-mode="dark"
       data-dark-theme="dark"
@@ -128,6 +128,17 @@ export class ChatEmbed {
         />
       </svg>
     </button>
+    <button
+      id="awp-display-studio"
+      class="btn position-fixed"
+      data-color-mode="dark"
+      data-dark-theme="dark"
+    >
+      <svg class="octicon" viewBox="0 0 20 20" width="24" height="24">
+        <path fill-rule="evenodd" clip-rule="evenodd"
+          d="M2 15V5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2zm2 0V5h7v10H4zm9 0h3V5h-3v10z" />
+      </svg>
+    </button>
     </div>`);
 
     return new Promise<void>((resolve) => {
@@ -138,18 +149,28 @@ export class ChatEmbed {
           e.preventDefault();
           this.onChat();
         });
-        $("#display-chat").on("click", function () {
-          if ($("body").hasClass("awp-inserted")) {
-            $("body").removeClass("awp-inserted");
+        $("#awp-display-chat").on("click", function () {
+          if ($("body").hasClass("awp-chat")) {
+            $("body").removeClass("awp-chat");
             $("#awp-chat-embed").animate({ right: "-300" }, 100, () => {
               $("#awp-chat-embed").hide();
             });
           } else {
-            $("body").addClass("awp-inserted");
+            $("body").addClass("awp-chat");
             $("#awp-chat-embed").show();
             $("#awp-chat-embed").animate({ right: "0" }, 100, () => {
               $("#awp-chat-embed").show();
             });
+          }
+        });
+        $("#awp-display-studio").on("click", function () {
+          if ($("body").hasClass("awp-studio")) {
+            $("body").removeClass("awp-studio");
+          } else {
+            $("body").addClass("awp-studio");
+            $(
+              "*:has(#jwplayer-container,#showmedia_video_player,.video-player-wrapper)"
+            ).addClass("awp-studio-container");
           }
         });
         resolve();
