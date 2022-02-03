@@ -22,7 +22,8 @@
     "activeTab",
     "tabs",
     "webNavigation",
-    "cookies"
+    "cookies",
+    "storage"
   ],
   "background": {
     "scripts": ["src/background-scripts/background-script.js"]
