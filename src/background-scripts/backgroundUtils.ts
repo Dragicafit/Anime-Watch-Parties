@@ -154,18 +154,15 @@ export class BackgroundUtils {
         action();
         return;
       }
-      browser.tabs.onUpdated.addListener(listener);
-      function listener(
-        tabId2: number,
-        changeInfo: browser.Tabs.OnUpdatedChangeInfoType
-      ) {
-        if (tabId != tabId2 || changeInfo?.status !== "complete") {
-          return;
-        }
-        browser.tabs.onUpdated.removeListener(listener);
-        action();
-      }
-
+      const waitTabToComplete = setInterval(() => {
+        browser.tabs.get(tabId).then((tab) => {
+          if (tab.status !== "complete") {
+            return;
+          }
+          clearInterval(waitTabToComplete);
+          action();
+        });
+      }, 100);
       function action() {
         browser.webNavigation
           .getAllFrames({ tabId: tabId })
