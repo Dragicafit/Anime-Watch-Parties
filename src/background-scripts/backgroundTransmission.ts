@@ -50,6 +50,7 @@ export default {
         } else {
           clientScript.clientSync.syncClient(clientTab);
         }
+        backgroundScript.backgroundSync.sendActualUrl(clientTab, tab);
       }
 
       if (changeInfo.status === "complete") {
