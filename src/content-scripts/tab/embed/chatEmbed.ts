@@ -1,4 +1,5 @@
 import browser from "webextension-polyfill";
+import { SupportedSite } from "../../../server/io/ioConst";
 import { TabContext } from "../tabContext";
 import { TabSync } from "../tabSync";
 
@@ -133,6 +134,7 @@ export class ChatEmbed {
       class="btn position-fixed"
       data-color-mode="dark"
       data-dark-theme="dark"
+      style="display: none;"
     >
       <svg class="octicon" viewBox="0 0 20 20" width="24" height="24">
         <path fill-rule="evenodd" clip-rule="evenodd"
@@ -149,6 +151,11 @@ export class ChatEmbed {
           e.preventDefault();
           this.onChat();
         });
+        browser.runtime
+          .sendMessage({
+            command: "askActualUrl",
+          })
+          .catch(console.error);
         $("#awp-display-chat").on("click", function () {
           if ($("body").hasClass("awp-chat")) {
             $("body").removeClass("awp-chat");
@@ -281,6 +288,26 @@ export class ChatEmbed {
       awpChatEmbed
         .find("#host")
         .text(this.tabContext.tabRoom.host ? "host" : "viewer");
+    }
+  }
+
+  showStudio(
+    actualUrl: {
+      videoId?: string | undefined;
+      site: SupportedSite | "awp";
+      location?: string | undefined;
+    } | null
+  ) {
+    const $ = this.tabContext.$;
+
+    if (
+      actualUrl?.videoId != null &&
+      actualUrl.site != "adn" &&
+      actualUrl.site != "oldFunimation"
+    ) {
+      $("#awp-display-studio").show();
+    } else {
+      $("#awp-display-studio").hide();
     }
   }
 }

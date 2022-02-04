@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { ClientRoomSimplier } from "../../client/clientRoom";
+import { SupportedSite } from "../../server/io/ioConst";
 import { ClientContextSimplier } from "./../../client/clientContext";
 import { TabContext } from "./tabContext";
 import { TabSync } from "./tabSync";
@@ -33,5 +34,17 @@ export class TabEvents {
     this.tabContext.name = clientContext.name;
 
     this.tabContext.embed!.update(scroll);
+  }
+
+  sendActualUrl(
+    actualUrl: {
+      videoId?: string | undefined;
+      site: SupportedSite | "awp";
+      location?: string | undefined;
+    } | null
+  ) {
+    console.log("send actual url", actualUrl);
+
+    this.tabContext.embed!.showStudio(actualUrl);
   }
 }

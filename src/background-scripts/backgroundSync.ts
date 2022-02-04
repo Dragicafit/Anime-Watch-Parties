@@ -113,6 +113,24 @@ export class BackgroundSync {
       .catch(() => {});
   }
 
+  sendActualUrl(clientTab: ClientTab, tab: browser.Tabs.Tab) {
+    console.log(...this.saveLog("send actual url", clientTab));
+
+    const clientRoom = clientTab.getClientRoom();
+    if (clientRoom == null) {
+      return;
+    }
+
+    this.backgroundScript.backgroundUtils.parseUrlTab(tab).then((actualUrl) => {
+      browser.tabs
+        .sendMessage(clientTab.getTabId(), {
+          command: "sendActualUrl",
+          actualUrl: actualUrl,
+        })
+        .catch(() => {});
+    });
+  }
+
   private saveLog(...logs: any[]) {
     return this.clientScript.clientUtils.saveLog(...logs);
   }

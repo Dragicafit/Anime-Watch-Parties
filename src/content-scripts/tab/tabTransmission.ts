@@ -9,6 +9,9 @@ export default {
         case "sendInfo":
           tabEvent.sendInfo(message.clientRoom, message.clientContext);
           break;
+        case "sendActualUrl":
+          tabEvent.sendActualUrl(message.actualUrl);
+          break;
       }
     });
   },

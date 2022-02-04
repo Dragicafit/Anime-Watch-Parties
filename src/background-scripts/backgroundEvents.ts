@@ -18,6 +18,12 @@ export class BackgroundEvent {
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
+  askActualUrl(clientTab: ClientTab, tab: browser.Tabs.Tab): void {
+    console.log(...this.saveLog("ask actual url", clientTab));
+
+    this.backgroundScript.backgroundSync.sendActualUrl(clientTab, tab);
+  }
+
   scriptLoaded(clientTab: ClientTab) {
     console.log(...this.saveLog("script loaded", clientTab));
 

@@ -66,7 +66,7 @@ export class ClientTab {
     clientRoom?: ClientRoom
   ) {
     const clientTab = new ClientTab(clientTabSimplier.tabId);
-    clientTab.setClientRoom(clientRoom);
+    clientTab.clientRoom = clientRoom;
     return clientTab;
   }
 }

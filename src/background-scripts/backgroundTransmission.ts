@@ -85,6 +85,9 @@ export default {
           case "askInfo":
             backgroundScript.backgroundEvent.askInfo(clientTab);
             break;
+          case "askActualUrl":
+            backgroundScript.backgroundEvent.askActualUrl(clientTab, tab);
+            break;
           case "joinTab":
             clientScript.clientUtils.createTab(tabId);
             break;
