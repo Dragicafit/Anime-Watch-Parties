@@ -28,7 +28,7 @@ export default {
       const clientRoom = clientTab.getClientRoom();
       if (clientRoom == null) return;
 
-      if (changeInfo.url != null) {
+      if (changeInfo.status === "loading") {
         console.log(...saveLog("updated: change url", tabId, changeInfo, tab));
 
         backgroundScript.backgroundUtils.insertScript(tab, tabId);
@@ -60,7 +60,10 @@ export default {
     browser.tabs.onRemoved.addListener((tabId) => {
       clientScript.clientUtils.deleteTab(tabId);
     });
-    browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    browser.tabs.onUpdated.addListener(() => {
+      backgroundScript.backgroundUtils.changeIcon();
+    });
+    browser.tabs.onActivated.addListener(() => {
       backgroundScript.backgroundUtils.changeIcon();
     });
     browser.windows.onFocusChanged.addListener(() => {

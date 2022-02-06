@@ -112,7 +112,7 @@ function refreshAdvanced() {
       type="button"
       ><img
         class="octicon"
-        src="${path}"
+        src="${path["32"]}"
         alt="${site}"
         width="16px"
         height="16px"

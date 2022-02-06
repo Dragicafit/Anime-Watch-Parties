@@ -32,18 +32,14 @@ export class ClientContext extends ClientSimpleContext {
 
   public simplify(): ClientContextSimplier {
     return {
-      clientRooms: new Map(
-        [...this.clientRooms].map(([roomnum, clientRoom]) => [
-          roomnum,
-          clientRoom.simplify(),
-        ])
-      ),
-      clientTabs: new Map(
-        [...this.clientTabs].map(([tabId, clientTab]) => [
-          tabId,
-          clientTab.simplify(),
-        ])
-      ),
+      clientRooms: [...this.clientRooms].map(([roomnum, clientRoom]) => [
+        roomnum,
+        clientRoom.simplify(),
+      ]),
+      clientTabs: [...this.clientTabs].map(([tabId, clientTab]) => [
+        tabId,
+        clientTab.simplify(),
+      ]),
       name: this.name,
     };
   }
@@ -76,7 +72,7 @@ export class ClientContext extends ClientSimpleContext {
 }
 
 export interface ClientContextSimplier {
-  clientTabs: Map<number, ClientTabSimplier>;
-  clientRooms: Map<string, ClientRoomSimplier>;
+  clientTabs: (readonly [number, ClientTabSimplier])[];
+  clientRooms: (readonly [string, ClientRoomSimplier])[];
   name: string | undefined;
 }

@@ -71,12 +71,10 @@ export class ClientRoom {
   public simplify(): ClientRoomSimplier {
     return {
       onlineUsers: this.onlineUsers,
-      clientTabs: new Map(
-        [...this.clientTabs].map(([number, clientTab]) => [
-          number,
-          clientTab.simplify(),
-        ])
-      ),
+      clientTabs: [...this.clientTabs].map(([number, clientTab]) => [
+        number,
+        clientTab.simplify(),
+      ]),
       roomnum: this.roomnum,
       host: this.host,
       state: this.state,
@@ -114,7 +112,7 @@ export class ClientRoom {
 
 export interface ClientRoomSimplier {
   roomnum: string;
-  clientTabs: Map<number, ClientTabSimplier>;
+  clientTabs: (readonly [number, ClientTabSimplier])[];
   host: boolean;
   onlineUsers: number;
   state: boolean;

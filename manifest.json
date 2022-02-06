@@ -5,8 +5,9 @@
   "version": "0.4.5",
   "author": "Dragicafit",
   "icons": {
-    "48": "src/icons/activate.svg",
-    "96": "src/icons/icon.svg"
+    "16": "src/icons/activate16.png",
+    "48": "src/icons/activate48.png",
+    "128": "src/icons/icon128.png"
   },
   "homepage_url": "https://animewatchparties.com",
   "permissions": [
@@ -32,8 +33,9 @@
     "default_title": "Anime Watch Parties",
     "default_popup": "src/popup/popup.html",
     "default_icon": {
-      "16": "src/icons/desactivate.svg",
-      "32": "src/icons/desactivate.svg"
+      "16": "src/icons/desactivate16.png",
+      "24": "src/icons/desactivate24.png",
+      "32": "src/icons/desactivate32.png"
     }
   },
   "web_accessible_resources": [

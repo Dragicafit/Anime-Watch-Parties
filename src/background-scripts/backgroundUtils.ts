@@ -377,7 +377,11 @@ export class BackgroundUtils {
       }
       if (tab?.id == null || clientTab?.getClientRoom() == null) {
         browser.browserAction.setIcon({
-          path: "/src/icons/desactivate.svg",
+          path: {
+            16: "/src/icons/desactivate16.png",
+            24: "/src/icons/desactivate24.png",
+            32: "/src/icons/desactivate32.png",
+          },
         });
         return;
       }
@@ -393,16 +397,36 @@ export class BackgroundUtils {
   getIcon(site: SupportedSite | null) {
     switch (site) {
       case "wakanim":
-        return "/src/icons/wakanim.svg";
+        return {
+          16: "/src/icons/wakanim16.png",
+          24: "/src/icons/wakanim24.png",
+          32: "/src/icons/wakanim32.png",
+        };
       case "crunchyroll":
-        return "/src/icons/crunchyroll.svg";
+        return {
+          16: "/src/icons/crunchyroll16.png",
+          24: "/src/icons/crunchyroll24.png",
+          32: "/src/icons/crunchyroll32.png",
+        };
       case "funimation":
       case "oldFunimation":
-        return "/src/icons/funimation.svg";
+        return {
+          16: "/src/icons/funimation16.png",
+          24: "/src/icons/funimation24.png",
+          32: "/src/icons/funimation32.png",
+        };
       case "adn":
-        return "/src/icons/adn.svg";
+        return {
+          16: "/src/icons/adn16.png",
+          24: "/src/icons/adn24.png",
+          32: "/src/icons/adn32.png",
+        };
       default:
-        return "/src/icons/activate.svg";
+        return {
+          16: "/src/icons/activate16.png",
+          24: "/src/icons/activate24.png",
+          32: "/src/icons/activate32.png",
+        };
     }
   }
 

@@ -1,16 +1,14 @@
 (function () {
   if (window.hasRun) {
     console.log("already running");
-    browser.runtime
-      .sendMessage({
-        command: "scriptLoaded",
-      })
-      .catch(console.error);
+    chrome.runtime.sendMessage({
+      command: "scriptLoaded",
+    });
     return;
   }
   window.hasRun = true;
 
-  browser.runtime.onMessage.addListener((message) => {
+  chrome.runtime.onMessage.addListener((message) => {
     message.direction = "from-content-AWP";
     window.postMessage(message, window.location.origin);
   });
@@ -22,19 +20,17 @@
       event.data?.direction !== "from-script-AWP"
     )
       return;
-    browser.runtime.sendMessage(event.data).catch(console.error);
+    chrome.runtime.sendMessage(event.data);
   });
 
   let s = document.createElement("script");
-  s.src = browser.runtime.getURL(
+  s.src = chrome.runtime.getURL(
     "/src/web-accessible-resources/js/player-script.js"
   );
   s.onload = function () {
-    browser.runtime
-      .sendMessage({
-        command: "scriptLoaded",
-      })
-      .catch(console.error);
+    chrome.runtime.sendMessage({
+      command: "scriptLoaded",
+    });
   };
   (document.head || document.documentElement).appendChild(s);
 })();

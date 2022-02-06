@@ -5,7 +5,7 @@
   }
   window.hasRun2 = true;
 
-  browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     message.direction = "from-content-AWP";
     if (message.command === "askUrlSerie") {
       console.log("ask url serie");
