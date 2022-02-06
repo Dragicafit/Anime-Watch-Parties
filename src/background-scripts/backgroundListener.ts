@@ -29,12 +29,16 @@ export class BackgroundListener implements ClientListener {
     this.backgroundScript.backgroundEvent.changeVideoClientTab(clientTab);
   }
 
+  changeNameClientTabListener(clientTab: ClientTab): void {
+    this.backgroundScript.backgroundSync.sendInfo(clientTab);
+  }
+
   createMessageClientTabListener(clientTab: ClientTab): void {
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
-  changeNameClientTabListener(clientTab: ClientTab): void {
-    this.backgroundScript.backgroundSync.sendInfo(clientTab);
+  changeNameClientListener(name: string): void {
+    browser.storage.local.set({ name: name });
   }
 
   changeHostClientTabListener(clientTab: ClientTab): void {

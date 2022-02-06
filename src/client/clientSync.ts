@@ -72,9 +72,9 @@ export class ClientSync {
     }
   }
 
-  changeNameServer(clientTab: ClientTab, name: string): void {
+  changeNameServer(name: string): void {
     console.log(
-      ...this.saveLog("change name server", clientTab, {
+      ...this.saveLog("change name server", {
         name: name,
       })
     );
@@ -88,18 +88,7 @@ export class ClientSync {
         if (error) {
           return;
         }
-        this.clientContext.name = name;
-
-        const clientRoom = clientTab.getClientRoom();
-        if (clientRoom == null) {
-          return;
-        }
-
-        for (const [, clientTab2] of clientRoom.clientTabs) {
-          this.clientContext.clientListener.changeNameClientTabListener(
-            clientTab2
-          );
-        }
+        this.clientContext.clientListener.changeNameClientListener(name);
       }
     );
   }

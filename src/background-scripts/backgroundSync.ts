@@ -66,15 +66,14 @@ export class BackgroundSync {
     this.backgroundScript.backgroundSync.sendInfo(clientTab);
   }
 
-  changeNameServer(clientTab: ClientTab, name: string) {
+  changeNameServer(name: string) {
     console.log(
-      ...this.saveLog("change name server", clientTab, {
+      ...this.saveLog("change name server", {
         name: name,
       })
     );
 
-    this.clientScript.clientSync.changeNameServer(clientTab, name);
-    this.backgroundScript.backgroundSync.sendInfo(clientTab);
+    this.clientScript.clientSync.changeNameServer(name);
   }
 
   createMessageServer(clientTab: ClientTab, message: string) {

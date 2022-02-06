@@ -176,6 +176,23 @@ export class ClientEvent {
     }
   }
 
+  changeNameClient(name: string | null) {
+    console.log(
+      ...this.saveLog("change name client", {
+        name: name,
+      })
+    );
+
+    this.clientContext.name = name!;
+    for (const [, clientRoom] of this.clientContext.clientRooms) {
+      for (const [, clientTab] of clientRoom.clientTabs) {
+        this.clientContext.clientListener.changeNameClientTabListener(
+          clientTab
+        );
+      }
+    }
+  }
+
   private saveLog(...logs: any[]) {
     return this.clientUtils.saveLog(...logs);
   }

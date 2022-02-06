@@ -54,6 +54,7 @@ beforeEach(() => {
       changeOnlineUsersClientTabListener: jest.fn(),
       changeNameClientTabListener: jest.fn(),
       createMessageClientTabListener: jest.fn(),
+      changeNameClientListener: jest.fn(),
 
       createdTabListener: jest.fn(),
       deletedTabListener: jest.fn(),

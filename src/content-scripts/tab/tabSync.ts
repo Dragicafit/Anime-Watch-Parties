@@ -20,13 +20,17 @@ export class TabSync {
     );
   }
 
-  sendName(name: string): void {
+  sendName(name: string | null): void {
     console.log("send name", name);
 
-    browser.runtime.sendMessage({
-      command: "sendName",
-      name: name,
-    });
+    if (name != null) {
+      browser.runtime.sendMessage({
+        command: "sendName",
+        name: name,
+      });
+    } else {
+      browser.storage.local.set({ name: null });
+    }
   }
 
   createMessage(message: string): void {

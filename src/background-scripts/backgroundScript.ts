@@ -43,6 +43,15 @@ export class BackgroundScript {
         });
       })
       .catch((error) => console.error(...this.saveError(error)));
+
+    browser.storage.local.get("name").then((value) => {
+      const name = value["name"];
+      if (name != null) {
+        browser.storage.local.set({ name: null }).finally(() => {
+          this.backgroundSync.changeNameServer(name);
+        });
+      }
+    });
   }
 
   private saveError(...errors: any[]) {

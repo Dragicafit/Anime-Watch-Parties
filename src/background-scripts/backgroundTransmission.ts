@@ -109,10 +109,7 @@ export default {
             );
             break;
           case "sendName":
-            backgroundScript.backgroundSync.changeNameServer(
-              clientTab,
-              message.name
-            );
+            backgroundScript.backgroundSync.changeNameServer(message.name);
             break;
           case "createMessage":
             backgroundScript.backgroundSync.createMessageServer(
@@ -133,6 +130,11 @@ export default {
             break;
         }
       }
+    });
+
+    browser.storage.onChanged.addListener((changes) => {
+      const name = changes["name"]?.newValue;
+      clientScript.clientEvent.changeNameClient(name);
     });
 
     function saveLog(...logs: any[]) {
