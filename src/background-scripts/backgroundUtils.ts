@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill";
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
-import { SupportedSite } from "./../server/io/ioConst";
+import { SupportedSite } from "../server/io/ioConst";
 import {
   parseUrlAdn,
   parseUrlCrunchyroll,
@@ -10,6 +10,7 @@ import {
   parseUrlOldFunimation,
   parseUrlSerieCrunchyroll,
   parseUrlWakanim,
+  SERVER_JOIN_URL,
 } from "./backgroundConst";
 
 export class BackgroundUtils {
@@ -106,7 +107,7 @@ export class BackgroundUtils {
           }
         }
         break;
-      case "awp.moe":
+      case SERVER_JOIN_URL:
         return { site: "awp" };
     }
     return null;
@@ -419,7 +420,7 @@ export class BackgroundUtils {
             browser.tabs
               .executeScript(tabId, {
                 runAt: "document_start",
-                file: "/src/content-scripts/tab/tab-script.js",
+                file: "/src/content-scripts/tab/tab.bundle.js",
                 frameId: detail.frameId,
               })
               .catch((error) => console.error(...this.saveError(error)));

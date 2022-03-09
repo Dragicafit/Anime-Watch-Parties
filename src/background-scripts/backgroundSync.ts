@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill";
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
-import { SupportedSite } from "./../server/io/ioConst";
+import { SupportedSite } from "../server/io/ioConst";
 import { BackgroundScript } from "./backgroundScript";
 
 export class BackgroundSync {

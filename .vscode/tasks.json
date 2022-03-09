@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "browserify",
+      "label": "webpack",
       "type": "shell",
       "command": "npm run release"
     }

@@ -1,5 +1,5 @@
-import browser from "webextension-polyfill";
 import $ from "jquery";
+import browser from "webextension-polyfill";
 import { ChatEmbed } from "./embed/chatEmbed";
 import { TabContext } from "./tabContext";
 import { TabEvents } from "./tabEvents";

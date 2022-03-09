@@ -1,6 +1,6 @@
 import browser from "webextension-polyfill";
 import { ClientScript } from "../client/clientScript";
-import { parseUrlAwp } from "./backgroundConst";
+import { parseUrlAwp, SERVER_JOIN_URL } from "./backgroundConst";
 import { BackgroundScript } from "./backgroundScript";
 
 export default {
@@ -13,7 +13,7 @@ export default {
 
       if (tab.url != null && changeInfo.url != null) {
         const url = new URL(tab.url);
-        if (url.host == "awp.moe") {
+        if (url.host == SERVER_JOIN_URL) {
           const roomnum = url.pathname.match(parseUrlAwp)?.groups!["roomnum"];
           if (roomnum == null) {
             console.log(

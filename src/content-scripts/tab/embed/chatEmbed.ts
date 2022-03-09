@@ -1,5 +1,7 @@
 import browser from "webextension-polyfill";
+import { SERVER_JOIN_URL } from "../../../background-scripts/backgroundConst";
 import { SupportedSite } from "../../../server/io/ioConst";
+import "../../../web-accessible-resources/tab/css/index.scss";
 import { TabContext } from "../tabContext";
 import { TabSync } from "../tabSync";
 
@@ -20,14 +22,6 @@ export class ChatEmbed {
 
     const $ = this.tabContext.$;
 
-    let css = document.createElement("link");
-    css.rel = "stylesheet";
-    css.type = "text/css";
-    css.href = browser.runtime.getURL(
-      "/src/web-accessible-resources/tab/css/index.css"
-    );
-    (document.head || document.documentElement).appendChild(css);
-
     $("body").addClass("awp-chat");
 
     $("body").append(`<div id="awp-embed">
@@ -38,11 +32,8 @@ export class ChatEmbed {
         frameBorder="0"
         srcdoc="${`<html>
         <head>
-          <link rel='stylesheet' href='${browser.runtime.getURL(
-            "/src/web-accessible-resources/chat/css/index.css"
-          )}' />
-          <script src='${browser.runtime.getURL(
-            "/src/web-accessible-resources/chat/js/chat-script.js"
+          <script defer src='${browser.runtime.getURL(
+            "/src/web-accessible-resources/chat/js/chat.bundle.js"
           )}'></script>
         </head>
         <body>
@@ -307,8 +298,11 @@ export class ChatEmbed {
 
     awpChatEmbed
       .find("#roomnumURL")
-      .attr("aria-label", `https://awp.moe/${this.tabContext.tabRoom.roomnum}`)
-      .val(`https://awp.moe/${this.tabContext.tabRoom.roomnum}`);
+      .attr(
+        "aria-label",
+        `https://${SERVER_JOIN_URL}/${this.tabContext.tabRoom.roomnum}`
+      )
+      .val(`https://${SERVER_JOIN_URL}/${this.tabContext.tabRoom.roomnum}`);
 
     if (this.tabContext.tabRoom.onlineUsers != null) {
       awpChatEmbed

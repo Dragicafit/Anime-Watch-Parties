@@ -1,4 +1,4 @@
-import { SupportedSite } from "./../server/io/ioConst";
+import { SupportedSite } from "../server/io/ioConst";
 import { ClientSimpleContext } from "./clientContext";
 import { ClientTab, ClientTabSimplier } from "./clientTab";
 

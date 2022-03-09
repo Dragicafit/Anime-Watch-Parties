@@ -1,6 +1,7 @@
 import browser from "webextension-polyfill";
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
+import { SERVER_URL } from "./backgroundConst";
 import { BackgroundScript } from "./backgroundScript";
 
 export class BackgroundEvent {
@@ -139,7 +140,7 @@ export class BackgroundEvent {
 
     browser.tabs.create({
       active: true,
-      url: "https://animewatchparties.com/reportBug",
+      url: `${SERVER_URL}/reportBug`,
     });
   }
 

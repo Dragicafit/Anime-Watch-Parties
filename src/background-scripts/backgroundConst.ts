@@ -11,3 +11,11 @@ export const parseUrlOldFunimation =
 export const parseUrlFunimation = /^\/v\/(?<videoId>[\w-]+\/[\w-]+)/; //
 export const parseUrlAdn = /^\/video\/(?<videoId>[\w-]+\/\d+)/;
 export const parseUrlAwp = /^\/(?<roomnum>[a-zA-Z0-9]{5})$/;
+
+export const SERVER_JOIN_URL =
+  process.env["NODE_ENV"] === "production" ? "awp.moe" : "localhost:4000";
+
+export const SERVER_URL =
+  process.env["NODE_ENV"] === "production"
+    ? "https://animewatchparties.com"
+    : "https://localhost:4000";

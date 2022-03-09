@@ -27,7 +27,7 @@
 
   let s = document.createElement("script");
   s.src = browser.runtime.getURL(
-    "/src/web-accessible-resources/js/player-script.js"
+    "/src/web-accessible-resources/js/player.bundle.js"
   );
   s.onload = function () {
     browser.runtime
