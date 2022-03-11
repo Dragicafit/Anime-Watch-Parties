@@ -1,5 +1,5 @@
 import { Event, Socket } from "socket.io";
-import { IoCallback, supportedEvents } from "../../src/server/io/ioConst";
+import { eventsServerReceive, IoCallback } from "../../src/server/io/ioConst";
 import filterInput from "../../src/server/middleware/filterInput";
 
 const supportedEventsTest = {
@@ -43,7 +43,7 @@ function testSupportedEvents(
 
 describe("test argument middleware", function () {
   it("verify supported events", () => {
-    expect(supportedEvents).toStrictEqual(supportedEventsTest);
+    expect(eventsServerReceive).toStrictEqual(supportedEventsTest);
     return Promise.resolve();
   });
 

@@ -1,7 +1,7 @@
 import browser from "webextension-polyfill";
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
-import { SERVER_URL } from "./backgroundConst";
+import { eventsBackgroundSend, SERVER_URL } from "./backgroundConst";
 import { BackgroundScript } from "./backgroundScript";
 
 export class BackgroundEvent {
@@ -41,7 +41,7 @@ export class BackgroundEvent {
 
     browser.tabs
       .sendMessage(clientTab.getTabId(), {
-        command: "changeStateClient",
+        command: eventsBackgroundSend.CHANGE_STATE_CLIENT,
         time: clientRoom.getCurrTime(),
         state: clientRoom.getState(),
       })
@@ -49,7 +49,7 @@ export class BackgroundEvent {
         setTimeout(() => {
           browser.tabs
             .sendMessage(clientTab.getTabId(), {
-              command: "changeStateClient",
+              command: eventsBackgroundSend.CHANGE_STATE_CLIENT,
               time: clientRoom.getCurrTime(),
               state: clientRoom.getState(),
             })

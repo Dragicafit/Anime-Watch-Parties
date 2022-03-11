@@ -1,3 +1,4 @@
+import { eventsBackgroundReceive } from "../../background-scripts/backgroundConst";
 import { PlayerContext } from "./playerContext";
 
 export class PlayerSync {
@@ -13,7 +14,7 @@ export class PlayerSync {
     this.tabContext.window.postMessage(
       {
         direction: "from-script-AWP",
-        command: "syncClient",
+        command: eventsBackgroundReceive.SYNC_CLIENT,
       },
       this.tabContext.window.location.origin
     );
@@ -25,7 +26,7 @@ export class PlayerSync {
     this.tabContext.window.postMessage(
       {
         direction: "from-script-AWP",
-        command: "sendState",
+        command: eventsBackgroundReceive.SEND_STATE,
         state: state,
         time: time,
       },

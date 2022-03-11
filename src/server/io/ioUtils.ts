@@ -1,4 +1,4 @@
-import { Data, IoCallback, IoDebugSocket } from "./ioConst";
+import { Data, eventsServerSend, IoCallback, IoDebugSocket } from "./ioConst";
 import { SocketContext } from "./ioContext";
 import { IoRoom, Room } from "./ioRoom";
 
@@ -54,10 +54,12 @@ export class IoUtils {
     }
     debugSocket(`applied to room-${roomnum}`);
 
-    this.socketContext.socket.to(`room-${roomnum}`).emit("getUsers", {
-      roomnum: roomnum,
-      onlineUsers: room.size,
-    });
+    this.socketContext.socket
+      .to(`room-${roomnum}`)
+      .emit(eventsServerSend.GET_USERS, {
+        roomnum: roomnum,
+        onlineUsers: room.size,
+      });
     toCallback.onlineUsers = room.size;
   }
 

@@ -1,27 +1,28 @@
+import { eventsServerSend } from "../server/io/ioConst";
 import { ClientContext } from "./clientContext";
 import { ClientEvent } from "./clientEvents";
 
 export default {
   start: function (clientContext: ClientContext, clientEvent: ClientEvent) {
-    clientContext.socket.on("changeStateClient", (data) => {
+    clientContext.socket.on(eventsServerSend.CHANGE_STATE_CLIENT, (data) => {
       const clientRoom = clientContext.clientRooms.get(data.roomnum);
       if (clientRoom == null) return;
 
       clientEvent.changeStateClient(clientRoom, data.time, data.state);
     });
-    clientContext.socket.on("getUsers", (data) => {
+    clientContext.socket.on(eventsServerSend.GET_USERS, (data) => {
       const clientRoom = clientContext.clientRooms.get(data.roomnum);
       if (clientRoom == null) return;
 
       clientEvent.changeOnlineUsersClient(clientRoom, data.onlineUsers);
     });
-    clientContext.socket.on("unSetHost", (data) => {
+    clientContext.socket.on(eventsServerSend.UNSET_HOST, (data) => {
       const clientRoom = clientContext.clientRooms.get(data.roomnum);
       if (clientRoom == null) return;
 
       clientEvent.changeHostClient(clientRoom, false);
     });
-    clientContext.socket.on("changeVideoClient", (data) => {
+    clientContext.socket.on(eventsServerSend.CHANGE_VIDEO_CLIENT, (data) => {
       const clientRoom = clientContext.clientRooms.get(data.roomnum);
       if (clientRoom == null) return;
 
@@ -31,7 +32,7 @@ export default {
         videoId: data.videoId,
       });
     });
-    clientContext.socket.on("createMessageClient", (data) => {
+    clientContext.socket.on(eventsServerSend.CREATE_MESSAGE_CLIENT, (data) => {
       const clientRoom = clientContext.clientRooms.get(data.roomnum);
       if (clientRoom == null) return;
 

@@ -1,4 +1,5 @@
 import browser from "webextension-polyfill";
+import { eventsBackgroundReceive } from "../../background-scripts/backgroundConst";
 import { TabContext } from "./tabContext";
 
 export class TabSync {
@@ -14,7 +15,7 @@ export class TabSync {
     this.tabContext.window.postMessage(
       {
         direction: "from-script-AWP",
-        command: "syncClient",
+        command: eventsBackgroundReceive.SYNC_CLIENT,
       },
       this.tabContext.window.location.origin
     );
@@ -25,7 +26,7 @@ export class TabSync {
 
     if (name != null) {
       browser.runtime.sendMessage({
-        command: "sendName",
+        command: eventsBackgroundReceive.SEND_NAME,
         name: name,
       });
     } else {
@@ -37,7 +38,7 @@ export class TabSync {
     console.log("create message", message);
 
     browser.runtime.sendMessage({
-      command: "createMessage",
+      command: eventsBackgroundReceive.CREATE_MESSAGE,
       message: message,
     });
   }

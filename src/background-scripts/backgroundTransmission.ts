@@ -1,6 +1,10 @@
 import browser from "webextension-polyfill";
 import { ClientScript } from "../client/clientScript";
-import { parseUrlAwp, SERVER_JOIN_URL } from "./backgroundConst";
+import {
+  eventsBackgroundReceive,
+  parseUrlAwp,
+  SERVER_JOIN_URL,
+} from "./backgroundConst";
 import { BackgroundScript } from "./backgroundScript";
 
 export default {
@@ -83,47 +87,47 @@ export default {
         }
 
         switch (message?.command) {
-          case "askInfo":
+          case eventsBackgroundReceive.ASK_INFO:
             backgroundScript.backgroundEvent.askInfo(clientTab);
             break;
-          case "askActualUrl":
+          case eventsBackgroundReceive.ASK_ACTUAL_URL:
             backgroundScript.backgroundEvent.askActualUrl(clientTab, tab);
             break;
-          case "joinTab":
+          case eventsBackgroundReceive.JOIN_TAB:
             clientScript.clientUtils.createTab(tabId);
             break;
-          case "createRoom":
+          case eventsBackgroundReceive.CREATE_ROOM:
             clientScript.clientEvent.createRoom(clientTab);
             break;
-          case "joinRoom":
+          case eventsBackgroundReceive.JOIN_ROOM:
             clientScript.clientEvent.joinRoom(clientTab, message.roomnum);
             break;
-          case "scriptLoaded":
+          case eventsBackgroundReceive.SCRIPT_LOADED:
             backgroundScript.backgroundEvent.scriptLoaded(clientTab);
             break;
-          case "sendState":
+          case eventsBackgroundReceive.SEND_STATE:
             backgroundScript.backgroundSync.changeStateServer(
               clientTab,
               message.time,
               message.state
             );
             break;
-          case "sendName":
+          case eventsBackgroundReceive.SEND_NAME:
             backgroundScript.backgroundSync.changeNameServer(message.name);
             break;
-          case "createMessage":
+          case eventsBackgroundReceive.CREATE_MESSAGE:
             backgroundScript.backgroundSync.createMessageServer(
               clientTab,
               message.message
             );
             break;
-          case "restartSocket":
+          case eventsBackgroundReceive.RESTART_SOCKET:
             clientScript.clientUtils.restartSocket(clientTab, message.roomnum);
             break;
-          case "syncClient":
+          case eventsBackgroundReceive.SYNC_CLIENT:
             clientScript.clientSync.syncClient(clientTab);
             break;
-          case "reportBug":
+          case eventsBackgroundReceive.REPORT_BUG:
             backgroundScript.backgroundEvent.reportEventTab();
             break;
           default:

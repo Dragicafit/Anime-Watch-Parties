@@ -12,6 +12,29 @@ export const parseUrlFunimation = /^\/v\/(?<videoId>[\w-]+\/[\w-]+)/; //
 export const parseUrlAdn = /^\/video\/(?<videoId>[\w-]+\/\d+)/;
 export const parseUrlAwp = /^\/(?<roomnum>[a-zA-Z0-9]{5})$/;
 
+export enum eventsBackgroundReceive {
+  ASK_INFO = "askInfo",
+  ASK_ACTUAL_URL = "askActualUrl",
+  JOIN_TAB = "joinTab",
+  CREATE_ROOM = "createRoom",
+  JOIN_ROOM = "joinRoom",
+  SCRIPT_LOADED = "scriptLoaded",
+  SEND_STATE = "sendState",
+  SEND_NAME = "sendName",
+  CREATE_MESSAGE = "createMessage",
+  RESTART_SOCKET = "restartSocket",
+  SYNC_CLIENT = "syncClient",
+  REPORT_BUG = "reportBug",
+}
+
+export enum eventsBackgroundSend {
+  CHANGE_STATE_CLIENT = "changeStateClient",
+  ASK_STATE = "askState",
+  SEND_INFO = "sendInfo",
+  SEND_ACTUAL_URL = "sendActualUrl",
+  ASK_URL_SERIE = "askUrlSerie",
+}
+
 export const SERVER_JOIN_URL =
   process.env["NODE_ENV"] === "production" ? "awp.moe" : "localhost:4000";
 

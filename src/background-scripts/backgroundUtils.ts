@@ -3,6 +3,7 @@ import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
 import { SupportedSite } from "../server/io/ioConst";
 import {
+  eventsBackgroundSend,
   parseUrlAdn,
   parseUrlCrunchyroll,
   parseUrlFunimation,
@@ -203,7 +204,7 @@ export class BackgroundUtils {
                 if (pathname != null) {
                   browser.tabs
                     .sendMessage(tabId, {
-                      command: "askUrlSerie",
+                      command: eventsBackgroundSend.ASK_URL_SERIE,
                     })
                     .then((urlSerieString) => {
                       if (urlSerieString == null) {

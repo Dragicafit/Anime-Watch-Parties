@@ -28,7 +28,7 @@ export interface IoDebugSocket {
   (...args: any[]): void;
 }
 
-export enum supportedEvents {
+export enum eventsServerReceive {
   CREATE_ROOM = "createRoom",
   JOIN_ROOM = "joinRoom",
   LEAVE_ROOM = "leaveRoom",
@@ -38,4 +38,13 @@ export enum supportedEvents {
   REPORT_BUG = "reportBug",
   CHANGE_NAME = "changeName",
   CREATE_MESSAGE_SERVER = "createMessageServer",
+}
+
+export enum eventsServerSend {
+  CHANGE_STATE_CLIENT = "changeStateClient",
+  GET_USERS = "getUsers",
+  UNSET_HOST = "unsetHost",
+  CHANGE_VIDEO_CLIENT = "changeVideoClient",
+  CREATE_MESSAGE_CLIENT = "createMessageClient",
+  LEAVE_ROOM = "leaveRoom",
 }
