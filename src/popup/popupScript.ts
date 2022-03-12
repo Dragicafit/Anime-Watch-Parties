@@ -11,6 +11,7 @@ import { ClientContext, ClientSimpleContext } from "../client/clientContext";
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
 import { ClientUtils } from "../client/clientUtils";
+import "./discord";
 import "./index.scss";
 
 const clientContext = new ClientSimpleContext(performance);

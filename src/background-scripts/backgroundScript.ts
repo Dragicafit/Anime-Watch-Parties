@@ -2,6 +2,7 @@ import io from "socket.io-client";
 import browser from "webextension-polyfill";
 import { ClientContext } from "../client/clientContext";
 import { ClientScript } from "../client/clientScript";
+import { DiscordScript } from "../discord/discordScript";
 import { SERVER_URL } from "./backgroundConst";
 import { BackgroundEvent } from "./backgroundEvents";
 import { BackgroundListener } from "./backgroundListener";
@@ -32,6 +33,8 @@ export class BackgroundScript {
     this.backgroundEvent = new BackgroundEvent(this.clientScript, this);
 
     clientTransmission.start(this.clientScript, this);
+
+    new DiscordScript();
 
     browser.tabs
       .query({})

@@ -82,6 +82,10 @@ module.exports = (env, argv) => ({
           from: "src/content-scripts/listener3.js",
           to: "src/content-scripts/listener3.js",
         },
+        {
+          from: "src/content-scripts/discord.js",
+          to: "src/content-scripts/discord.js",
+        },
         { from: "src/popup/popup.html", to: "src/popup/popup.html" },
       ],
     }),

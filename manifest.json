@@ -25,6 +25,7 @@
     "cookies",
     "storage"
   ],
+  "optional_permissions": ["https://discord.com/channels/*"],
   "background": {
     "scripts": ["src/background-scripts/background.bundle.js"]
   },
