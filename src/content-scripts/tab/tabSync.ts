@@ -42,20 +42,4 @@ export class TabSync {
       message: message,
     });
   }
-
-  sendActivity(): void {
-    console.log("send activity");
-
-    browser.runtime.sendMessage({
-      command: "sendActivity",
-      serieName: "Miss Kobayashi's Dragon Maid",
-      episodeNumber: 1,
-      serieNumber: 1,
-      onlineUsers: 3,
-      site: "crunchyroll",
-      playing: true,
-      roomId: "https://awp.moe/cVkSI",
-      urlSerie: "https://www.crunchyroll.com/fr/miss-kobayashis-dragon-maid",
-    });
-  }
 }

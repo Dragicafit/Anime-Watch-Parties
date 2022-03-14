@@ -28,5 +28,4 @@ if (!(<any>window).AWPHasRun) {
         .catch(console.error);
     });
   });
-  tabSync.sendActivity();
 }

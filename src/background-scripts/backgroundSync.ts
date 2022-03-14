@@ -111,6 +111,11 @@ export class BackgroundSync {
         clientTab: clientTab.simplify(),
       })
       .catch(() => {});
+
+    this.backgroundScript.discordScript.discordSocket.sendInfo(
+      clientRoom,
+      clientTab.getTabId()
+    );
   }
 
   sendActualUrl(clientTab: ClientTab, tab: browser.Tabs.Tab) {

@@ -5,13 +5,14 @@ import { DiscordTransmission } from "./discordTransmission";
 import { DiscordUtils as DiscordUtils } from "./discordUtils";
 
 export class DiscordScript {
-  constructor() {
-    let context = new DiscordContext();
+  discordSocket: DiscordSocket;
+
+  constructor(context: DiscordContext) {
     let discordUtils = new DiscordUtils(context);
-    let discordSocket = new DiscordSocket(context);
+    this.discordSocket = new DiscordSocket(context);
     let discordTransmission = new DiscordTransmission(
       context,
-      discordSocket,
+      this.discordSocket,
       discordUtils
     );
 
@@ -19,7 +20,7 @@ export class DiscordScript {
 
     browser.storage.local.get("discordToken").then((item) => {
       if (item["discordToken"] != null) {
-        discordSocket.start(item["discordToken"]);
+        this.discordSocket.start(item["discordToken"]);
       }
     });
   }

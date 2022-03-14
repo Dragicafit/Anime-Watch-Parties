@@ -3,6 +3,7 @@ import browser from "webextension-polyfill";
 import { ClientContext } from "../client/clientContext";
 import { ClientScript } from "../client/clientScript";
 import { DiscordScript } from "../discord/discordScript";
+import { DiscordContext } from "../discord/discordContext";
 import { SERVER_URL } from "./backgroundConst";
 import { BackgroundEvent } from "./backgroundEvents";
 import { BackgroundListener } from "./backgroundListener";
@@ -12,6 +13,7 @@ import { BackgroundUtils } from "./backgroundUtils";
 
 export class BackgroundScript {
   clientScript: ClientScript;
+  discordScript: DiscordScript;
 
   backgroundUtils: BackgroundUtils;
   backgroundSync: BackgroundSync;
@@ -28,13 +30,14 @@ export class BackgroundScript {
     this.clientScript = new ClientScript(clientContext);
     backgroundListener.setClientScript(this.clientScript);
 
+    let discordContext = new DiscordContext(clientContext);
+    this.discordScript = new DiscordScript(discordContext);
+
     this.backgroundUtils = new BackgroundUtils(this.clientScript);
     this.backgroundSync = new BackgroundSync(this.clientScript, this);
     this.backgroundEvent = new BackgroundEvent(this.clientScript, this);
 
     clientTransmission.start(this.clientScript, this);
-
-    new DiscordScript();
 
     browser.tabs
       .query({})

@@ -1,3 +1,8 @@
+import {
+  SERVER_JOIN_URL,
+  SERVER_URL,
+} from "../background-scripts/backgroundConst";
+import { ClientRoom } from "../client/clientRoom";
 import { SupportedSite } from "../server/io/ioConst";
 import { DiscordContext } from "./discordContext";
 
@@ -73,11 +78,26 @@ export class DiscordSocket {
     };
   }
 
+  sendInfo(clientRoom: ClientRoom, tabId: number) {
+    let tabVideoInfo = this.context.tabVideoInfos.get(tabId);
+    if (tabVideoInfo == null) {
+      return;
+    }
+    this.context.lastTabId = tabId;
+
+    this.sendActivity({
+      titleEpisode: tabVideoInfo.titleEpisode,
+      onlineUsers: clientRoom.onlineUsers,
+      site: "crunchyroll",
+      playing: clientRoom.getState(),
+      roomId: clientRoom.roomnum,
+      urlSerie: tabVideoInfo.urlSerie,
+    });
+  }
+
   sendActivity(
     info: {
-      serieName: string;
-      episodeNumber: number;
-      serieNumber: number;
+      titleEpisode: string;
       onlineUsers: number;
       site: SupportedSite;
       playing: boolean;
@@ -98,9 +118,7 @@ export class DiscordSocket {
 
   private activity(
     info: {
-      serieName: string;
-      episodeNumber: number;
-      serieNumber: number;
+      titleEpisode: string;
       onlineUsers: number;
       site: SupportedSite;
       playing: boolean;
@@ -117,9 +135,10 @@ export class DiscordSocket {
       };
     }
 
-    let serieName = info.serieName;
-    if (serieName.length > 25) {
-      serieName = `${serieName.substring(0, 22)}...`;
+    let titleEpisode = info.titleEpisode;
+    let titleEpisodeShort = titleEpisode;
+    if (titleEpisodeShort.length > 25) {
+      titleEpisodeShort = `${titleEpisodeShort.substring(0, 22)}...`;
     }
     return {
       status: this.status,
@@ -130,11 +149,11 @@ export class DiscordSocket {
           application_id: "934593653651931197",
           type: 3,
           name: "Anime Watch Parties",
-          details: `${info.serieName} S${info.serieNumber} E${info.episodeNumber}`,
+          details: titleEpisode,
           state:
-            info.onlineUsers == 1
+            info.onlineUsers <= 1
               ? "Alone"
-              : `With ${info.onlineUsers} friends`,
+              : `With ${info.onlineUsers - 1} friends`,
           assets: {
             large_image: this.siteToImage[info.site],
             large_text: this.siteToName[info.site],
@@ -143,13 +162,13 @@ export class DiscordSocket {
           },
           buttons: [
             info.roomId != null ? "Join Room" : "About Anime Watch Parties",
-            `About ${serieName}`,
+            `About ${titleEpisodeShort}`,
           ],
           metadata: {
             button_urls: [
               info.roomId != null
-                ? "https://awp.moe/cVkSI"
-                : "https://animewatchparties.com/",
+                ? `https://${SERVER_JOIN_URL}/${info.roomId}`
+                : SERVER_URL,
               info.urlSerie,
             ],
           },

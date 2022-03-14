@@ -17,4 +17,27 @@
     }
     sendResponse(null);
   });
+
+  console.log("send info video");
+
+  let titleEpisode = document.head.querySelector(
+    "[property='og:title'][content]"
+  )?.content;
+  let urlSerie = document.head.querySelector(
+    "[property='video:series'][content]"
+  )?.content;
+  let urlEpisode = document.head.querySelector(
+    "[property='og:url'][content]"
+  )?.content;
+  let videoDuration = document.head.querySelector(
+    "[property='video:duration'][content]"
+  )?.content;
+
+  browser.runtime.sendMessage({
+    command: "sendInfoVideo",
+    titleEpisode: titleEpisode,
+    urlSerie: urlSerie,
+    urlEpisode: urlEpisode,
+    videoDuration: videoDuration,
+  });
 })();

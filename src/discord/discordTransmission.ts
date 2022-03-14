@@ -32,6 +32,7 @@ export class DiscordTransmission {
     });
 
     browser.runtime.onMessage.addListener((message, sender) => {
+      const tabId = sender.tab?.id;
       switch (message?.command) {
         case "sendDiscordToken":
           if (this.context.tabIdToDelete != null) {
@@ -58,23 +59,18 @@ export class DiscordTransmission {
               });
           });
           break;
-        case "sendActivity":
-          const tabId = sender.tab?.id;
+        case "sendInfoVideo":
           if (tabId == null) {
             return;
           }
-          this.context.lastTabId = tabId;
 
-          this.discordSocket.sendActivity({
-            serieName: message.serieName,
-            episodeNumber: message.episodeNumber,
-            serieNumber: message.serieNumber,
-            onlineUsers: message.onlineUsers,
-            site: message.site,
-            playing: message.playing,
-            roomId: message.roomId,
+          this.context.tabVideoInfos.set(tabId, {
+            titleEpisode: message.titleEpisode,
             urlSerie: message.urlSerie,
+            urlEpisode: message.urlEpisode,
+            videoDuration: message.videoDuration,
           });
+          break;
       }
     });
 
