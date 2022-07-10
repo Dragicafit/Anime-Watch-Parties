@@ -13,10 +13,15 @@
     "noPropertyAccessFromIndexSignature": true,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
-    "module": "ES2020",
-    "target": "ES2020",
+    "module": "es2022",
+    "target": "es2022",
     "moduleResolution": "node",
     "typeRoots": ["@types", "node_modules/@types"]
   },
-  "include": ["./src/**/*", "./@types/**/*"]
+  "include": ["./src/**/*", "./@types/**/*"],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  }
 }
