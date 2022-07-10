@@ -91,9 +91,9 @@ export class BackgroundEvent {
                   oldUrl?.site === "crunchyroll" &&
                   oldUrl?.location != null
                 ) {
-                  newUrl = `https://www.crunchyroll.com/${oldUrl.location}/${url.videoId}`;
+                  newUrl = `https://www.crunchyroll.com/${oldUrl.location}/watch/${url.videoId}`;
                 } else {
-                  newUrl = `https://www.crunchyroll.com/${url.videoId}`;
+                  newUrl = `https://www.crunchyroll.com/watch/${url.videoId}`;
                 }
                 break;
               case "funimation":

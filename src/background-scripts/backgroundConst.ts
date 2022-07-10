@@ -4,8 +4,6 @@ export const parseUrlCrunchyroll =
   /^\/(?:(?<location>[a-zA-Z]{2})\/)?(?<serie_name>[\w-]+)\/episode[\w-]*-(?<media_id>\d+)/;
 export const parseUrlNewCrunchyroll =
   /^\/(?:(?<location>[a-zA-Z]{2})\/)?watch\/(?<etp_guid>[A-Z0-9]+)/;
-export const parseUrlSerieCrunchyroll =
-  /^\/series\/(?<serie_etp_guid>[A-Z0-9]+)/;
 export const parseUrlOldFunimation =
   /^\/(?<location>[a-zA-Z]{2})\/shows\/(?<videoId>[\w-]+\/[\w-]+)/;
 export const parseUrlFunimation = /^\/v\/(?<videoId>[\w-]+\/[\w-]+)/; //

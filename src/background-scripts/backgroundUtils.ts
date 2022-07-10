@@ -3,13 +3,11 @@ import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
 import { SupportedSite } from "../server/io/ioConst";
 import {
-  eventsBackgroundSend,
   parseUrlAdn,
   parseUrlCrunchyroll,
   parseUrlFunimation,
   parseUrlNewCrunchyroll,
   parseUrlOldFunimation,
-  parseUrlSerieCrunchyroll,
   parseUrlWakanim,
   SERVER_JOIN_URL,
 } from "./backgroundConst";
@@ -61,15 +59,12 @@ export class BackgroundUtils {
           }
         }
         break;
-      case "www.crunchyroll.com":
+      case "beta.crunchyroll.com":
         {
-          let pathname = url.pathname.match(parseUrlCrunchyroll);
+          let pathname = url.pathname.match(parseUrlNewCrunchyroll);
           if (pathname != null) {
             return {
-              videoId:
-                pathname.groups!["serie_name"] +
-                "/episode-" +
-                pathname.groups!["media_id"],
+              videoId: pathname.groups!["etp_guid"],
               site: "crunchyroll",
               location: pathname.groups!["location"],
             };
@@ -173,14 +168,15 @@ export class BackgroundUtils {
               const url = new URL(detail.url);
               if (
                 url.host === "www.crunchyroll.com" &&
-                url.pathname === "/affiliate_iframeplayer"
+                url.pathname.endsWith("/affiliate_iframeplayer")
               ) {
-                console.log(...backgroundUtils.saveLog("ask url", url));
                 let media_id = url.searchParams.get("media_id");
                 if (media_id != null) {
                   backgroundUtils
-                    .crunchyrollMediaIdToUrl(media_id)
-                    .then((url2) => resolve(url2))
+                    .crunchyrollMediaIdToEtpGuid(media_id)
+                    .then((etp_guid) =>
+                      resolve(`https://beta.crunchyroll.com/watch/${etp_guid}`)
+                    )
                     .catch((error) => {
                       console.error(...backgroundUtils.saveError(error));
                       resolve(null);
@@ -188,69 +184,19 @@ export class BackgroundUtils {
                   return;
                 }
               } else if (
-                url.host === "beta.crunchyroll.com" &&
-                url.pathname.includes("/watch") &&
+                url.host === "www.crunchyroll.com" &&
                 detail.frameId === 0
               ) {
-                const crunchyUrl =
-                  backgroundUtils.urlFromCrunchyrollBetaToCrunchyroll.get(
-                    detail.url
-                  );
-                if (crunchyUrl != null) {
-                  return resolve(crunchyUrl);
-                }
-                console.log(...backgroundUtils.saveLog("ask url", url));
-                let pathname = url.pathname.match(parseUrlNewCrunchyroll);
+                let pathname = url.pathname.match(parseUrlCrunchyroll);
                 if (pathname != null) {
-                  browser.tabs
-                    .sendMessage(tabId, {
-                      command: eventsBackgroundSend.ASK_URL_SERIE,
-                    })
-                    .then((urlSerieString) => {
-                      if (urlSerieString == null) {
-                        throw new Error("urlSerieString is null");
-                      }
-                      let urlSerie = new URL(urlSerieString);
-                      if (
-                        urlSerie.protocol === "https:" &&
-                        urlSerie.host === "beta.crunchyroll.com"
-                      ) {
-                        let pathnameSerie = urlSerie.pathname.match(
-                          parseUrlSerieCrunchyroll
-                        );
-                        if (pathnameSerie != null) {
-                          let serie_etp_guid =
-                            pathnameSerie.groups!["serie_etp_guid"];
-                          if (serie_etp_guid != null) {
-                            backgroundUtils
-                              .crunchyrollEtpGuidToUrl(
-                                pathname!.groups!["etp_guid"],
-                                serie_etp_guid
-                              )
-                              .then((url2) => {
-                                if (url2 != null) {
-                                  backgroundUtils.urlFromCrunchyrollBetaToCrunchyroll.set(
-                                    detail.url,
-                                    url2
-                                  );
-                                }
-                                resolve(url2);
-                              })
-                              .catch((error) => {
-                                console.error(
-                                  ...backgroundUtils.saveError(error)
-                                );
-                                resolve(null);
-                              });
-                            return;
-                          }
-                        }
-                      }
-                      resolve(null);
-                    })
+                  backgroundUtils
+                    .crunchyrollMediaIdToEtpGuid(pathname!.groups!["media_id"])
+                    .then((etp_guid) =>
+                      resolve(`https://beta.crunchyroll.com/watch/${etp_guid}`)
+                    )
                     .catch((error) => {
                       console.error(...backgroundUtils.saveError(error));
-                      setTimeout(action, 500);
+                      resolve(null);
                     });
                   return;
                 }
@@ -273,9 +219,14 @@ export class BackgroundUtils {
     });
   }
 
-  crunchyrollMediaIdToUrl(
+  crunchyrollMediaIdToEtpGuid(
     media_id: string
   ): Promise<string | null | undefined> {
+    const crunchyUrl = this.urlFromCrunchyrollBetaToCrunchyroll.get(media_id);
+    if (crunchyUrl != null) {
+      return Promise.resolve(crunchyUrl);
+    }
+
     return new Promise((resolve) => {
       this.getSessionId()
         .then((session_id) => {
@@ -288,61 +239,14 @@ export class BackgroundUtils {
           )
             .then((response) => response.json())
             .then((json) => {
-              resolve(json.data.url);
-            })
-            .catch((error) => {
-              console.error(...this.saveError(error));
-              resolve(null);
-            });
-        })
-        .catch((error) => {
-          console.error(...this.saveError(error));
-          resolve(null);
-        });
-    });
-  }
-
-  crunchyrollEtpGuidToUrl(
-    etp_guid: string,
-    serie_etp_guid: string
-  ): Promise<string | null | undefined> {
-    return new Promise((resolve) => {
-      this.getSessionId()
-        .then((session_id) => {
-          if (session_id == null) {
-            resolve(null);
-            return;
-          }
-          fetch(
-            `https://www.crunchyroll.com/ajax/?req=RpcApiSearch_GetSearchCandidates`
-          )
-            .then((response) => response.text())
-            .then((text) => JSON.parse(text.split("\n")[1]))
-            .then((json) => {
-              for (const serie_info of json.data) {
-                if (serie_info.etp_guid === serie_etp_guid) {
-                  let series_id = serie_info.id;
-                  fetch(
-                    `https://api.crunchyroll.com/list_media.0.json?series_id=${series_id}&limit=10000&session_id=${session_id}`
-                  )
-                    .then((response) => response.json())
-                    .then((json2) => {
-                      for (const media_info of json2.data) {
-                        if (media_info.etp_guid === etp_guid) {
-                          resolve(media_info.url);
-                          return;
-                        }
-                      }
-                      resolve(null);
-                    })
-                    .catch((error) => {
-                      console.error(...this.saveError(error));
-                      resolve(null);
-                    });
-                  return;
-                }
+              const etp_guid = json.data.etp_guid;
+              if (etp_guid != null) {
+                this.urlFromCrunchyrollBetaToCrunchyroll.set(
+                  media_id,
+                  etp_guid
+                );
               }
-              resolve(null);
+              return resolve(etp_guid);
             })
             .catch((error) => {
               console.error(...this.saveError(error));
