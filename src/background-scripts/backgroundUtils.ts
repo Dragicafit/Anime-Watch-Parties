@@ -351,19 +351,6 @@ export class BackgroundUtils {
               .catch((error) => console.error(...this.saveError(error)));
           }
           if (
-            url.host === "beta.crunchyroll.com" &&
-            url.pathname.includes("/watch/") &&
-            detail.frameId === 0
-          ) {
-            browser.tabs
-              .executeScript(tabId, {
-                runAt: "document_end",
-                file: "/src/content-scripts/listener2.js",
-                frameId: detail.frameId,
-              })
-              .catch((error) => console.error(...this.saveError(error)));
-          }
-          if (
             this.clientScript.clientContext.clientTabs.get(tabId)?.getHost() !==
             true
           ) {

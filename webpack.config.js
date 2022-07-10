@@ -75,10 +75,6 @@ module.exports = (env, argv) => ({
           to: "src/content-scripts/listener.js",
         },
         {
-          from: "src/content-scripts/listener2.js",
-          to: "src/content-scripts/listener2.js",
-        },
-        {
           from: "src/content-scripts/listener3.js",
           to: "src/content-scripts/listener3.js",
         },

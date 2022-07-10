@@ -30,7 +30,6 @@ export enum eventsBackgroundSend {
   ASK_STATE = "askState",
   SEND_INFO = "sendInfo",
   SEND_ACTUAL_URL = "sendActualUrl",
-  ASK_URL_SERIE = "askUrlSerie",
 }
 
 export const SERVER_JOIN_URL =
