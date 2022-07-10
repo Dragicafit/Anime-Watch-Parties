@@ -1,7 +1,4 @@
 {
-  "name": "anime-watch-parties",
-  "version": "0.4.5",
-  "description": "A cross-platform extension that synchronizes videos on major anime websites.",
   "private": true,
   "scripts": {
     "start": "ts-node --project src/server/tsconfig.json src/server/server.ts",
@@ -12,12 +9,6 @@
     "watch-extension": "webpack --mode=development -w",
     "cert": "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj \"/CN=localhost\" -sha256"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Dragicafit/Anime-Watch-Parties.git"
-  },
-  "author": "Dragicafit",
-  "license": "MIT",
   "dependencies": {
     "@socket.io/redis-adapter": "^7.1.0",
     "clipboard": "^2.0.10",
@@ -30,10 +21,6 @@
     "redis": "^3.1.2",
     "socket.io": "^4.4.1"
   },
-  "bugs": {
-    "url": "https://github.com/Dragicafit/Anime-Watch-Parties/issues"
-  },
-  "homepage": "https://github.com/Dragicafit/Anime-Watch-Parties#readme",
   "devDependencies": {
     "@ffflorian/jszip-cli": "^3.1.6",
     "@primer/css": "19.1.1",
