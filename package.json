@@ -4,6 +4,8 @@
     "start": "ts-node --project src/server/tsconfig.json src/server/server.ts",
     "debug": "DEBUG=*erverAWP:* npm start",
     "test": "jest",
+    "publish-extension": "npm run release && jszip-cli add --noconfig --force -o built/Release/Firefox/Anime-Watch-Parties-Source.zip src LICENSE manifest.json package.json package-lock.json tsconfig.json webpack.config.js release/README.md",
+    "release-version": "ts-node release/release-version.ts && npm run release",
     "release": "webpack --mode=production && mkdirp built/Release/Firefox/ && rimraf built/Release/Firefox/Anime-Watch-Parties.xpi && jszip-cli add --noconfig --force -o built/Release/Firefox/Anime-Watch-Parties.xpi built/Firefox/src built/Firefox/LICENSE built/Firefox/manifest.json",
     "build-extension": "webpack --mode=development",
     "watch-extension": "webpack --mode=development -w",
