@@ -1,6 +1,7 @@
 import browser from "webextension-polyfill";
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
+import { eventsBackgroundSend, SERVER_URL } from "./backgroundConst";
 import { BackgroundScript } from "./backgroundScript";
 
 export class BackgroundEvent {
@@ -40,7 +41,7 @@ export class BackgroundEvent {
 
     browser.tabs
       .sendMessage(clientTab.getTabId(), {
-        command: "changeStateClient",
+        command: eventsBackgroundSend.CHANGE_STATE_CLIENT,
         time: clientRoom.getCurrTime(),
         state: clientRoom.getState(),
       })
@@ -48,7 +49,7 @@ export class BackgroundEvent {
         setTimeout(() => {
           browser.tabs
             .sendMessage(clientTab.getTabId(), {
-              command: "changeStateClient",
+              command: eventsBackgroundSend.CHANGE_STATE_CLIENT,
               time: clientRoom.getCurrTime(),
               state: clientRoom.getState(),
             })
@@ -90,9 +91,9 @@ export class BackgroundEvent {
                   oldUrl?.site === "crunchyroll" &&
                   oldUrl?.location != null
                 ) {
-                  newUrl = `https://www.crunchyroll.com/${oldUrl.location}/${url.videoId}`;
+                  newUrl = `https://www.crunchyroll.com/${oldUrl.location}/watch/${url.videoId}`;
                 } else {
-                  newUrl = `https://www.crunchyroll.com/${url.videoId}`;
+                  newUrl = `https://www.crunchyroll.com/watch/${url.videoId}`;
                 }
                 break;
               case "funimation":
@@ -139,7 +140,7 @@ export class BackgroundEvent {
 
     browser.tabs.create({
       active: true,
-      url: "https://animewatchparties.com/reportBug",
+      url: `${SERVER_URL}/reportBug`,
     });
   }
 

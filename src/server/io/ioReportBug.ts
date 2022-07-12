@@ -1,11 +1,11 @@
-import { IoCallback, IoDebugSocket } from "./ioConst";
+import { eventsServerReceive, IoCallback, IoDebugSocket } from "./ioConst";
 import { SocketContext } from "./ioContext";
 import { IoUtils } from "./ioUtils";
 
 export default {
   start: function (socketContext: SocketContext, ioUtils: IoUtils) {
     socketContext.socket.on(
-      "reportBug",
+      eventsServerReceive.REPORT_BUG,
       (debugSocket: IoDebugSocket, logs: string[], callback: IoCallback) => {
         if (
           !Array.isArray(logs) ||

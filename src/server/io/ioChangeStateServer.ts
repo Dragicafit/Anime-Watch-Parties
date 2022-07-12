@@ -1,4 +1,9 @@
-import { IoCallback, IoDebugSocket } from "./ioConst";
+import {
+  eventsServerReceive,
+  eventsServerSend,
+  IoCallback,
+  IoDebugSocket,
+} from "./ioConst";
 import { SocketContext } from "./ioContext";
 import { IoUtils } from "./ioUtils";
 
@@ -7,7 +12,7 @@ const regexRoom = /^\w{1,30}$/;
 export default {
   start: function (socketContext: SocketContext, ioUtils: IoUtils) {
     socketContext.socket.on(
-      "changeStateServer",
+      eventsServerReceive.CHANGE_STATE_SERVER,
       (
         debugSocket: IoDebugSocket,
         roomnum: string,
@@ -42,7 +47,7 @@ export default {
         ioRoom.updateState(state, time);
         socketContext.socket
           .to(`room-${roomnum}`)
-          .emit("changeStateClient", ioRoom.stateObject);
+          .emit(eventsServerSend.CHANGE_STATE_CLIENT, ioRoom.stateObject);
 
         callback(null, {});
       }

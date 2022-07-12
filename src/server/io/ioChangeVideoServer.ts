@@ -1,4 +1,9 @@
-import { IoCallback, IoDebugSocket } from "./ioConst";
+import {
+  eventsServerReceive,
+  eventsServerSend,
+  IoCallback,
+  IoDebugSocket,
+} from "./ioConst";
 import { SocketContext } from "./ioContext";
 import { IoUtils } from "./ioUtils";
 
@@ -10,7 +15,7 @@ const regexLocation = /^[a-zA-Z]{2}$/;
 export default {
   start: function (socketContext: SocketContext, ioUtils: IoUtils) {
     socketContext.socket.on(
-      "changeVideoServer",
+      eventsServerReceive.CHANGE_VIDEO_SERVER,
       (
         debugSocket: IoDebugSocket,
         roomnum: string,
@@ -54,7 +59,7 @@ export default {
         ioRoom.updateVideo(videoId, site, location);
         socketContext.socket
           .to(`room-${roomnum}`)
-          .emit("changeVideoClient", ioRoom.videoObject);
+          .emit(eventsServerSend.CHANGE_VIDEO_CLIENT, ioRoom.videoObject);
 
         callback(null, {});
       }

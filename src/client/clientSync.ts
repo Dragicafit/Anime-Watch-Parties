@@ -1,5 +1,8 @@
-import { IoCallback } from "../server/io/ioConst";
-import { SupportedSite } from "./../server/io/ioConst";
+import {
+  eventsServerReceive,
+  IoCallback,
+  SupportedSite,
+} from "../server/io/ioConst";
 import { ClientContext } from "./clientContext";
 import { ClientEvent } from "./clientEvents";
 import { ClientTab } from "./clientTab";
@@ -31,7 +34,7 @@ export class ClientSync {
     const tabId = clientTab.getTabId();
 
     clientRoom.updateVideo(url);
-    this.clientContext.socket.emit("changeVideoServer", {
+    this.clientContext.socket.emit(eventsServerReceive.CHANGE_VIDEO_SERVER, {
       roomnum: clientRoom.roomnum,
       site: url.site,
       location: url.location,
@@ -59,7 +62,7 @@ export class ClientSync {
     const tabId = clientTab.getTabId();
 
     clientRoom.updateState(state, time);
-    this.clientContext.socket.emit("changeStateServer", {
+    this.clientContext.socket.emit(eventsServerReceive.CHANGE_STATE_SERVER, {
       roomnum: clientRoom.roomnum,
       time: time,
       state: state,
@@ -80,7 +83,7 @@ export class ClientSync {
     );
 
     this.clientContext.socket.emit(
-      "changeName",
+      eventsServerReceive.CHANGE_NAME,
       {
         name: name,
       },
@@ -107,7 +110,7 @@ export class ClientSync {
       })
     );
 
-    this.clientContext.socket.emit("createMessageServer", {
+    this.clientContext.socket.emit(eventsServerReceive.CREATE_MESSAGE_SERVER, {
       roomnum: clientRoom.roomnum,
       message: message,
     });
@@ -121,7 +124,7 @@ export class ClientSync {
     console.log(...this.saveLog("sync client", clientTab));
 
     this.clientContext.socket.emit(
-      "syncClient",
+      eventsServerReceive.SYNC_CLIENT,
       {
         roomnum: clientRoom.roomnum,
       },
@@ -155,7 +158,7 @@ export class ClientSync {
   reportBug() {
     console.log(...this.saveLog("report a bug"));
 
-    this.clientContext.socket.emit("reportBug", {
+    this.clientContext.socket.emit(eventsServerReceive.REPORT_BUG, {
       logs: this.clientUtils.getLogs(),
     });
   }

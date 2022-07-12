@@ -1,12 +1,17 @@
 import ClipboardJS from "clipboard";
 import $ from "jquery";
 import browser from "webextension-polyfill";
-import { ClientSimpleContext } from "../client/clientContext";
+import {
+  eventsBackgroundReceive,
+  eventsBackgroundSend,
+  SERVER_JOIN_URL,
+} from "../background-scripts/backgroundConst";
+import { BackgroundUtils } from "../background-scripts/backgroundUtils";
+import { ClientContext, ClientSimpleContext } from "../client/clientContext";
+import { ClientScript } from "../client/clientScript";
+import { ClientTab } from "../client/clientTab";
 import { ClientUtils } from "../client/clientUtils";
-import { BackgroundUtils } from "./../background-scripts/backgroundUtils";
-import { ClientContext } from "./../client/clientContext";
-import { ClientScript } from "./../client/clientScript";
-import { ClientTab } from "./../client/clientTab";
+import "./index.scss";
 
 const clientContext = new ClientSimpleContext(performance);
 const clientUtils = new ClientUtils(<ClientContext>clientContext);
@@ -20,7 +25,7 @@ function scriptLoaded() {
   console.log("ask info");
   browser.runtime
     .sendMessage({
-      command: "askInfo",
+      command: eventsBackgroundReceive.ASK_INFO,
     })
     .catch(console.error);
 }
@@ -75,10 +80,10 @@ function sendInfo(clientTab: ClientTab) {
     $(".show-with-room").show();
     $(".show-without-room").hide();
 
-    $("#roomnumURL").val(`https://awp.moe/${clientRoom.roomnum}`);
+    $("#roomnumURL").val(`https://${SERVER_JOIN_URL}/${clientRoom.roomnum}`);
     $("#roomnumURL").attr(
       "aria-label",
-      `https://awp.moe/${clientRoom.roomnum}`
+      `https://${SERVER_JOIN_URL}/${clientRoom.roomnum}`
     );
 
     $("#online-users").text(clientRoom.onlineUsers);
@@ -138,21 +143,21 @@ function refreshAdvanced() {
 
 browser.runtime
   .sendMessage({
-    command: "joinTab",
+    command: eventsBackgroundReceive.JOIN_TAB,
   })
   .catch(console.error);
 
 $("#create").on("click", () => {
   browser.runtime
     .sendMessage({
-      command: "createRoom",
+      command: eventsBackgroundReceive.CREATE_ROOM,
     })
     .catch(console.error);
 });
 
 browser.runtime.onMessage.addListener((message) => {
   switch (message?.command) {
-    case "sendInfo":
+    case eventsBackgroundSend.SEND_INFO:
       const clientContextLocal = ClientContext.complexify(
         message.clientContext,
         performance
@@ -167,7 +172,7 @@ browser.runtime.onMessage.addListener((message) => {
         sendInfo(clientTab);
       });
       break;
-    case "scriptLoaded":
+    case eventsBackgroundReceive.SCRIPT_LOADED:
       scriptLoaded();
       break;
     default:
@@ -178,7 +183,7 @@ browser.runtime.onMessage.addListener((message) => {
 console.log("ask info");
 browser.runtime
   .sendMessage({
-    command: "askInfo",
+    command: eventsBackgroundReceive.ASK_INFO,
   })
   .catch(console.error);
 
@@ -199,7 +204,7 @@ $("#advanced-button").on("click", function () {
 $("#report-bug").on("click", function () {
   browser.runtime
     .sendMessage({
-      command: "reportBug",
+      command: eventsBackgroundReceive.REPORT_BUG,
     })
     .catch(console.error);
 });

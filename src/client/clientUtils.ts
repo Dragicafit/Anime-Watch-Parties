@@ -1,3 +1,4 @@
+import { eventsServerSend } from "../server/io/ioConst";
 import { ClientContext } from "./clientContext";
 import { ClientRoom } from "./clientRoom";
 import { ClientTab } from "./clientTab";
@@ -47,7 +48,7 @@ export class ClientUtils {
   private deleteRoom(roomnum: string): void {
     this.clientContext.clientRooms.delete(roomnum);
 
-    this.clientContext.socket.emit("leaveRoom", {
+    this.clientContext.socket.emit(eventsServerSend.LEAVE_ROOM, {
       roomnum: roomnum,
     });
 

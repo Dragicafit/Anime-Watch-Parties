@@ -1,6 +1,3 @@
-"use strict";
-
-import $ from "jquery";
 import { AdnVideoJsSetup } from "./player/adnVideoJsSetup";
 import { BrightcovePlayerSetup } from "./player/brightcovePlayerSetup";
 import { CrunchyrollPlayerSetup } from "./player/crunchyrollPlayerSetup";
@@ -16,9 +13,7 @@ import { PlayerSync } from "./playerSync";
 import tabTransmission from "./playerTransmission";
 
 let tabContext = new PlayerContext(
-  "https://localhost:4000",
   new PlayerRoom(),
-  $,
   window,
   window.performance
 );

@@ -1,5 +1,9 @@
-import { Data, IoCallback } from "../server/io/ioConst";
-import { SupportedSite } from "./../server/io/ioConst";
+import {
+  Data,
+  eventsServerReceive,
+  IoCallback,
+  SupportedSite,
+} from "../server/io/ioConst";
 import { ClientContext } from "./clientContext";
 import { ClientRoom } from "./clientRoom";
 import { ClientSync } from "./clientSync";
@@ -24,17 +28,19 @@ export class ClientEvent {
   createRoom(clientTab: ClientTab) {
     console.log(...this.saveLog("create room from tab", clientTab));
 
-    this.clientContext.socket.emit("createRoom", <IoCallback>(
-      ((err, data) => this.joinedRoom(err, data, clientTab))
-    ));
+    this.clientContext.socket.emit(eventsServerReceive.CREATE_ROOM, <
+      IoCallback
+    >((err, data) => this.joinedRoom(err, data, clientTab)));
   }
 
   joinRoom(clientTab: ClientTab, roomnum: string) {
     console.log(...this.saveLog("join room", roomnum, "from tab", clientTab));
 
-    this.clientContext.socket.emit("joinRoom", { roomnum: roomnum }, <
-      IoCallback
-    >((err, data) => this.joinedRoom(err, data, clientTab)));
+    this.clientContext.socket.emit(
+      eventsServerReceive.JOIN_ROOM,
+      { roomnum: roomnum },
+      <IoCallback>((err, data) => this.joinedRoom(err, data, clientTab))
+    );
   }
 
   private joinedRoom(

@@ -1,10 +1,10 @@
+import { Performance } from "perf_hooks";
 import { Server, Socket } from "socket.io";
-import ioReportBug from "../../src/server/io/ioReportBug";
+import { IoCallback, IoDebugSocket } from "../../src/server/io/ioConst";
 import { IoContext, SocketContext } from "../../src/server/io/ioContext";
+import ioReportBug from "../../src/server/io/ioReportBug";
 import { IoRoom } from "../../src/server/io/ioRoom";
 import { IoUtils } from "../../src/server/io/ioUtils";
-import { Performance } from "perf_hooks";
-import { IoCallback, IoDebugSocket } from "../../src/server/io/ioConst";
 
 let io: Server;
 let socket: Socket;

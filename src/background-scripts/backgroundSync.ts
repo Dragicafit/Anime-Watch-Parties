@@ -1,7 +1,8 @@
 import browser from "webextension-polyfill";
 import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
-import { SupportedSite } from "./../server/io/ioConst";
+import { SupportedSite } from "../server/io/ioConst";
+import { eventsBackgroundSend } from "./backgroundConst";
 import { BackgroundScript } from "./backgroundScript";
 
 export class BackgroundSync {
@@ -34,7 +35,7 @@ export class BackgroundSync {
 
     browser.tabs
       .sendMessage(clientTab.getTabId(), {
-        command: "askState",
+        command: eventsBackgroundSend.ASK_STATE,
       })
       .catch(() => {});
   }
@@ -92,7 +93,7 @@ export class BackgroundSync {
 
     browser.runtime
       .sendMessage({
-        command: "sendInfo",
+        command: eventsBackgroundSend.SEND_INFO,
         clientContext: this.clientScript.clientContext.simplify(),
       })
       .catch(() => {});
@@ -104,7 +105,7 @@ export class BackgroundSync {
 
     browser.tabs
       .sendMessage(clientTab.getTabId(), {
-        command: "sendInfo",
+        command: eventsBackgroundSend.SEND_INFO,
         clientContext: this.clientScript.clientContext.simplify(),
         clientRoom: clientRoom.simplify(),
         clientTab: clientTab.simplify(),
@@ -123,7 +124,7 @@ export class BackgroundSync {
     this.backgroundScript.backgroundUtils.parseUrlTab(tab).then((actualUrl) => {
       browser.tabs
         .sendMessage(clientTab.getTabId(), {
-          command: "sendActualUrl",
+          command: eventsBackgroundSend.SEND_ACTUAL_URL,
           actualUrl: actualUrl,
         })
         .catch(() => {});

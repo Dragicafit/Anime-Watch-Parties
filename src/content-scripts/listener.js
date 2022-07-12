@@ -25,7 +25,7 @@
 
   let s = document.createElement("script");
   s.src = chrome.runtime.getURL(
-    "/src/web-accessible-resources/js/player-script.js"
+    "/src/web-accessible-resources/js/player.bundle.js"
   );
   s.onload = function () {
     chrome.runtime.sendMessage({

@@ -1,4 +1,9 @@
-import { IoCallback, IoDebugSocket } from "../ioConst";
+import {
+  eventsServerReceive,
+  eventsServerSend,
+  IoCallback,
+  IoDebugSocket,
+} from "../ioConst";
 import { SocketContext } from "../ioContext";
 import { IoUtils } from "../ioUtils";
 
@@ -8,7 +13,7 @@ const regexMessage = /^.{1,200}$/;
 export default {
   start: function (socketContext: SocketContext, ioUtils: IoUtils) {
     socketContext.socket.on(
-      "createMessageServer",
+      eventsServerReceive.CREATE_MESSAGE_SERVER,
       (
         debugSocket: IoDebugSocket,
         roomnum: string,
@@ -40,11 +45,13 @@ export default {
           sender: socketContext,
           message: message,
         });
-        socketContext.io.to(`room-${roomnum}`).emit("createMessageClient", {
-          roomnum: roomnum,
-          sender: socketContext.name,
-          message: message,
-        });
+        socketContext.io
+          .to(`room-${roomnum}`)
+          .emit(eventsServerSend.CREATE_MESSAGE_CLIENT, {
+            roomnum: roomnum,
+            sender: socketContext.name,
+            message: message,
+          });
 
         callback(null, {});
       }

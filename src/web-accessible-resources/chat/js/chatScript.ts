@@ -1,5 +1,6 @@
 import ClipboardJS from "clipboard";
 import $ from "jquery";
+import "../css/index.scss";
 
 function showTooltip(elem: Element, msg: string) {
   const ariaLabel = $(elem).attr("aria-label");

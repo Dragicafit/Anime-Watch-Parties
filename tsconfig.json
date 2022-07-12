@@ -1,0 +1,28 @@
+{
+  "extends": "@tsconfig/recommended/tsconfig.json",
+
+  "compilerOptions": {
+    "outDir": "./built/Chrome/src",
+    "sourceMap": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "module": "es2022",
+    "target": "es2022",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "typeRoots": ["@types", "node_modules/@types"]
+  },
+  "include": ["./src/**/*", "./@types/**/*"],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  }
+}

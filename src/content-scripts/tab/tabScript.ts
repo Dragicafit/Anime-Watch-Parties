@@ -1,5 +1,6 @@
-import browser from "webextension-polyfill";
 import $ from "jquery";
+import browser from "webextension-polyfill";
+import { eventsBackgroundReceive } from "../../background-scripts/backgroundConst";
 import { ChatEmbed } from "./embed/chatEmbed";
 import { TabContext } from "./tabContext";
 import { TabEvents } from "./tabEvents";
@@ -22,7 +23,7 @@ if (!(<any>window).AWPHasRun) {
     chatEmbed.startEmbed().then(() => {
       browser.runtime
         .sendMessage({
-          command: "askInfo",
+          command: eventsBackgroundReceive.ASK_INFO,
         })
         .catch(console.error);
     });

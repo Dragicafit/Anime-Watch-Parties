@@ -2,33 +2,29 @@ import debugModule from "debug";
 import { Socket } from "socket.io";
 import {
   Data,
+  eventsServerReceive,
   IoCallback,
   IoDebugSocket,
-  supportedEvents,
 } from "../io/ioConst";
 
 const debug = debugModule("filterInputServerAWP");
 
-const CREATE_ROOM = supportedEvents.CREATE_ROOM;
-const JOIN_ROOM = supportedEvents.JOIN_ROOM;
-const LEAVE_ROOM = supportedEvents.LEAVE_ROOM;
-const CHANGE_STATE_SERVER = supportedEvents.CHANGE_STATE_SERVER;
-const CHANGE_VIDEO_SERVER = supportedEvents.CHANGE_VIDEO_SERVER;
-const SYNC_CLIENT = supportedEvents.SYNC_CLIENT;
-const REPORT_BUG = supportedEvents.REPORT_BUG;
-const CHANGE_NAME = supportedEvents.CHANGE_NAME;
-const CREATE_MESSAGE_SERVER = supportedEvents.CREATE_MESSAGE_SERVER;
-
 const debugArgument = debug.extend("argument");
-const debugCreateRoom = debug.extend(CREATE_ROOM);
-const debugJoinRoom = debug.extend(JOIN_ROOM);
-const debugLeaveRoom = debug.extend(LEAVE_ROOM);
-const debugChangeStateServer = debug.extend(CHANGE_STATE_SERVER);
-const debugChangeVideoServer = debug.extend(CHANGE_VIDEO_SERVER);
-const debugSyncClient = debug.extend(SYNC_CLIENT);
-const debugReportBug = debug.extend(REPORT_BUG);
-const debugChangeName = debug.extend(CHANGE_NAME);
-const debugCreateMessageServer = debug.extend(CREATE_MESSAGE_SERVER);
+const debugCreateRoom = debug.extend(eventsServerReceive.CREATE_ROOM);
+const debugJoinRoom = debug.extend(eventsServerReceive.JOIN_ROOM);
+const debugLeaveRoom = debug.extend(eventsServerReceive.LEAVE_ROOM);
+const debugChangeStateServer = debug.extend(
+  eventsServerReceive.CHANGE_STATE_SERVER
+);
+const debugChangeVideoServer = debug.extend(
+  eventsServerReceive.CHANGE_VIDEO_SERVER
+);
+const debugSyncClient = debug.extend(eventsServerReceive.SYNC_CLIENT);
+const debugReportBug = debug.extend(eventsServerReceive.REPORT_BUG);
+const debugChangeName = debug.extend(eventsServerReceive.CHANGE_NAME);
+const debugCreateMessageServer = debug.extend(
+  eventsServerReceive.CREATE_MESSAGE_SERVER
+);
 
 export default {
   start: (socket: Socket) => {
@@ -68,27 +64,27 @@ export default {
       }
 
       switch (event) {
-        case CREATE_ROOM:
+        case eventsServerReceive.CREATE_ROOM:
           events[1] = <IoDebugSocket>((...args) => {
             debugCreateRoom(`${socket.id}:`, ...args);
           });
           events[2] = callback;
           break;
-        case JOIN_ROOM:
+        case eventsServerReceive.JOIN_ROOM:
           events[1] = <IoDebugSocket>((...args) => {
             debugJoinRoom(`${socket.id}:`, ...args);
           });
           events[2] = data.roomnum;
           events[3] = callback;
           break;
-        case LEAVE_ROOM:
+        case eventsServerReceive.LEAVE_ROOM:
           events[1] = <IoDebugSocket>((...args) => {
             debugLeaveRoom(`${socket.id}:`, ...args);
           });
           events[2] = data.roomnum;
           events[3] = callback;
           break;
-        case CHANGE_STATE_SERVER:
+        case eventsServerReceive.CHANGE_STATE_SERVER:
           events[1] = <IoDebugSocket>((...args) => {
             debugChangeStateServer(`${socket.id}:`, ...args);
           });
@@ -97,7 +93,7 @@ export default {
           events[4] = data.time;
           events[5] = callback;
           break;
-        case CHANGE_VIDEO_SERVER:
+        case eventsServerReceive.CHANGE_VIDEO_SERVER:
           events[1] = <IoDebugSocket>((...args) => {
             debugChangeVideoServer(`${socket.id}:`, ...args);
           });
@@ -107,28 +103,28 @@ export default {
           events[5] = data.location;
           events[6] = callback;
           break;
-        case SYNC_CLIENT:
+        case eventsServerReceive.SYNC_CLIENT:
           events[1] = <IoDebugSocket>((...args) => {
             debugSyncClient(`${socket.id}:`, ...args);
           });
           events[2] = data.roomnum;
           events[3] = callback;
           break;
-        case REPORT_BUG:
+        case eventsServerReceive.REPORT_BUG:
           events[1] = <IoDebugSocket>((...args) => {
             debugReportBug(`${socket.id}:`, ...args);
           });
           events[2] = data.logs;
           events[3] = callback;
           break;
-        case CHANGE_NAME:
+        case eventsServerReceive.CHANGE_NAME:
           events[1] = <IoDebugSocket>((...args) => {
             debugChangeName(`${socket.id}:`, ...args);
           });
           events[2] = data.name;
           events[3] = callback;
           break;
-        case CREATE_MESSAGE_SERVER:
+        case eventsServerReceive.CREATE_MESSAGE_SERVER:
           events[1] = <IoDebugSocket>((...args) => {
             debugCreateMessageServer(`${socket.id}:`, ...args);
           });

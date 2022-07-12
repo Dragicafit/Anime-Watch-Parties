@@ -1,3 +1,4 @@
+import { eventsBackgroundSend } from "../../background-scripts/backgroundConst";
 import { PlayerContext } from "./playerContext";
 import { PlayerEvents } from "./playerEvents";
 
@@ -11,13 +12,13 @@ export default {
       )
         return;
       switch (event.data.command) {
-        case "sendInfo":
+        case eventsBackgroundSend.SEND_INFO:
           tabEvent.sendInfo(event.data.clientRoom);
           break;
-        case "changeStateClient":
+        case eventsBackgroundSend.CHANGE_STATE_CLIENT:
           tabEvent.changeStateClient(event.data.time, event.data.state);
           break;
-        case "askState":
+        case eventsBackgroundSend.ASK_STATE:
           tabEvent.askState();
           break;
         default:

@@ -24,7 +24,7 @@
       "request": "launch",
       "reAttach": true,
       "addonPath": "${workspaceFolder}",
-      "preLaunchTask": "browserify"
+      "preLaunchTask": "webpack"
     },
     {
       "type": "node",

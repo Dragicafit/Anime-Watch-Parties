@@ -1,8 +1,8 @@
-import { Server, Socket } from "socket.io";
-import { IoUtils } from "../../src/server/io/ioUtils";
-import { IoRoom } from "../../src/server/io/ioRoom";
-import { IoContext, SocketContext } from "../../src/server/io/ioContext";
 import { Performance } from "perf_hooks";
+import { Server, Socket } from "socket.io";
+import { IoContext, SocketContext } from "../../src/server/io/ioContext";
+import { IoRoom } from "../../src/server/io/ioRoom";
+import { IoUtils } from "../../src/server/io/ioUtils";
 
 let io: Server;
 let socket: Socket;

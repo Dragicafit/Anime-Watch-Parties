@@ -1,9 +1,8 @@
-"use strict";
-
 import io from "socket.io-client";
 import browser from "webextension-polyfill";
 import { ClientContext } from "../client/clientContext";
 import { ClientScript } from "../client/clientScript";
+import { SERVER_URL } from "./backgroundConst";
 import { BackgroundEvent } from "./backgroundEvents";
 import { BackgroundListener } from "./backgroundListener";
 import { BackgroundSync } from "./backgroundSync";
@@ -18,7 +17,7 @@ export class BackgroundScript {
   backgroundEvent: BackgroundEvent;
 
   public constructor() {
-    const socket = io("https://animewatchparties.com");
+    const socket = io(SERVER_URL);
     const backgroundListener = new BackgroundListener(this);
     let clientContext = new ClientContext(
       socket,
