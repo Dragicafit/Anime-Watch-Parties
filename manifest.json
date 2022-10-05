@@ -25,6 +25,7 @@
     "cookies",
     "storage"
   ],
+  "optional_permissions": ["https://animationdigitalnetwork.fr/video/*"],
   "background": {
     "scripts": ["src/background-scripts/background.bundle.js"]
   },

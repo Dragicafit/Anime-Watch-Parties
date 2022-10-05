@@ -92,6 +92,7 @@ export class BackgroundUtils {
         }
         break;
       case "animedigitalnetwork.fr":
+      case "animationdigitalnetwork.fr":
         {
           let pathname = url.pathname.match(parseUrlAdn);
           if (pathname != null) {
@@ -377,10 +378,10 @@ export class BackgroundUtils {
     },
     oldUrl:
       | {
-          site: string;
-          location?: string;
-          videoId: string;
-        }
+        site: string;
+        location?: string;
+        videoId: string;
+      }
       | undefined
   ): void {
     console.log(...this.saveLog("old url is", oldUrl));

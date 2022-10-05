@@ -208,3 +208,57 @@ $("#report-bug").on("click", function () {
     })
     .catch(console.error);
 });
+
+browser.tabs
+  .query({
+    currentWindow: true,
+    active: true,
+  })
+  .then((tabs) => {
+    if (!tabs[0].url?.includes("animationdigitalnetwork.fr")) {
+      $(".show-activate-adn").hide();
+      $(".show-activated-adn").show();
+    } else {
+      $("#activate-adn").on("click", function () {
+        browser.permissions
+          .request({
+            origins: ["https://animationdigitalnetwork.fr/video/*"],
+          })
+          .catch(console.error);
+      });
+
+      browser.permissions.onAdded.addListener((permissions) => {
+        if (
+          permissions.origins?.includes("https://animationdigitalnetwork.fr/*")
+        ) {
+          $(".show-activate-adn").hide();
+          $(".show-activated-adn").show();
+        }
+      });
+
+      browser.permissions.onRemoved.addListener((permissions) => {
+        if (
+          permissions.origins?.includes("https://animationdigitalnetwork.fr/*")
+        ) {
+          $(".show-activate-adn").show();
+          $(".show-activated-adn").hide();
+        }
+      });
+
+      browser.permissions
+        .contains({
+          origins: ["https://animationdigitalnetwork.fr/video/*"],
+        })
+        .then((result) => {
+          if (result) {
+            $(".show-activate-adn").hide();
+            $(".show-activated-adn").show();
+          } else {
+            $(".show-activate-adn").show();
+            $(".show-activated-adn").hide();
+          }
+        })
+        .catch(console.error);
+    }
+  })
+  .catch(console.error);
