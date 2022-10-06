@@ -1,4 +1,5 @@
 import http = require("http");
+import type { Server as HTTPSServer } from "https";
 import {
   attach,
   Server as Engine,
@@ -8,23 +9,20 @@ import {
 } from "engine.io";
 import { EventEmitter } from "events";
 import { ExtendedError, Namespace, ServerReservedEventsMap } from "./namespace";
-import { ParentNamespace } from "socket.io/dist/parent-namespace";
+import { ParentNamespace } from "./parent-namespace";
 import { Adapter, Room, SocketId } from "socket.io-adapter";
 import * as parser from "socket.io-parser";
 import type { Encoder } from "socket.io-parser";
 import debugModule from "debug";
 import { Socket } from "./socket";
-import type {
-  BroadcastOperator,
-  RemoteSocket,
-} from "socket.io/dist/broadcast-operator";
+import type { BroadcastOperator, RemoteSocket } from "./broadcast-operator";
 import {
   EventsMap,
   DefaultEventsMap,
   EventParams,
   StrictEventEmitter,
   EventNames,
-} from "socket.io/dist/typed-events";
+} from "./typed-events";
 
 const debug = debugModule("socket.io:server");
 
@@ -127,7 +125,7 @@ export class Server<
    * @private
    */
   _connectTimeout: number;
-  private httpServer: http.Server;
+  private httpServer: http.Server | HTTPSServer;
 
   /**
    * Server constructor.
@@ -137,13 +135,26 @@ export class Server<
    * @public
    */
   constructor(opts?: Partial<ServerOptions>);
-  constructor(srv?: http.Server | number, opts?: Partial<ServerOptions>);
   constructor(
-    srv: undefined | Partial<ServerOptions> | http.Server | number,
+    srv?: http.Server | HTTPSServer | number,
     opts?: Partial<ServerOptions>
   );
   constructor(
-    srv: undefined | Partial<ServerOptions> | http.Server | number,
+    srv:
+      | undefined
+      | Partial<ServerOptions>
+      | http.Server
+      | HTTPSServer
+      | number,
+    opts?: Partial<ServerOptions>
+  );
+  constructor(
+    srv:
+      | undefined
+      | Partial<ServerOptions>
+      | http.Server
+      | HTTPSServer
+      | number,
     opts: Partial<ServerOptions> = {}
   ) {
     super();
@@ -168,7 +179,8 @@ export class Server<
     this.adapter(opts.adapter || Adapter);
     this.sockets = this.of("/");
     this.opts = opts;
-    if (srv || typeof srv == "number") this.attach(srv as http.Server | number);
+    if (srv || typeof srv == "number")
+      this.attach(srv as http.Server | HTTPSServer | number);
   }
 
   /**
@@ -301,7 +313,7 @@ export class Server<
    * @public
    */
   public listen(
-    srv: http.Server | number,
+    srv: http.Server | HTTPSServer | number,
     opts: Partial<ServerOptions> = {}
   ): this {
     return this.attach(srv, opts);
@@ -316,7 +328,7 @@ export class Server<
    * @public
    */
   public attach(
-    srv: http.Server | number,
+    srv: http.Server | HTTPSServer | number,
     opts: Partial<ServerOptions> = {}
   ): this {
     return <any>jest.fn(() => this);
@@ -330,7 +342,7 @@ export class Server<
    * @private
    */
   private initEngine(
-    srv: http.Server,
+    srv: http.Server | HTTPSServer,
     opts: EngineOptions & AttachOptions
   ): void {
     return <any>jest.fn();
@@ -342,7 +354,7 @@ export class Server<
    * @param srv http server
    * @private
    */
-  private attachServe(srv: http.Server): void {
+  private attachServe(srv: http.Server | HTTPSServer): void {
     return <any>jest.fn();
   }
 
@@ -581,6 +593,23 @@ export class Server<
    */
   public get local(): BroadcastOperator<EmitEvents, SocketData> {
     return this.sockets.local;
+  }
+
+  /**
+   * Adds a timeout in milliseconds for the next operation
+   *
+   * <pre><code>
+   *
+   * io.timeout(1000).emit("some-event", (err, responses) => {
+   *   // ...
+   * });
+   *
+   * </pre></code>
+   *
+   * @param timeout
+   */
+  public timeout(timeout: number) {
+    return this.sockets.timeout(timeout);
   }
 
   /**

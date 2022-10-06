@@ -104,7 +104,7 @@ export class BackgroundEvent {
                 }
                 break;
               case "adn":
-                newUrl = `https://animedigitalnetwork.fr/video/${url.videoId}`;
+                newUrl = `https://animationdigitalnetwork.fr/video/${url.videoId}`;
                 break;
               default:
                 return;

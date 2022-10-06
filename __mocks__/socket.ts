@@ -7,7 +7,7 @@ import {
   EventsMap,
   StrictEventEmitter,
   DefaultEventsMap,
-} from "socket.io/dist/typed-events";
+} from "./typed-events";
 import type { Client } from "socket.io/dist/client";
 import type { Namespace, NamespaceReservedEventsMap } from "./namespace";
 import type { IncomingMessage, IncomingHttpHeaders } from "http";
@@ -19,7 +19,7 @@ import type {
 } from "socket.io-adapter";
 import base64id from "base64id";
 import type { ParsedUrlQuery } from "querystring";
-import { BroadcastOperator } from "socket.io/dist/broadcast-operator";
+import { BroadcastOperator } from "./broadcast-operator";
 
 const debug = debugModule("socket.io:socket");
 
@@ -107,7 +107,12 @@ export interface Handshake {
   auth: { [key: string]: any };
 }
 
-export type Event = [eventName: string, ...args: any[]];
+/**
+ * `[eventName, ...args]`
+ */
+export type Event = [string, ...any[]];
+
+function noop() {}
 
 export class Socket<
   ListenEvents extends EventsMap = DefaultEventsMap,
@@ -137,8 +142,9 @@ export class Socket<
   private readonly adapter: Adapter;
   private acks: Map<number, () => void> = new Map();
   private fns: Array<(event: Event, next: (err?: Error) => void) => void> = [];
-  private flags: BroadcastFlags & { timeout?: number } = {};
+  private flags: BroadcastFlags = {};
   private _anyListeners?: Array<(...args: any[]) => void>;
+  private _anyOutgoingListeners?: Array<(...args: any[]) => void>;
 
   public events: any;
 
@@ -373,9 +379,6 @@ export class Socket<
       case PacketType.DISCONNECT:
         this.ondisconnect();
         break;
-
-      case PacketType.CONNECT_ERROR:
-        this._onerror(new Error(packet.data));
     }
   }
 
@@ -480,12 +483,22 @@ export class Socket<
     if (!this.connected) return this;
     debug("closing socket - reason %s", reason);
     this.emitReserved("disconnecting", reason);
-    this.leaveAll();
+    this._cleanup();
     this.nsp._remove(this);
     this.client._remove(<any>this);
     this.connected = false;
     this.emitReserved("disconnect", reason);
     return;
+  }
+
+  /**
+   * Makes the socket leave all the rooms it was part of and prevents it from joining any other room
+   *
+   * @private
+   */
+  _cleanup() {
+    this.leaveAll();
+    this.join = noop;
   }
 
   /**
@@ -678,8 +691,8 @@ export class Socket<
   }
 
   /**
-   * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
-   * callback.
+   * Adds a listener that will be fired when any event is received. The event name is passed as the first argument to
+   * the callback.
    *
    * @param listener
    * @public
@@ -691,8 +704,8 @@ export class Socket<
   }
 
   /**
-   * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
-   * callback. The listener is added to the beginning of the listeners array.
+   * Adds a listener that will be fired when any event is received. The event name is passed as the first argument to
+   * the callback. The listener is added to the beginning of the listeners array.
    *
    * @param listener
    * @public
@@ -704,7 +717,7 @@ export class Socket<
   }
 
   /**
-   * Removes the listener that will be fired when any event is emitted.
+   * Removes the listener that will be fired when any event is received.
    *
    * @param listener
    * @public
@@ -735,6 +748,114 @@ export class Socket<
    */
   public listenersAny() {
     return this._anyListeners || [];
+  }
+
+  /**
+   * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
+   * callback.
+   *
+   * @param listener
+   *
+   * <pre><code>
+   *
+   * socket.onAnyOutgoing((event, ...args) => {
+   *   console.log(event);
+   * });
+   *
+   * </pre></code>
+   *
+   * @public
+   */
+  public onAnyOutgoing(listener: (...args: any[]) => void): this {
+    this._anyOutgoingListeners = this._anyOutgoingListeners || [];
+    this._anyOutgoingListeners.push(listener);
+    return this;
+  }
+
+  /**
+   * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
+   * callback. The listener is added to the beginning of the listeners array.
+   *
+   * @param listener
+   *
+   * <pre><code>
+   *
+   * socket.prependAnyOutgoing((event, ...args) => {
+   *   console.log(event);
+   * });
+   *
+   * </pre></code>
+   *
+   * @public
+   */
+  public prependAnyOutgoing(listener: (...args: any[]) => void): this {
+    this._anyOutgoingListeners = this._anyOutgoingListeners || [];
+    this._anyOutgoingListeners.unshift(listener);
+    return this;
+  }
+
+  /**
+   * Removes the listener that will be fired when any event is emitted.
+   *
+   * @param listener
+   *
+   * <pre><code>
+   *
+   * const handler = (event, ...args) => {
+   *   console.log(event);
+   * }
+   *
+   * socket.onAnyOutgoing(handler);
+   *
+   * // then later
+   * socket.offAnyOutgoing(handler);
+   *
+   * </pre></code>
+   *
+   * @public
+   */
+  public offAnyOutgoing(listener?: (...args: any[]) => void): this {
+    if (!this._anyOutgoingListeners) {
+      return this;
+    }
+    if (listener) {
+      const listeners = this._anyOutgoingListeners;
+      for (let i = 0; i < listeners.length; i++) {
+        if (listener === listeners[i]) {
+          listeners.splice(i, 1);
+          return this;
+        }
+      }
+    } else {
+      this._anyOutgoingListeners = [];
+    }
+    return this;
+  }
+
+  /**
+   * Returns an array of listeners that are listening for any event that is specified. This array can be manipulated,
+   * e.g. to remove listeners.
+   *
+   * @public
+   */
+  public listenersAnyOutgoing() {
+    return this._anyOutgoingListeners || [];
+  }
+
+  /**
+   * Notify the listeners for each packet sent (emit or broadcast)
+   *
+   * @param packet
+   *
+   * @private
+   */
+  private notifyOutgoingListeners(packet: Packet) {
+    if (this._anyOutgoingListeners && this._anyOutgoingListeners.length) {
+      const listeners = this._anyOutgoingListeners.slice();
+      for (const listener of listeners) {
+        listener.apply(this, packet.data);
+      }
+    }
   }
 
   private newBroadcastOperator(): BroadcastOperator<EmitEvents, SocketData> {
