@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Anime Watch Parties",
   "description": "A cross-platform extension that synchronizes videos on major anime websites.",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "author": "Dragicafit",
   "icons": {
     "48": "src/icons/activate.svg",
