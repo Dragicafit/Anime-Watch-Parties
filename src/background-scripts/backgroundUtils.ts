@@ -60,6 +60,8 @@ export class BackgroundUtils {
         }
         break;
       case "beta.crunchyroll.com":
+      case "www.crunchyroll.com":
+      case "crunchyroll.com":
         {
           let pathname = url.pathname.match(parseUrlNewCrunchyroll);
           if (pathname != null) {
@@ -176,7 +178,7 @@ export class BackgroundUtils {
                   backgroundUtils
                     .crunchyrollMediaIdToEtpGuid(media_id)
                     .then((etp_guid) =>
-                      resolve(`https://beta.crunchyroll.com/watch/${etp_guid}`)
+                      resolve(`https://www.crunchyroll.com/watch/${etp_guid}`)
                     )
                     .catch((error) => {
                       console.error(...backgroundUtils.saveError(error));
@@ -193,7 +195,7 @@ export class BackgroundUtils {
                   backgroundUtils
                     .crunchyrollMediaIdToEtpGuid(pathname!.groups!["media_id"])
                     .then((etp_guid) =>
-                      resolve(`https://beta.crunchyroll.com/watch/${etp_guid}`)
+                      resolve(`https://www.crunchyroll.com/watch/${etp_guid}`)
                     )
                     .catch((error) => {
                       console.error(...backgroundUtils.saveError(error));
@@ -378,10 +380,10 @@ export class BackgroundUtils {
     },
     oldUrl:
       | {
-        site: string;
-        location?: string;
-        videoId: string;
-      }
+          site: string;
+          location?: string;
+          videoId: string;
+        }
       | undefined
   ): void {
     console.log(...this.saveLog("old url is", oldUrl));
