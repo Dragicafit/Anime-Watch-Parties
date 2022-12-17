@@ -1,3 +1,4 @@
+import { AWP_TOKEN } from "../../background-scripts/backgroundConst";
 import { ClientListener } from "../../client-new/clientListener";
 import { ClientRoom } from "../../client-new/clientRoom";
 import { ClientTab } from "../../client-new/clientTab";
@@ -37,8 +38,6 @@ export class PlayerListener implements ClientListener {
 
   changeOnlineUsersClientTabListener(clientTab: ClientTab): void {}
 
-  createdTabListener(clientTab: ClientTab) {}
-
   deletedTabListener(tabId: number): void {}
 
   createdRoomListener(clientRoom: ClientRoom): void {}
@@ -50,4 +49,8 @@ export class PlayerListener implements ClientListener {
   joinedRoomListener(clientTab: ClientTab, clientRoom: ClientRoom) {}
 
   leavedRoomListener(clientTab: ClientTab) {}
+
+  tokenListener(): string | null {
+    return localStorage.getItem(AWP_TOKEN);
+  }
 }

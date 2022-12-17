@@ -6,7 +6,6 @@ export class ClientRoom {
   private clientContext: ClientContext;
 
   roomnum: string;
-  clientTab?: ClientTab;
   host: boolean;
   onlineUsers: number;
   private state: boolean;
@@ -65,5 +64,9 @@ export class ClientRoom {
 
   public getState() {
     return this.state;
+  }
+
+  public getClientTab(): ClientTab {
+    return this.clientContext.clientTab;
   }
 }

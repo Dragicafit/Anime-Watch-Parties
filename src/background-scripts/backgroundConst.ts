@@ -39,3 +39,5 @@ export const SERVER_URL =
   process.env["NODE_ENV"] === "production"
     ? "https://animewatchparties.com"
     : "https://localhost:4000";
+
+export const AWP_TOKEN = "AWP-token";

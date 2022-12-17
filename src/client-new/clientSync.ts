@@ -33,7 +33,7 @@ export class ClientSync {
     console.log(...this.saveLog("change video server", clientTab, url));
 
     clientRoom.updateVideo(url);
-    this.clientContext.socket.emit(eventsServerReceive.CHANGE_VIDEO_SERVER, {
+    this.clientUtils.emit(eventsServerReceive.CHANGE_VIDEO_SERVER, {
       roomnum: clientRoom.roomnum,
       site: url.site,
       location: url.location,
@@ -54,7 +54,7 @@ export class ClientSync {
     );
 
     clientRoom.updateState(state, time);
-    this.clientContext.socket.emit(eventsServerReceive.CHANGE_STATE_SERVER, {
+    this.clientUtils.emit(eventsServerReceive.CHANGE_STATE_SERVER, {
       roomnum: clientRoom.roomnum,
       time: time,
       state: state,
@@ -68,7 +68,7 @@ export class ClientSync {
       })
     );
 
-    this.clientContext.socket.emit(
+    this.clientUtils.emit(
       eventsServerReceive.CHANGE_NAME,
       {
         name: name,
@@ -96,7 +96,7 @@ export class ClientSync {
       })
     );
 
-    this.clientContext.socket.emit(eventsServerReceive.CREATE_MESSAGE_SERVER, {
+    this.clientUtils.emit(eventsServerReceive.CREATE_MESSAGE_SERVER, {
       roomnum: clientRoom.roomnum,
       message: message,
     });
@@ -109,7 +109,7 @@ export class ClientSync {
     }
     console.log(...this.saveLog("sync client", clientTab));
 
-    this.clientContext.socket.emit(
+    this.clientUtils.emit(
       eventsServerReceive.SYNC_CLIENT,
       {
         roomnum: clientRoom.roomnum,
@@ -144,7 +144,7 @@ export class ClientSync {
   reportBug() {
     console.log(...this.saveLog("report a bug"));
 
-    this.clientContext.socket.emit(eventsServerReceive.REPORT_BUG, {
+    this.clientUtils.emit(eventsServerReceive.REPORT_BUG, {
       logs: this.clientUtils.getLogs(),
     });
   }

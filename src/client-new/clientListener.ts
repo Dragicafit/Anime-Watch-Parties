@@ -13,11 +13,12 @@ export interface ClientListener {
   createMessageClientTabListener(clientTab: ClientTab): void;
   changeNameClientListener(name: string): void;
 
-  createdTabListener(clientTab: ClientTab): void;
   deletedTabListener(tabId: number): void;
   createdRoomListener(clientRoom: ClientRoom): void;
   modifiedRoomListener(clientRoom: ClientRoom): void;
   deletedRoomListener(roomnum: string): void;
   joinedRoomListener(clientTab: ClientTab, clientRoom: ClientRoom): void;
   leavedRoomListener(clientTab: ClientTab, clientRoom: ClientRoom): void;
+
+  tokenListener(): string | null;
 }

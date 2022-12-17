@@ -40,7 +40,8 @@ const io = new IoServer(httpsServer, {
       req.headers.origin == null ||
       extensionIds.some(
         (extensionId) => req.headers.origin!.match(extensionId) != null
-      );
+      ) ||
+      req.headers.origin === "https://static.crunchyroll.com";
     callback(null, isOriginValid);
   },
   adapter: createAdapter(pubClient, subClient),

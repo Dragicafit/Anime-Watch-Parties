@@ -28,19 +28,17 @@ export class ClientEvent {
   createRoom(clientTab: ClientTab) {
     console.log(...this.saveLog("create room from tab", clientTab));
 
-    this.clientContext.socket.emit(eventsServerReceive.CREATE_ROOM, <
-      IoCallback
-    >((err, data) => this.joinedRoom(err, data, clientTab)));
+    this.clientUtils.emit(eventsServerReceive.CREATE_ROOM, <IoCallback>(
+      ((err, data) => this.joinedRoom(err, data, clientTab))
+    ));
   }
 
   joinRoom(clientTab: ClientTab, roomnum: string) {
     console.log(...this.saveLog("join room", roomnum, "from tab", clientTab));
 
-    this.clientContext.socket.emit(
-      eventsServerReceive.JOIN_ROOM,
-      { roomnum: roomnum },
-      <IoCallback>((err, data) => this.joinedRoom(err, data, clientTab))
-    );
+    this.clientUtils.emit(eventsServerReceive.JOIN_ROOM, { roomnum: roomnum }, <
+      IoCallback
+    >((err, data) => this.joinedRoom(err, data, clientTab)));
   }
 
   private joinedRoom(
@@ -53,8 +51,6 @@ export class ClientEvent {
     }
     if (data == null) return;
     console.log(...this.saveLog("joined room", data, "from tab", clientTab));
-
-    this.leaveOldRoom(clientTab, data.roomnum!);
 
     const clientRoom = this.clientUtils.joinRoom(clientTab, data.roomnum!);
 
@@ -83,27 +79,6 @@ export class ClientEvent {
     }
   }
 
-  private leaveOldRoom(clientTab: ClientTab, roomnum: string) {
-    const clientRoom = clientTab.getClientRoom();
-    if (clientRoom == null) {
-      return;
-    }
-    if (clientRoom.roomnum !== roomnum) {
-      this.leaveRoom(clientTab);
-    }
-  }
-
-  leaveRoom(clientTab: ClientTab): void {
-    console.log(...this.saveLog(`leave room`));
-
-    const clientRoom = clientTab.getClientRoom();
-    if (clientRoom == null) {
-      return;
-    }
-
-    this.clientUtils.leaveRoom(clientTab);
-  }
-
   changeVideoClient(
     clientRoom: ClientRoom,
     url: {
@@ -115,11 +90,9 @@ export class ClientEvent {
     console.log(...this.saveLog("change video client", url));
 
     clientRoom.updateVideo(url);
-    if (clientRoom.clientTab) {
-      this.clientContext.clientListener.changeVideoClientTabListener(
-        clientRoom.clientTab
-      );
-    }
+    this.clientContext.clientListener.changeVideoClientTabListener(
+      clientRoom.getClientTab()
+    );
   }
 
   changeStateClient(clientRoom: ClientRoom, time: number, state: boolean) {
@@ -131,33 +104,27 @@ export class ClientEvent {
     );
 
     clientRoom.updateState(state, time);
-    if (clientRoom.clientTab) {
-      this.clientContext.clientListener.changeStateClientTabListener(
-        clientRoom.clientTab
-      );
-    }
+    this.clientContext.clientListener.changeStateClientTabListener(
+      clientRoom.getClientTab()
+    );
   }
 
   changeOnlineUsersClient(clientRoom: ClientRoom, onlineUsers: number) {
     console.log(...this.saveLog("change online users client", onlineUsers));
 
     clientRoom.onlineUsers = onlineUsers;
-    if (clientRoom.clientTab) {
-      this.clientContext.clientListener.changeOnlineUsersClientTabListener(
-        clientRoom.clientTab
-      );
-    }
+    this.clientContext.clientListener.changeOnlineUsersClientTabListener(
+      clientRoom.getClientTab()
+    );
   }
 
   changeHostClient(clientRoom: ClientRoom, host: boolean) {
     console.log(...this.saveLog("change host client", host));
 
     clientRoom.host = host;
-    if (clientRoom.clientTab) {
-      this.clientContext.clientListener.changeHostClientTabListener(
-        clientRoom.clientTab
-      );
-    }
+    this.clientContext.clientListener.changeHostClientTabListener(
+      clientRoom.getClientTab()
+    );
   }
 
   createMessageClient(clientRoom: ClientRoom, sender: string, message: string) {
@@ -167,11 +134,9 @@ export class ClientEvent {
       sender: sender,
       message: message,
     });
-    if (clientRoom.clientTab) {
-      this.clientContext.clientListener.createMessageClientTabListener(
-        clientRoom.clientTab
-      );
-    }
+    this.clientContext.clientListener.createMessageClientTabListener(
+      clientRoom.getClientTab()
+    );
   }
 
   changeMessagesClient(
@@ -181,14 +146,12 @@ export class ClientEvent {
     console.log(...this.saveLog("change message client", messages));
 
     clientRoom.messages = messages;
-    if (clientRoom.clientTab) {
-      this.clientContext.clientListener.createMessageClientTabListener(
-        clientRoom.clientTab
-      );
-    }
+    this.clientContext.clientListener.createMessageClientTabListener(
+      clientRoom.getClientTab()
+    );
   }
 
-  changeNameClient(clientRoom: ClientRoom, name: string | null) {
+  changeNameClient(name: string | null) {
     console.log(
       ...this.saveLog("change name client", {
         name: name,
@@ -196,9 +159,9 @@ export class ClientEvent {
     );
 
     this.clientContext.name = name!;
-    if (clientRoom.clientTab) {
+    if (this.clientContext.clientRoom) {
       this.clientContext.clientListener.changeNameClientTabListener(
-        clientRoom.clientTab
+        this.clientContext.clientRoom.getClientTab()
       );
     }
   }

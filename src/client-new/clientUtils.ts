@@ -1,4 +1,3 @@
-import { eventsServerSend } from "../server/io/ioConst";
 import { ClientContext } from "./clientContext";
 import { ClientRoom } from "./clientRoom";
 import { ClientTab } from "./clientTab";
@@ -14,7 +13,7 @@ export class ClientUtils {
 
   private createRoom(roomnum: string): ClientRoom {
     let clientRoom = this.clientContext.clientRoom;
-    if (clientRoom == null) {
+    if (clientRoom == null || clientRoom.roomnum !== roomnum) {
       clientRoom = new ClientRoom(roomnum, this.clientContext);
       this.clientContext.clientRoom = clientRoom;
     }
@@ -23,19 +22,8 @@ export class ClientUtils {
     return clientRoom;
   }
 
-  private deleteRoom(roomnum: string): void {
-    this.clientContext.clientRoom = undefined;
-
-    this.clientContext.socket.emit(eventsServerSend.LEAVE_ROOM, {
-      roomnum: roomnum,
-    });
-
-    this.clientContext.clientListener.deletedRoomListener(roomnum);
-  }
-
   joinRoom(clientTab: ClientTab, roomnum: string): ClientRoom {
     const clientRoom = this.createRoom(roomnum);
-    clientRoom.clientTab = clientTab;
     clientTab.setClientRoom(clientRoom);
 
     this.clientContext.clientListener.joinedRoomListener(clientTab, clientRoom);
@@ -47,16 +35,9 @@ export class ClientUtils {
     const clientRoom = clientTab.getClientRoom();
     if (clientRoom == null) return;
 
-    const roomnum = clientRoom.roomnum;
-
     clientTab.setClientRoom(undefined);
-    clientRoom.clientTab = undefined;
 
     this.clientContext.clientListener.leavedRoomListener(clientTab, clientRoom);
-
-    if (clientRoom.clientTab == null) {
-      this.deleteRoom(roomnum);
-    }
   }
 
   restartSocket(clientTab: ClientTab, roomnum: string) {
@@ -93,5 +74,13 @@ export class ClientUtils {
 
   getLogs() {
     return this.logs;
+  }
+
+  emit(ev: string, ...args: any) {
+    args = {
+      ...args,
+      token: this.clientContext.clientListener.tokenListener(),
+    };
+    return this.clientContext.socket.emit(ev, ...args);
   }
 }
