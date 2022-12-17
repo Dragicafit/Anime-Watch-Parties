@@ -1,10 +1,10 @@
 import { PlayerContext } from "../playerContext";
-import { PlayerSync } from "../playerSync";
+import { PlayerScript } from "../playerScript";
 import { VideoJsSetup } from "./videoJsSetup";
 
 export class AdnVideoJsSetup extends VideoJsSetup {
-  public constructor(tabContext: PlayerContext, tabSync: PlayerSync) {
-    super("AdnVideoJs", tabContext, tabSync);
+  public constructor(tabContext: PlayerContext, playerScript: PlayerScript) {
+    super("AdnVideoJs", tabContext, playerScript);
   }
 
   protected override player() {

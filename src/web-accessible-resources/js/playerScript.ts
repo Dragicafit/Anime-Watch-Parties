@@ -1,3 +1,6 @@
+import io from "socket.io-client";
+import { SERVER_URL } from "../../background-scripts/backgroundConst";
+import { ClientScript } from "../../client-new/clientScript";
 import { AdnVideoJsSetup } from "./player/adnVideoJsSetup";
 import { BrightcovePlayerSetup } from "./player/brightcovePlayerSetup";
 import { CrunchyrollPlayerSetup } from "./player/crunchyrollPlayerSetup";
@@ -8,25 +11,39 @@ import { PlayerAWP } from "./player/playerAWP";
 import { VideoJsSetup } from "./player/videoJsSetup";
 import { PlayerContext } from "./playerContext";
 import { PlayerEvents } from "./playerEvents";
-import { PlayerRoom } from "./playerRoom";
+import { PlayerListener } from "./playerListener";
 import { PlayerSync } from "./playerSync";
-import tabTransmission from "./playerTransmission";
 
-let tabContext = new PlayerContext(
-  new PlayerRoom(),
-  window,
-  window.performance
-);
+export class PlayerScript {
+  private clientScript: ClientScript;
 
-let tabSync = new PlayerSync(tabContext);
-tabContext.playerAWP = new PlayerAWP(
-  new JwplayerSetup(tabContext, tabSync),
-  new CrunchyrollPlayerSetup(tabContext, tabSync),
-  new BrightcovePlayerSetup(tabContext, tabSync),
-  new FunimationPlayerSetup(tabContext, tabSync),
-  new AdnVideoJsSetup(tabContext, tabSync),
-  new VideoJsSetup("VideoJs", tabContext, tabSync),
-  new NonExistantSetup(tabContext, tabSync)
-);
-let tabEvents = new PlayerEvents(tabContext, tabSync);
-tabTransmission.start(tabContext, tabEvents);
+  playerSync: PlayerSync;
+  playerEvents: PlayerEvents;
+
+  public constructor() {
+    const socket = io(SERVER_URL);
+    const playerListener = new PlayerListener(this);
+    let playerContext = new PlayerContext(
+      socket,
+      window.performance,
+      playerListener,
+      window
+    );
+    this.clientScript = new ClientScript(playerContext);
+
+    this.playerSync = new PlayerSync(this.clientScript, playerContext);
+    this.playerEvents = new PlayerEvents(playerContext, this);
+
+    playerContext.playerAWP = new PlayerAWP(
+      new JwplayerSetup(playerContext, this),
+      new CrunchyrollPlayerSetup(playerContext, this),
+      new BrightcovePlayerSetup(playerContext, this),
+      new FunimationPlayerSetup(playerContext, this),
+      new AdnVideoJsSetup(playerContext, this),
+      new VideoJsSetup("VideoJs", playerContext, this),
+      new NonExistantSetup(playerContext, this)
+    );
+  }
+}
+
+new PlayerScript();

@@ -1,5 +1,5 @@
 import { PlayerContext } from "../playerContext";
-import { PlayerSync } from "../playerSync";
+import { PlayerScript } from "../playerScript";
 import { AwpplayerSetup } from "./awpplayerSetup";
 
 export abstract class Html5Player extends AwpplayerSetup {
@@ -8,9 +8,9 @@ export abstract class Html5Player extends AwpplayerSetup {
   public constructor(
     name: string,
     tabContext: PlayerContext,
-    tabSync: PlayerSync
+    playerScript: PlayerScript
   ) {
-    super(name, tabContext, tabSync);
+    super(name, tabContext, playerScript);
     this.previousSeek = 0;
   }
 
@@ -28,7 +28,7 @@ export abstract class Html5Player extends AwpplayerSetup {
 
   protected override _onSeek(callback: (...events: any[]) => void): void {
     this.player().ontimeupdate = (e: any) => {
-      if (this.tabContext.window.document.hidden) {
+      if (this.playerContext.window.document.hidden) {
         return;
       }
       let oldPreviousSeek = this.previousSeek;

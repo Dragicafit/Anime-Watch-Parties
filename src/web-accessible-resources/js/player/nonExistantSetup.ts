@@ -1,10 +1,10 @@
 import { PlayerContext } from "../playerContext";
-import { PlayerSync } from "../playerSync";
+import { PlayerScript } from "../playerScript";
 import { AwpplayerSetup } from "./awpplayerSetup";
 
 export class NonExistantSetup extends AwpplayerSetup {
-  public constructor(tabContext: PlayerContext, tabSync: PlayerSync) {
-    super("non existant", tabContext, tabSync);
+  public constructor(tabContext: PlayerContext, playerScript: PlayerScript) {
+    super("non existant", tabContext, playerScript);
   }
 
   protected override player() {

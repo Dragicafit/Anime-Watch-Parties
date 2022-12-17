@@ -1,5 +1,5 @@
 import { PlayerContext } from "../playerContext";
-import { PlayerSync } from "../playerSync";
+import { PlayerScript } from "../playerScript";
 import { AwpplayerSetup } from "./awpplayerSetup";
 
 export class VideoJsSetup extends AwpplayerSetup {
@@ -8,9 +8,9 @@ export class VideoJsSetup extends AwpplayerSetup {
   public constructor(
     name: string,
     tabContext: PlayerContext,
-    tabSync: PlayerSync
+    playerScript: PlayerScript
   ) {
-    super(name, tabContext, tabSync);
+    super(name, tabContext, playerScript);
     this.previousSeek = 0;
   }
 
@@ -33,7 +33,7 @@ export class VideoJsSetup extends AwpplayerSetup {
   protected override _onSeek(callback: (...events: any[]) => void): void {
     this.player().on("timeupdate", (e: any) => {
       if (
-        this.tabContext.window.document.hidden ||
+        this.playerContext.window.document.hidden ||
         e.manuallyTriggered !== true
       ) {
         return;

@@ -1,10 +1,10 @@
 import { PlayerContext } from "../playerContext";
-import { PlayerSync } from "../playerSync";
+import { PlayerScript } from "../playerScript";
 import { VideoJsSetup } from "./videoJsSetup";
 
 export class BrightcovePlayerSetup extends VideoJsSetup {
-  public constructor(tabContext: PlayerContext, tabSync: PlayerSync) {
-    super("BrightcovePlayer", tabContext, tabSync);
+  public constructor(tabContext: PlayerContext, playerScript: PlayerScript) {
+    super("BrightcovePlayer", tabContext, playerScript);
   }
 
   protected override player() {

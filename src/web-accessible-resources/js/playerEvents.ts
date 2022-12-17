@@ -1,45 +1,37 @@
-import { ClientRoomSimplier } from "../../client/clientRoom";
 import { PlayerContext } from "./playerContext";
+import { PlayerScript } from "./playerScript";
 import { PlayerSync } from "./playerSync";
 
 export class PlayerEvents {
-  tabContext: PlayerContext;
-  tabSync: PlayerSync;
+  playerContext: PlayerContext;
+  playerSync: PlayerSync;
 
-  constructor(tabContext: PlayerContext, tabSync: PlayerSync) {
-    this.tabContext = tabContext;
-    this.tabSync = tabSync;
+  constructor(tabContext: PlayerContext, playerScript: PlayerScript) {
+    this.playerContext = tabContext;
+    this.playerSync = playerScript.playerSync;
   }
 
   changeStateClient(time: number, state: boolean) {
     console.log("change state client", { time: time, state: state });
 
-    setTimeout(() => {
-      this.tabContext.playerAWP!.getTime().then((clientTime) => {
-        console.log("current time is:", clientTime);
-        console.log("current time server is:", time);
-        console.log("current state server is:", state);
+    this.playerContext.playerAWP!.getTime().then((clientTime) => {
+      console.log("current time is:", clientTime);
+      console.log("current time server is:", time);
+      console.log("current state server is:", state);
 
-        this.tabContext.playerAWP!.setState(state);
+      this.playerContext.playerAWP!.setState(state);
 
-        if (Math.abs(clientTime - time) > 0.2)
-          this.tabContext.playerAWP!.seekTo(time);
-      });
-    }, this.tabContext.tabRoom.delay);
-  }
-
-  sendInfo(clientRoom: ClientRoomSimplier): void {
-    console.log("send info", clientRoom);
-
-    this.tabContext.tabRoom.host = clientRoom.host;
+      if (Math.abs(clientTime - time) > 0.2)
+        this.playerContext.playerAWP!.seekTo(time);
+    });
   }
 
   askState() {
     console.log("ask state");
 
-    this.tabContext.playerAWP!.getTime().then((time: number): void => {
-      this.tabContext.playerAWP!.isPlay().then((state: boolean): void => {
-        this.tabSync.sendState(time, state);
+    this.playerContext.playerAWP!.getTime().then((time: number): void => {
+      this.playerContext.playerAWP!.isPlay().then((state: boolean): void => {
+        this.playerSync.sendState(time, state);
       });
     });
   }

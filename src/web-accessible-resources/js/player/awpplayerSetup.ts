@@ -1,22 +1,23 @@
 import { PlayerContext } from "../playerContext";
+import { PlayerScript } from "../playerScript";
 import { PlayerSync } from "../playerSync";
 import { AwpPlayerInterface } from "./awpPlayerInterface";
 
 export abstract class AwpplayerSetup implements AwpPlayerInterface {
   private name: string;
-  protected tabContext: PlayerContext;
-  protected tabSync: PlayerSync;
+  protected playerContext: PlayerContext;
+  protected playerSync: PlayerSync;
 
   private preventCallIfTriggered: Map<string, number>;
 
   public constructor(
     name: string,
     tabContext: PlayerContext,
-    tabSync: PlayerSync
+    playerScript: PlayerScript
   ) {
     this.name = name;
-    this.tabContext = tabContext;
-    this.tabSync = tabSync;
+    this.playerContext = tabContext;
+    this.playerSync = playerScript.playerSync;
 
     this.preventCallIfTriggered = new Map();
 
@@ -39,15 +40,16 @@ export abstract class AwpplayerSetup implements AwpPlayerInterface {
       console.log(
         "prevent play",
         preventPlay,
-        this.tabContext.performance.now()
+        this.playerContext.performance.now()
       );
       if (
         preventPlay == null ||
-        this.tabContext.performance.now() - preventPlay > 200
+        this.playerContext.performance.now() - preventPlay > 200
       ) {
         console.log(`${this.name} playing`, e);
-        if (!this.tabContext.tabRoom.host) return this.tabSync.syncClient();
-        this.getTime().then((time) => this.tabSync.sendState(time, true));
+        if (!this.playerContext.clientRoom?.host)
+          return this.playerSync.syncClient();
+        this.getTime().then((time) => this.playerSync.sendState(time, true));
       }
     });
   }
@@ -58,15 +60,16 @@ export abstract class AwpplayerSetup implements AwpPlayerInterface {
       console.log(
         "prevent pause",
         preventPause,
-        this.tabContext.performance.now()
+        this.playerContext.performance.now()
       );
       if (
         preventPause == null ||
-        this.tabContext.performance.now() - preventPause > 200
+        this.playerContext.performance.now() - preventPause > 200
       ) {
         console.log(`${this.name} pausing`, e);
-        if (!this.tabContext.tabRoom.host) return this.tabSync.syncClient();
-        this.getTime().then((time) => this.tabSync.sendState(time, false));
+        if (!this.playerContext.clientRoom?.host)
+          return this.playerSync.syncClient();
+        this.getTime().then((time) => this.playerSync.sendState(time, false));
       }
     });
   }
@@ -77,15 +80,16 @@ export abstract class AwpplayerSetup implements AwpPlayerInterface {
       console.log(
         "prevent seek",
         preventSeek,
-        this.tabContext.performance.now()
+        this.playerContext.performance.now()
       );
       if (
         preventSeek == null ||
-        this.tabContext.performance.now() - preventSeek > 200
+        this.playerContext.performance.now() - preventSeek > 200
       ) {
         console.log(`${this.name} seeking ${offset} sec`, e);
-        if (!this.tabContext.tabRoom.host) return this.tabSync.syncClient();
-        this.isPlay().then((state) => this.tabSync.sendState(offset, state));
+        if (!this.playerContext.clientRoom?.host)
+          return this.playerSync.syncClient();
+        this.isPlay().then((state) => this.playerSync.sendState(offset, state));
       }
     });
   }
@@ -102,7 +106,10 @@ export abstract class AwpplayerSetup implements AwpPlayerInterface {
 
   public seekTo(time: number): void {
     if (!this.playerExist()) return;
-    this.preventCallIfTriggered.set("seek", this.tabContext.performance.now());
+    this.preventCallIfTriggered.set(
+      "seek",
+      this.playerContext.performance.now()
+    );
     console.log("prevent seek", this.preventCallIfTriggered.get("seek"));
     this._seekTo(time);
   }
@@ -112,13 +119,13 @@ export abstract class AwpplayerSetup implements AwpPlayerInterface {
     if (state) {
       this.preventCallIfTriggered.set(
         "play",
-        this.tabContext.performance.now()
+        this.playerContext.performance.now()
       );
       console.log("prevent play", this.preventCallIfTriggered.get("play"));
     } else {
       this.preventCallIfTriggered.set(
         "pause",
-        this.tabContext.performance.now()
+        this.playerContext.performance.now()
       );
       console.log("prevent pause", this.preventCallIfTriggered.get("play"));
     }

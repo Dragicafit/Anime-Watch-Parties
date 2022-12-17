@@ -1,12 +1,12 @@
 import { PlayerContext } from "../playerContext";
-import { PlayerSync } from "../playerSync";
+import { PlayerScript } from "../playerScript";
 import { AwpplayerSetup } from "./awpplayerSetup";
 
 export class JwplayerSetup extends AwpplayerSetup {
   private previousSeek: number;
 
-  public constructor(tabContext: PlayerContext, tabSync: PlayerSync) {
-    super("jwplayer", tabContext, tabSync);
+  public constructor(tabContext: PlayerContext, playerScript: PlayerScript) {
+    super("jwplayer", tabContext, playerScript);
     this.previousSeek = 0;
   }
 
@@ -17,7 +17,7 @@ export class JwplayerSetup extends AwpplayerSetup {
   protected override _onPlay(callback: (...events: any[]) => void): void {
     this.player().on("play", (e) => {
       if (
-        this.tabContext.tabRoom.host ||
+        this.playerContext.clientRoom?.host ||
         (e.playReason === "interaction" && (<any>e).reason === "playing")
       ) {
         callback(e);
@@ -33,7 +33,7 @@ export class JwplayerSetup extends AwpplayerSetup {
 
   protected override _onSeek(callback: (...events: any[]) => void): void {
     this.player().on("seek", (e) => {
-      if (this.tabContext.window.document.hidden) {
+      if (this.playerContext.window.document.hidden) {
         return;
       }
       let previousSeek = this.previousSeek;

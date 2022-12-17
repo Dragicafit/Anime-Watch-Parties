@@ -1,15 +1,19 @@
+import { Socket } from "socket.io-client";
+import { ClientContext } from "../../client-new/clientContext";
+import { ClientListener } from "../../client-new/clientListener";
 import { PlayerAWP } from "./player/playerAWP";
-import { PlayerRoom } from "./playerRoom";
 
-export class PlayerContext {
-  tabRoom: PlayerRoom;
+export class PlayerContext extends ClientContext {
   window: Window;
-  performance: Performance;
-  playerAWP: PlayerAWP | undefined;
+  playerAWP?: PlayerAWP;
 
-  constructor(tabRoom: PlayerRoom, window: Window, performance: Performance) {
-    this.tabRoom = tabRoom;
+  constructor(
+    socket: Socket,
+    performance: any,
+    clientListener: ClientListener,
+    window: Window
+  ) {
+    super(socket, performance, clientListener);
     this.window = window;
-    this.performance = performance;
   }
 }
