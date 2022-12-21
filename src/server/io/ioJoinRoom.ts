@@ -13,14 +13,28 @@ export default {
   start: function (socketContext: SocketContext, ioUtils: IoUtils) {
     socketContext.socket.on(
       eventsServerReceive.JOIN_ROOM,
-      (debugSocket: IoDebugSocket, roomnum: string, callback: IoCallback) => {
+      (
+        debugSocket: IoDebugSocket,
+        oldRoomnum: string,
+        oldHost: boolean,
+        roomnum: string,
+        callback: IoCallback
+      ) => {
         if (typeof roomnum !== "string" || !regexRoom.test(roomnum)) {
           debugSocket("roomnum is not a valid string");
           return callback("wrong input");
         }
 
         let toCallback: Data = {};
-        ioUtils.joinRoom(debugSocket, roomnum, callback, toCallback);
+        ioUtils.joinRoom(
+          debugSocket,
+          oldRoomnum,
+          oldHost,
+          roomnum,
+          callback,
+          toCallback
+        );
+        ioUtils.createJwtToken(toCallback);
         callback(null, toCallback);
       }
     );

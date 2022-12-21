@@ -5,13 +5,13 @@ export class IoRoom {
   static ioContext: IoContext;
 
   roomnum: string;
-  host: SocketId | undefined;
+  hosts: SocketId[];
   state: boolean;
   currTime: number;
   lastChange: number;
-  currVideo: string | undefined;
-  site: string | undefined;
-  location: string | undefined;
+  currVideo?: string;
+  site?: string;
+  location?: string;
   messages: { sender: SocketContext; message: string }[];
 
   constructor(roomnum: string) {
@@ -20,6 +20,7 @@ export class IoRoom {
     this.currTime = 0;
     this.lastChange = 0;
     this.messages = [];
+    this.hosts = [];
 
     this.updateState(false, 0);
   }

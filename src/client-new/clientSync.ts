@@ -141,6 +141,25 @@ export class ClientSync {
     );
   }
 
+  askInfo(clientTab: ClientTab): void {
+    this.clientUtils.emit(eventsServerReceive.ASK_INFO, <IoCallback>((
+      err,
+      data
+    ) => {
+      if (err) {
+        return console.log(...this.saveLog(err));
+      }
+      if (data == null) return;
+
+      if (data.name) {
+        this.clientEvent?.changeNameClient(data.name);
+      }
+      if (data.roomnum) {
+        this.clientEvent?.joinRoom(clientTab, data.roomnum);
+      }
+    }));
+  }
+
   reportBug() {
     console.log(...this.saveLog("report a bug"));
 

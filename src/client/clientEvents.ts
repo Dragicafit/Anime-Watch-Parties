@@ -1,3 +1,5 @@
+import { AWP_TOKEN } from "../background-scripts/backgroundConst";
+import browser from "webextension-polyfill";
 import {
   Data,
   eventsServerReceive,
@@ -58,6 +60,9 @@ export class ClientEvent {
 
     const clientRoom = this.clientUtils.joinRoom(clientTab, data.roomnum!);
 
+    if (data.token != null) {
+      browser.storage.local.set({ [AWP_TOKEN]: data.token });
+    }
     if (data.host != null) {
       this.changeHostClient(clientRoom, data.host);
     }

@@ -50,7 +50,7 @@ export default {
           debugSocket("socket is not connected to room");
           return callback("access denied");
         }
-        if (socketContext.socket.id !== ioRoom.host) {
+        if (!ioUtils.isHost(ioRoom)) {
           debugSocket("socket is not host");
           return callback("access denied");
         }

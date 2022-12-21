@@ -14,6 +14,7 @@ export interface Data {
   logs?: string[];
   name?: string;
   message?: string;
+  token?: string;
   messages?: { sender: string; message: string }[];
 }
 
@@ -29,6 +30,8 @@ export interface IoDebugSocket {
 }
 
 export enum eventsServerReceive {
+  AUTH = "auth",
+  ASK_INFO = "askInfo",
   CREATE_ROOM = "createRoom",
   JOIN_ROOM = "joinRoom",
   LEAVE_ROOM = "leaveRoom",

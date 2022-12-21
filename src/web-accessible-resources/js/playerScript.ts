@@ -1,6 +1,10 @@
 import io from "socket.io-client";
-import { SERVER_URL } from "../../background-scripts/backgroundConst";
+import {
+  AWP_TOKEN,
+  SERVER_URL,
+} from "../../background-scripts/backgroundConst";
 import { ClientScript } from "../../client-new/clientScript";
+import { eventsServerReceive, IoCallback } from "../../server/io/ioConst";
 import { AdnVideoJsSetup } from "./player/adnVideoJsSetup";
 import { BrightcovePlayerSetup } from "./player/brightcovePlayerSetup";
 import { CrunchyrollPlayerSetup } from "./player/crunchyrollPlayerSetup";
@@ -22,6 +26,7 @@ export class PlayerScript {
 
   public constructor() {
     const socket = io(SERVER_URL);
+
     const playerListener = new PlayerListener(this);
     let playerContext = new PlayerContext(
       socket,
@@ -43,6 +48,17 @@ export class PlayerScript {
       new VideoJsSetup("VideoJs", playerContext, this),
       new NonExistantSetup(playerContext, this)
     );
+
+    if (!playerListener.tokenListener()) {
+      socket.emit(eventsServerReceive.AUTH, <IoCallback>((err, data) => {
+        if (data?.token) {
+          localStorage.setItem(AWP_TOKEN, data?.token);
+        }
+        this.clientScript.clientSync.askInfo(playerContext.clientTab);
+      }));
+    } else {
+      this.clientScript.clientSync.askInfo(playerContext.clientTab);
+    }
   }
 }
 

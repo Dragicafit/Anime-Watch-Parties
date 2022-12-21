@@ -10,11 +10,18 @@ import { IoUtils } from "./ioUtils";
 export default {
   start: function (socketContext: SocketContext, ioUtils: IoUtils) {
     socketContext.socket.on(
-      eventsServerReceive.CREATE_ROOM,
-      (debugSocket: IoDebugSocket, callback: IoCallback) => {
+      eventsServerReceive.ASK_INFO,
+      (
+        debugSocket: IoDebugSocket,
+        name: string,
+        roomnum: string,
+        callback: IoCallback
+      ) => {
         let toCallback: Data = {};
-        ioUtils.createRoom(debugSocket, callback, toCallback);
-        ioUtils.createJwtToken(toCallback);
+        toCallback.name = name;
+        toCallback.roomnum = roomnum;
+
+        debugSocket(`token decoded roomnum: room-${roomnum}, name: ${name}`);
         callback(null, toCallback);
       }
     );

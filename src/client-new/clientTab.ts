@@ -45,4 +45,8 @@ export class ClientTab {
     }
     this.clientRoom.roomnum = val;
   }
+
+  public simplify() {
+    return { clientRoom: this.clientRoom?.simplify() };
+  }
 }

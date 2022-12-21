@@ -16,11 +16,17 @@ const debug = debugModule("serverAWP");
 
 const debugMain = debug.extend("main");
 
+const jwtSecret = process.env["JWT_SECRET"];
 const port = process.env["PORT"] || 4000;
 const extensionIds =
   process.env["EXTENSION_IDS"]
     ?.split(",")
     .map((extensionId) => extensionId.trim()) || [];
+
+if (!jwtSecret || jwtSecret === "CHANGE_ME") {
+  debugMain(`Please set a JWT_SECRET in .env`);
+  process.exit();
+}
 
 const app = express();
 const pubClient = createClient();
@@ -48,7 +54,7 @@ const io = new IoServer(httpsServer, {
 });
 
 rateLimiter.start(app, io, pubClient);
-ioServerSetup.start(io);
+ioServerSetup.start(io, jwtSecret);
 httpsServerSetup.start(app);
 
 httpsServer.listen(port, () => {

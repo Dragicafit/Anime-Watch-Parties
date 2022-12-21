@@ -1,4 +1,9 @@
-import { eventsServerReceive, IoCallback, IoDebugSocket } from "../ioConst";
+import {
+  Data,
+  eventsServerReceive,
+  IoCallback,
+  IoDebugSocket,
+} from "../ioConst";
 import { SocketContext } from "../ioContext";
 import { IoUtils } from "../ioUtils";
 
@@ -16,7 +21,9 @@ export default {
 
         socketContext.name = name;
 
-        callback(null, {});
+        let toCallback: Data = {};
+        ioUtils.createJwtToken(toCallback);
+        callback(null, toCallback);
       }
     );
   },

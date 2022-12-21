@@ -69,4 +69,17 @@ export class ClientRoom {
   public getClientTab(): ClientTab {
     return this.clientContext.clientTab;
   }
+
+  public simplify() {
+    return {
+      roomnum: this.roomnum,
+      host: this.host,
+      onlineUsers: this.onlineUsers,
+      state: this.state,
+      currTime: this.currTime,
+      lastChange: this.lastChange,
+      url: this.url,
+      messages: this.messages,
+    };
+  }
 }

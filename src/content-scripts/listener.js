@@ -10,6 +10,11 @@
     localStorage.setItem("AWP-token", token);
   });
 
+  browser.storage.local.get("AWP-token").then((value) => {
+    const token = value["AWP-token"];
+    localStorage.setItem("AWP-token", token);
+  });
+
   let s = document.createElement("script");
   s.src = browser.runtime.getURL(
     "/src/web-accessible-resources/js/player.bundle.js"

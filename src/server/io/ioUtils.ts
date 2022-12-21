@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import { Data, eventsServerSend, IoCallback, IoDebugSocket } from "./ioConst";
 import { SocketContext } from "./ioContext";
 import { IoRoom, Room } from "./ioRoom";
@@ -100,6 +101,8 @@ export class IoUtils {
 
   joinRoom(
     debugSocket: IoDebugSocket,
+    oldRoomnum: string,
+    oldHost: boolean,
     roomnum: string,
     callback: IoCallback,
     toCallback: Data = {}
@@ -118,6 +121,12 @@ export class IoUtils {
       return callback("access denied");
     }
 
+    if (oldRoomnum === roomnum) {
+      if (oldHost) {
+        debugSocket("socket is host");
+        room.ioRoom?.hosts.push(this.socketContext.socket.id);
+      }
+    }
     this.socketContext.socket.join(`room-${roomnum}`);
     this._configure(debugSocket, roomnum, room, callback, toCallback);
 
@@ -133,13 +142,13 @@ export class IoUtils {
   ) {
     debugSocket(`connected to room-${roomnum}`);
 
-    let ioRoom = room.ioRoom;
-    if (ioRoom == null) {
-      ioRoom = room.ioRoom = new IoRoom(roomnum);
+    if (room.ioRoom == null) {
+      room.ioRoom = new IoRoom(roomnum);
     }
-    if (ioRoom.host == null) {
+    const ioRoom = room.ioRoom;
+    if (ioRoom.hosts.length == 0) {
       debugSocket("socket is host");
-      ioRoom.host = this.socketContext.socket.id;
+      ioRoom.hosts.push(this.socketContext.socket.id);
     }
 
     toCallback.roomnum = roomnum;
@@ -152,17 +161,34 @@ export class IoUtils {
     if (ioRoom == null) {
       return;
     }
-    if (this.isHost(ioRoom)) {
-      ioRoom.host = undefined;
-    }
+
+    this.removeHost(ioRoom);
     this.socketContext.socket.leave(`room-${roomnum}`);
     debugSocket(`applied to room-${roomnum}`);
 
     this.updateRoomUsers(debugSocket, roomnum);
   }
 
+  createJwtToken(toCallback: Data) {
+    const name = this.socketContext.name;
+    const roomnum = this.getJoinedRoomnums()[0];
+    const host = toCallback.host;
+    toCallback.token = jwt.sign(
+      { name, roomnum, host },
+      IoRoom.ioContext.jwtSecret
+    );
+    toCallback.name = name;
+    toCallback.roomnum = roomnum;
+  }
+
   isHost(ioRoom: IoRoom): boolean {
-    return this.socketContext.socket.id === ioRoom?.host;
+    return ioRoom?.hosts.includes(this.socketContext.socket.id);
+  }
+
+  removeHost(ioRoom: IoRoom) {
+    ioRoom.hosts = ioRoom.hosts.filter(
+      (person) => person != this.socketContext.socket.id
+    );
   }
 
   getRoom(roomnum: string): Room | undefined {

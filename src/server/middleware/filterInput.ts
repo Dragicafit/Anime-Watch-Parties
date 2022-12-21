@@ -1,4 +1,5 @@
 import debugModule from "debug";
+import jwt from "jsonwebtoken";
 import { Socket } from "socket.io";
 import {
   Data,
@@ -6,10 +7,13 @@ import {
   IoCallback,
   IoDebugSocket,
 } from "../io/ioConst";
+import { IoRoom } from "../io/ioRoom";
 
 const debug = debugModule("filterInputServerAWP");
 
 const debugArgument = debug.extend("argument");
+const debugAskInfo = debug.extend(eventsServerReceive.ASK_INFO);
+const debugAuth = debug.extend(eventsServerReceive.AUTH);
 const debugCreateRoom = debug.extend(eventsServerReceive.CREATE_ROOM);
 const debugJoinRoom = debug.extend(eventsServerReceive.JOIN_ROOM);
 const debugLeaveRoom = debug.extend(eventsServerReceive.LEAVE_ROOM);
@@ -64,19 +68,44 @@ export default {
       }
 
       switch (event) {
+        case eventsServerReceive.ASK_INFO:
+          events[1] = <IoDebugSocket>((...args) => {
+            debugAskInfo(`${socket.id}:`, ...args);
+          });
+          const { name, roomnum } = jwt.verify(
+            data.token!,
+            IoRoom.ioContext.jwtSecret
+          ) as any;
+          events[2] = name;
+          events[3] = roomnum;
+          events[4] = callback;
+          break;
+        case eventsServerReceive.AUTH:
+          events[1] = <IoDebugSocket>((...args) => {
+            debugAuth(`${socket.id}:`, ...args);
+          });
+          events[2] = callback;
+          break;
         case eventsServerReceive.CREATE_ROOM:
           events[1] = <IoDebugSocket>((...args) => {
             debugCreateRoom(`${socket.id}:`, ...args);
           });
           events[2] = callback;
           break;
-        case eventsServerReceive.JOIN_ROOM:
+        case eventsServerReceive.JOIN_ROOM: {
+          const { host, roomnum } = jwt.verify(
+            data.token!,
+            IoRoom.ioContext.jwtSecret
+          ) as any;
           events[1] = <IoDebugSocket>((...args) => {
             debugJoinRoom(`${socket.id}:`, ...args);
           });
-          events[2] = data.roomnum;
-          events[3] = callback;
+          events[2] = roomnum;
+          events[3] = host;
+          events[4] = data.roomnum;
+          events[5] = callback;
           break;
+        }
         case eventsServerReceive.LEAVE_ROOM:
           events[1] = <IoDebugSocket>((...args) => {
             debugLeaveRoom(`${socket.id}:`, ...args);

@@ -77,10 +77,11 @@ export class ClientUtils {
   }
 
   emit(ev: string, ...args: any) {
-    args = {
-      ...args,
-      token: this.clientContext.clientListener.tokenListener(),
-    };
-    return this.clientContext.socket.emit(ev, ...args);
+    const token = this.clientContext.clientListener.tokenListener();
+    if (typeof args[0] === "object") {
+      args[0].token = token;
+      return this.clientContext.socket.emit(ev, ...args);
+    }
+    return this.clientContext.socket.emit(ev, { token }, ...args);
   }
 }
