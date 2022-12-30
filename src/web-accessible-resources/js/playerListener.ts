@@ -50,7 +50,11 @@ export class PlayerListener implements ClientListener {
 
   leavedRoomListener(clientTab: ClientTab) {}
 
-  tokenListener(): string | null {
+  async getToken(): Promise<string | null> {
     return localStorage.getItem(AWP_TOKEN);
+  }
+
+  setToken(token: string) {
+    localStorage.setItem(AWP_TOKEN, token);
   }
 }

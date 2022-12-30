@@ -1,7 +1,6 @@
+import { ClientTab } from "./../../client-new/clientTab";
 import browser from "webextension-polyfill";
-import { ClientScript } from "../client/clientScript";
-import { ClientTab } from "../client/clientTab";
-import { SupportedSite } from "../server/io/ioConst";
+import { SupportedSite } from "../../server/io/ioConst";
 import {
   parseUrlAdn,
   parseUrlCrunchyroll,
@@ -10,14 +9,12 @@ import {
   parseUrlOldFunimation,
   parseUrlWakanim,
   SERVER_JOIN_URL,
-} from "./backgroundConst";
+} from "../../background-scripts/backgroundConst";
 
-export class BackgroundUtils {
-  private clientScript: ClientScript;
+export class PopupUtils {
   private urlFromCrunchyrollBetaToCrunchyroll: Map<string, string>;
 
-  constructor(clientScript: ClientScript) {
-    this.clientScript = clientScript;
+  constructor() {
     this.urlFromCrunchyrollBetaToCrunchyroll = new Map();
   }
 
@@ -277,12 +274,8 @@ export class BackgroundUtils {
     });
   }
 
-  changeIcon(): void {
+  changeIcon(clientTab: ClientTab): void {
     this.getActiveTab().then((tab) => {
-      let clientTab: ClientTab | undefined;
-      if (tab?.id != null) {
-        clientTab = this.clientScript.clientContext.clientTabs.get(tab.id);
-      }
       if (tab?.id == null || clientTab?.getClientRoom() == null) {
         browser.browserAction.setIcon({
           path: "/src/icons/desactivate.svg",
@@ -314,103 +307,67 @@ export class BackgroundUtils {
     }
   }
 
-  insertScript(tab: browser.Tabs.Tab, tabId: number) {
+  insertScript(clientTab: ClientTab) {
     console.log(...this.saveLog("insert script"));
-
-    browser.webNavigation
-      .getAllFrames({ tabId: tabId })
-      .then((details) => {
-        for (const detail of details) {
-          const url = new URL(detail.url);
-          let site = this.parseUrl(detail.url)?.site;
-          if (detail.frameId === 0) {
-            browser.tabs
-              .executeScript(tabId, {
-                runAt: "document_start",
-                file: "/src/content-scripts/tab/tab.bundle.js",
-                frameId: detail.frameId,
-              })
-              .catch((error) => console.error(...this.saveError(error)));
-          }
-          if (
-            (site === "wakanim" && detail.frameId === 0) ||
-            (url.host === "www.wakanim.tv" &&
-              url.pathname.includes("/v2/catalogue/embeddedplayer/")) ||
-            (url.host === "static.crunchyroll.com" &&
-              (url.pathname === "/vilos-v2/web/vilos/player.html" ||
-                url.pathname === "/vilos/player.html")) ||
-            (site === "funimation" && detail.frameId === 0) ||
-            (url.host === "www.funimation.com" &&
-              url.pathname.startsWith("/player/")) ||
-            (site === "adn" && detail.frameId === 0)
-          ) {
-            browser.tabs
-              .executeScript(tabId, {
-                runAt: "document_end",
-                file: "/src/content-scripts/listener.js",
-                frameId: detail.frameId,
-              })
-              .catch((error) => console.error(...this.saveError(error)));
-          }
-          if (
-            this.clientScript.clientContext.clientTabs.get(tabId)?.getHost() !==
-            true
-          ) {
-            if (site === "awp" && detail.frameId === 0) {
+    this.getActiveTab().then((tab) => {
+      const tabId = tab?.id!;
+      browser.webNavigation
+        .getAllFrames({ tabId: tabId })
+        .then((details) => {
+          for (const detail of details) {
+            const url = new URL(detail.url);
+            let site = this.parseUrl(detail.url)?.site;
+            if (detail.frameId === 0) {
               browser.tabs
                 .executeScript(tabId, {
-                  runAt: "document_end",
-                  file: "/src/content-scripts/listener3.js",
+                  runAt: "document_start",
+                  file: "/src/content-scripts/tab/tab.bundle.js",
                   frameId: detail.frameId,
                 })
                 .catch((error) => console.error(...this.saveError(error)));
             }
+            if (
+              (site === "wakanim" && detail.frameId === 0) ||
+              (url.host === "www.wakanim.tv" &&
+                url.pathname.includes("/v2/catalogue/embeddedplayer/")) ||
+              (url.host === "static.crunchyroll.com" &&
+                (url.pathname === "/vilos-v2/web/vilos/player.html" ||
+                  url.pathname === "/vilos/player.html")) ||
+              (site === "funimation" && detail.frameId === 0) ||
+              (url.host === "www.funimation.com" &&
+                url.pathname.startsWith("/player/")) ||
+              (site === "adn" && detail.frameId === 0)
+            ) {
+              browser.tabs
+                .executeScript(tabId, {
+                  runAt: "document_end",
+                  file: "/src/content-scripts/listener.js",
+                  frameId: detail.frameId,
+                })
+                .catch((error) => console.error(...this.saveError(error)));
+            }
+            if (clientTab?.getHost() !== true) {
+              if (site === "awp" && detail.frameId === 0) {
+                browser.tabs
+                  .executeScript(tabId, {
+                    runAt: "document_end",
+                    file: "/src/content-scripts/listener3.js",
+                    frameId: detail.frameId,
+                  })
+                  .catch((error) => console.error(...this.saveError(error)));
+              }
+            }
           }
-        }
-      })
-      .catch((error) => console.error(...this.saveError(error)));
-  }
-
-  convertUrl(
-    url: {
-      site: string;
-      location?: string;
-      videoId: string;
-    },
-    oldUrl:
-      | {
-          site: string;
-          location?: string;
-          videoId: string;
-        }
-      | undefined
-  ): void {
-    console.log(...this.saveLog("old url is", oldUrl));
-    if (oldUrl?.site === url.site && oldUrl?.videoId === url.videoId) {
-      return;
-    }
-
-    switch (url.site) {
-      case "crunchyroll":
-        if (oldUrl?.site === "crunchyroll" && oldUrl?.location != null) {
-          url.location = oldUrl.location;
-        }
-        break;
-      case "funimation":
-        if (oldUrl?.site === "funimation" && oldUrl?.location != null) {
-          url.location = oldUrl.location;
-        }
-        break;
-      default:
-        return;
-    }
+        })
+        .catch((error) => console.error(...this.saveError(error)));
+    });
   }
 
   private saveLog(...logs: any[]) {
-    return this.clientScript.clientUtils.saveLog(...logs);
+    return logs;
   }
 
   private saveError(...errors: any[]) {
-    return this.clientScript.clientUtils.saveError(...errors);
+    return errors;
   }
 }

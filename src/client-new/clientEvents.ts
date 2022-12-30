@@ -54,6 +54,9 @@ export class ClientEvent {
 
     const clientRoom = this.clientUtils.joinRoom(clientTab, data.roomnum!);
 
+    if (data.token != null) {
+      this.clientContext.clientListener.setToken(data.token);
+    }
     if (data.host != null) {
       this.changeHostClient(clientRoom, data.host);
     }

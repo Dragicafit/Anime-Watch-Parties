@@ -20,5 +20,6 @@ export interface ClientListener {
   joinedRoomListener(clientTab: ClientTab, clientRoom: ClientRoom): void;
   leavedRoomListener(clientTab: ClientTab, clientRoom: ClientRoom): void;
 
-  tokenListener(): string | null;
+  getToken(): Promise<string | null>;
+  setToken(token: string): void;
 }

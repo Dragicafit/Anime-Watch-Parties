@@ -9,7 +9,7 @@ module.exports = (env, argv) => ({
   entry: {
     "src/background-scripts/background":
       "./src/background-scripts/backgroundScript.ts",
-    "src/popup/popup": "./src/popup/popupScript.ts",
+    "src/popup/js/popup": "./src/popup/js/popupScript.ts",
     "src/content-scripts/tab/tab": "./src/content-scripts/tab/tabScript.ts",
     "src/web-accessible-resources/chat/js/chat":
       "./src/web-accessible-resources/chat/js/chatScript.ts",

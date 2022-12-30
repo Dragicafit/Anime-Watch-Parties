@@ -49,16 +49,18 @@ export class PlayerScript {
       new NonExistantSetup(playerContext, this)
     );
 
-    if (!playerListener.tokenListener()) {
-      socket.emit(eventsServerReceive.AUTH, <IoCallback>((err, data) => {
-        if (data?.token) {
-          localStorage.setItem(AWP_TOKEN, data?.token);
-        }
+    playerListener.getToken().then((token) => {
+      if (!token) {
+        socket.emit(eventsServerReceive.AUTH, <IoCallback>((err, data) => {
+          if (data?.token) {
+            localStorage.setItem(AWP_TOKEN, data?.token);
+          }
+          this.clientScript.clientSync.askInfo(playerContext.clientTab);
+        }));
+      } else {
         this.clientScript.clientSync.askInfo(playerContext.clientTab);
-      }));
-    } else {
-      this.clientScript.clientSync.askInfo(playerContext.clientTab);
-    }
+      }
+    });
   }
 }
 
