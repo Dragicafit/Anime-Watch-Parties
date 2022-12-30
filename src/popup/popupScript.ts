@@ -8,16 +8,11 @@ import {
 } from "../background-scripts/backgroundConst";
 import { BackgroundUtils } from "../background-scripts/backgroundUtils";
 import { ClientContext, ClientSimpleContext } from "../client/clientContext";
-import { ClientScript } from "../client/clientScript";
 import { ClientTab } from "../client/clientTab";
-import { ClientUtils } from "../client/clientUtils";
 import "./index.scss";
 
 const clientContext = new ClientSimpleContext(performance);
-const clientUtils = new ClientUtils(<ClientContext>clientContext);
-const backgroundUtils = new BackgroundUtils(<ClientScript>{
-  clientUtils: clientUtils,
-});
+const backgroundUtils = new BackgroundUtils();
 
 function scriptLoaded() {
   console.log("scipt loaded");

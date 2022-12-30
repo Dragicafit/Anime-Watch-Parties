@@ -1,6 +1,4 @@
 import browser from "webextension-polyfill";
-import { ClientScript } from "../client/clientScript";
-import { ClientTab } from "../client/clientTab";
 import { SupportedSite } from "../server/io/ioConst";
 import {
   parseUrlAdn,
@@ -13,11 +11,9 @@ import {
 } from "./backgroundConst";
 
 export class BackgroundUtils {
-  private clientScript: ClientScript;
   private urlFromCrunchyrollBetaToCrunchyroll: Map<string, string>;
 
-  constructor(clientScript: ClientScript) {
-    this.clientScript = clientScript;
+  constructor() {
     this.urlFromCrunchyrollBetaToCrunchyroll = new Map();
   }
 
@@ -278,26 +274,7 @@ export class BackgroundUtils {
     });
   }
 
-  changeIcon(): void {
-    this.getActiveTab().then((tab) => {
-      let clientTab: ClientTab | undefined;
-      if (tab?.id != null) {
-        clientTab = this.clientScript.clientContext.clientTabs.get(tab.id);
-      }
-      if (tab?.id == null || clientTab?.getClientRoom() == null) {
-        browser.browserAction.setIcon({
-          path: "/src/icons/desactivate.svg",
-        });
-        return;
-      }
-      this.parseUrlTab(tab).then((url) => {
-        const site = url?.site ?? null;
-        browser.browserAction.setIcon({
-          path: this.getIcon(site === "awp" ? null : site),
-        });
-      });
-    });
-  }
+  changeIcon(): void {}
 
   getIcon(site: SupportedSite | null) {
     switch (site) {
@@ -353,20 +330,6 @@ export class BackgroundUtils {
               })
               .catch((error) => console.error(...this.saveError(error)));
           }
-          if (
-            this.clientScript.clientContext.clientTabs.get(tabId)?.getHost() !==
-            true
-          ) {
-            if (site === "awp" && detail.frameId === 0) {
-              browser.tabs
-                .executeScript(tabId, {
-                  runAt: "document_end",
-                  file: "/src/content-scripts/listener3.js",
-                  frameId: detail.frameId,
-                })
-                .catch((error) => console.error(...this.saveError(error)));
-            }
-          }
         }
       })
       .catch((error) => console.error(...this.saveError(error)));
@@ -408,10 +371,10 @@ export class BackgroundUtils {
   }
 
   private saveLog(...logs: any[]) {
-    return this.clientScript.clientUtils.saveLog(...logs);
+    return logs;
   }
 
   private saveError(...errors: any[]) {
-    return this.clientScript.clientUtils.saveError(...errors);
+    return errors;
   }
 }

@@ -1,75 +1,24 @@
 import browser from "webextension-polyfill";
-import { ClientScript } from "../client/clientScript";
-import { ClientTab } from "../client/clientTab";
-import { eventsBackgroundSend, SERVER_URL } from "./backgroundConst";
+import { SupportedSite } from "../server/io/ioConst";
 import { BackgroundScript } from "./backgroundScript";
 
 export class BackgroundEvent {
-  private clientScript: ClientScript;
   private backgroundScript: BackgroundScript;
 
-  constructor(clientScript: ClientScript, backgroundScript: BackgroundScript) {
-    this.clientScript = clientScript;
+  constructor(backgroundScript: BackgroundScript) {
     this.backgroundScript = backgroundScript;
   }
 
-  askInfo(clientTab: ClientTab) {
-    console.log(...this.saveLog("ask info", clientTab));
+  changeVideoClientTab(
+    url: {
+      videoId: string;
+      site: SupportedSite;
+      location?: string;
+    },
+    tabId: number
+  ) {
+    console.log(...this.saveLog("change video client tab"));
 
-    this.backgroundScript.backgroundSync.sendInfo(clientTab);
-  }
-
-  askActualUrl(clientTab: ClientTab, tab: browser.Tabs.Tab): void {
-    console.log(...this.saveLog("ask actual url", clientTab));
-
-    this.backgroundScript.backgroundSync.sendActualUrl(clientTab, tab);
-  }
-
-  scriptLoaded(clientTab: ClientTab) {
-    console.log(...this.saveLog("script loaded", clientTab));
-
-    this.backgroundScript.backgroundSync.sendInfo(clientTab);
-  }
-
-  changeStateClientTab(clientTab: ClientTab): void {
-    console.log(...this.saveLog("change state client tab", clientTab));
-
-    const clientRoom = clientTab.getClientRoom();
-    if (clientRoom == null) {
-      return;
-    }
-
-    browser.tabs
-      .sendMessage(clientTab.getTabId(), {
-        command: eventsBackgroundSend.CHANGE_STATE_CLIENT,
-        time: clientRoom.getCurrTime(),
-        state: clientRoom.getState(),
-      })
-      .catch(() => {
-        setTimeout(() => {
-          browser.tabs
-            .sendMessage(clientTab.getTabId(), {
-              command: eventsBackgroundSend.CHANGE_STATE_CLIENT,
-              time: clientRoom.getCurrTime(),
-              state: clientRoom.getState(),
-            })
-            .catch(() => {});
-        }, 50);
-      });
-
-    this.backgroundScript.backgroundSync.sendInfo(clientTab);
-  }
-
-  changeVideoClientTab(clientTab: ClientTab) {
-    console.log(...this.saveLog("change video client tab", clientTab));
-
-    const clientRoom = clientTab.getClientRoom();
-    if (clientRoom == null) return;
-
-    const url = clientRoom.getUrl();
-    if (url == null) return;
-
-    const tabId = clientTab.getTabId();
     browser.tabs
       .get(tabId)
       .then((tab) => {
@@ -117,38 +66,13 @@ export class BackgroundEvent {
           });
       })
       .catch((error) => console.error(...this.saveError(error)));
-
-    this.backgroundScript.backgroundSync.sendInfo(clientTab);
-  }
-
-  changeHostClientTab(clientTab: ClientTab): void {
-    console.log(...this.saveLog("change host client tab", clientTab));
-
-    this.backgroundScript.backgroundSync.sendInfo(clientTab);
-  }
-
-  changeOnlineUsersClientTab(clientTab: ClientTab): void {
-    console.log(...this.saveLog("change online users client tab", clientTab));
-
-    this.backgroundScript.backgroundSync.sendInfo(clientTab);
-  }
-
-  reportEventTab() {
-    console.log(...this.saveLog("report a bug tab"));
-
-    this.clientScript.clientSync.reportBug();
-
-    browser.tabs.create({
-      active: true,
-      url: `${SERVER_URL}/reportBug`,
-    });
   }
 
   private saveLog(...logs: any[]) {
-    return this.clientScript.clientUtils.saveLog(...logs);
+    return logs;
   }
 
   private saveError(...errors: any[]) {
-    return this.clientScript.clientUtils.saveError(...errors);
+    return errors;
   }
 }
