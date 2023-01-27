@@ -167,7 +167,10 @@ export class BackgroundUtils {
         browser.webNavigation
           .getAllFrames({ tabId: tabId })
           .then((details) => {
-            for (const detail of details) {
+            if (details == null) {
+              return resolve(null);
+            }
+            for (const detail of details!) {
               const url = new URL(detail.url);
               if (
                 url.host === "www.crunchyroll.com" &&
@@ -321,6 +324,9 @@ export class BackgroundUtils {
     browser.webNavigation
       .getAllFrames({ tabId: tabId })
       .then((details) => {
+        if (details == null) {
+          return;
+        }
         for (const detail of details) {
           const url = new URL(detail.url);
           let site = this.parseUrl(detail.url)?.site;
